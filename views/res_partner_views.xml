@@ -22,25 +22,25 @@
             <div name="button_box" position="inside">
                 <!-- Bouton Équipes -->
                 <button name="action_view_teams" type="object" class="oe_stat_button" icon="fa-users"
-                        invisible="not is_company or team_count == 0 or organization_type == 'prayer_cell'">
+                        invisible="not is_company or team_count == 0 or organization_type in ('prayer_cell', 'group', 'academy')">
                     <field name="team_count" widget="statinfo" string="Équipes"/>
                 </button>
                 
                 <!-- Bouton Cellules de prière -->
                 <button name="action_view_prayer_cells" type="object" class="oe_stat_button" icon="fa-heart"
-                        invisible="not is_company or prayer_cell_count == 0 or organization_type == 'group'">
+                        invisible="not is_company or prayer_cell_count == 0 or organization_type in ('group', 'academy', 'company')">
                     <field name="prayer_cell_count" widget="statinfo" string="Cellules"/>
                 </button>
                 
                 <!-- Bouton Groupes -->
                 <button name="action_view_groups" type="object" class="oe_stat_button" icon="fa-group"
-                        invisible="not is_company or group_count == 0 or organization_type == 'academy'">
+                        invisible="not is_company or group_count == 0 or organization_type in ('prayer_cell', 'academy', 'company')">
                     <field name="group_count" widget="statinfo" string="Groupes"/>
                 </button>
                 
                 <!-- Bouton Académies -->
                 <button name="action_view_academies" type="object" class="oe_stat_button" icon="fa-graduation-cap"
-                        invisible="not is_company or academy_count == 0 or organization_type in ('prayer_cell', 'group')">
+                        invisible="not is_company or academy_count == 0 or organization_type in ('prayer_cell', 'group', 'company')">
                     <field name="academy_count" widget="statinfo" string="Académies"/>
                 </button>
             </div>
