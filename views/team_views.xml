@@ -1,0 +1,134 @@
+<odoo>
+    <record id="view_team_tree" model="ir.ui.view">
+        <field name="name">random.team.tree</field>
+        <field name="model">random.team</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="team_lead_id"/>
+                <field name="team_lead_phone" />
+                <field name="members_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_team_form" model="ir.ui.view">
+        <field name="name">random.team.form</field>
+        <field name="model">random.team</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="team_lead_id" domain="[('id', 'in', members_ids)]"/>
+                        <field name="members_ids"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_generate_teams_mass" model="ir.actions.server">
+        <field name="name">Générer Équipes</field>
+        <field name="model_id" ref="random_team_generator.model_random_team" />
+        <field name="binding_model_id" ref="random_team_generator.model_random_team" />
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_generate_teams()
+        </field>
+    </record>
+
+    <record id="view_random_team_dashboard" model="ir.ui.view">
+        <field name="name">random.team.dashboard</field>
+        <field name="model">random.team</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile o_kanban_team_list" sample="1">
+                <field name="name"/>
+                <field name="team_lead_id"/>
+                <field name="team_lead_phone"/>
+                <field name="members_ids"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click"
+                            style="border: 1px solid #ddd; margin: 8px 0; padding: 16px; background: #fff; border-radius: 4px;">
+                            
+                            <!-- Header -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-grow-1">
+                                    <h4 class="mb-1 fw-bold">
+                                        <field name="name"/>
+                                    </h4>
+                                    <small class="text-muted">
+                                        <t t-esc="record.members_ids.raw_value.length"/> membre<t t-if="record.members_ids.raw_value.length != 1">s</t>
+                                    </small>
+                                </div>
+                                <div class="o_kanban_manage_button_section">
+                                    <a class="o_kanban_manage_toggle_button" href="#" data-toggle="dropdown">
+                                        <i class="fa fa-ellipsis-v" role="img" aria-label="Manage"/>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Chef d'équipe -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-user me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Chef d'équipe</small>
+                                        <span class="fw-medium">
+                                            <field name="team_lead_id"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Téléphone -->
+                            <div class="mb-3" t-if="record.team_lead_phone.value">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-phone me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Téléphone</small>
+                                        <span>
+                                            <field name="team_lead_phone"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Membres -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-users me-2 text-muted"></i>
+                                    <small class="text-muted">Membres de l'équipe</small>
+                                </div>
+                                
+                                <div class="ms-4">
+                                    <t t-if="record.members_ids.raw_value.length">
+                                        <field name="members_ids" widget="many2many_tags" 
+                                            options="{'no_create_edit': true, 'no_open': true}"/>
+                                    </t>
+                                    <t t-else="">
+                                        <small class="text-muted fst-italic">Aucun membre assigné</small>
+                                    </t>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_random_team" model="ir.actions.act_window">
+        <field name="name">Équipes</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <menuitem id="menu_random_team_root" name="Team Management" sequence="10"/>
+    <menuitem id="menu_random_team" name="Teams" parent="menu_random_team_root" action="action_random_team"/>
+    <menuitem id="menu_team_settings" name="Configuration" parent="menu_random_team_root" action="action_team_settings"/>
+</odoo>

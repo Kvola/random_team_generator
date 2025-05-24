@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_extended" model="ir.ui.view">
+        <field name="name">res.partner.form.extended</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Ajout du champ type d'organisation -->
+            <field name="is_company" position="after">
+                <field name="organization_type" invisible="not is_company"/>
+            </field>
+
+            <!-- Ajout des relations spécialisées pour les contacts -->
+            <field name="parent_id" position="after">
+                <field name="prayer_cell_id" invisible="is_company"/>
+                <field name="group_id" invisible="is_company"/>
+                <field name="academy_id" invisible="is_company"/>
+            </field>
+
+            <!-- Boutons intelligents -->
+            <div name="button_box" position="inside">
+                <!-- Bouton Équipes -->
+                <button name="action_view_teams" type="object" class="oe_stat_button" icon="fa-users"
+                        invisible="not is_company or team_count == 0 or organization_type == 'prayer_cell'">
+                    <field name="team_count" widget="statinfo" string="Équipes"/>
+                </button>
+                
+                <!-- Bouton Cellules de prière -->
+                <button name="action_view_prayer_cells" type="object" class="oe_stat_button" icon="fa-heart"
+                        invisible="not is_company or prayer_cell_count == 0 or organization_type == 'group'">
+                    <field name="prayer_cell_count" widget="statinfo" string="Cellules"/>
+                </button>
+                
+                <!-- Bouton Groupes -->
+                <button name="action_view_groups" type="object" class="oe_stat_button" icon="fa-group"
+                        invisible="not is_company or group_count == 0 or organization_type == 'academy'">
+                    <field name="group_count" widget="statinfo" string="Groupes"/>
+                </button>
+                
+                <!-- Bouton Académies -->
+                <button name="action_view_academies" type="object" class="oe_stat_button" icon="fa-graduation-cap"
+                        invisible="not is_company or academy_count == 0 or organization_type in ('prayer_cell', 'group')">
+                    <field name="academy_count" widget="statinfo" string="Académies"/>
+                </button>
+            </div>
+
+            <!-- Bouton Générer des équipes -->
+            <sheet position="before">
+                <header>
+                    <button name="action_generate_teams" string="Générer des équipes" type="object" 
+                        class="btn-primary" invisible="not is_company or organization_type not in ('prayer_cell', 'group', 'academy')"/>
+                </header>
+            </sheet>
+
+            <!-- Masquer l'onglet contacts pour les organisations spécialisées -->
+            <page name="contact_addresses" position="attributes">
+                <attribute name="invisible">is_company and organization_type in ('prayer_cell', 'group', 'academy')</attribute>
+            </page>
+
+            <!-- Onglets avec les membres selon le type d'organisation -->
+            <page name="contact_addresses" position="after">
+
+                <!-- Onglet Membres de la cellule de prière -->
+                <page string="Membres de la cellule" name="prayer_cell_members" 
+                    invisible="organization_type != 'prayer_cell'">
+                    <field name="prayer_cell_members" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="avatar_128"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_content">
+                                            <div class="oe_kanban_details">
+                                                <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
+                                                    class="oe_kanban_avatar float-start" alt="Avatar"/>
+                                                <div class="oe_kanban_details_body">
+                                                    <strong><field name="name"/></strong>
+                                                    <div t-if="record.email.value">
+                                                        <i class="fa fa-envelope"/> <field name="email"/>
+                                                    </div>
+                                                    <div t-if="record.phone.value">
+                                                        <i class="fa fa-phone"/> <field name="phone"/>
+                                                    </div>
+                                                    <div t-if="record.mobile.value">
+                                                        <i class="fa fa-mobile"/> <field name="mobile"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
+                <!-- Onglet Membres du groupe -->
+                <page string="Membres du groupe" name="group_members" 
+                    invisible="organization_type != 'group'">
+                    <field name="group_members" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="avatar_128"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_content">
+                                            <div class="oe_kanban_details">
+                                                <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
+                                                    class="oe_kanban_avatar float-start" alt="Avatar"/>
+                                                <div class="oe_kanban_details_body">
+                                                    <strong><field name="name"/></strong>
+                                                    <div t-if="record.email.value">
+                                                        <i class="fa fa-envelope"/> <field name="email"/>
+                                                    </div>
+                                                    <div t-if="record.phone.value">
+                                                        <i class="fa fa-phone"/> <field name="phone"/>
+                                                    </div>
+                                                    <div t-if="record.mobile.value">
+                                                        <i class="fa fa-mobile"/> <field name="mobile"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
+                <!-- Onglet Membres de l'académie -->
+                <page string="Membres de l'académie" name="academy_members" 
+                    invisible="organization_type != 'academy'">
+                    <field name="academy_members" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="avatar_128"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_content">
+                                            <div class="oe_kanban_details">
+                                                <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
+                                                    class="oe_kanban_avatar float-start" alt="Avatar"/>
+                                                <div class="oe_kanban_details_body">
+                                                    <strong><field name="name"/></strong>
+                                                    <div t-if="record.email.value">
+                                                        <i class="fa fa-envelope"/> <field name="email"/>
+                                                    </div>
+                                                    <div t-if="record.phone.value">
+                                                        <i class="fa fa-phone"/> <field name="phone"/>
+                                                    </div>
+                                                    <div t-if="record.mobile.value">
+                                                        <i class="fa fa-mobile"/> <field name="mobile"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
+                <!-- Onglet Contacts d'entreprise (modifié pour être plus explicite) -->
+                <page string="Contacts d'entreprise" name="company_contacts" 
+                    invisible="not is_company">
+                    <field name="company_contacts" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="avatar_128"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_content">
+                                            <div class="oe_kanban_details">
+                                                <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
+                                                    class="oe_kanban_avatar float-start" alt="Avatar"/>
+                                                <div class="oe_kanban_details_body">
+                                                    <strong><field name="name"/></strong>
+                                                    <div t-if="record.email.value">
+                                                        <i class="fa fa-envelope"/> <field name="email"/>
+                                                    </div>
+                                                    <div t-if="record.phone.value">
+                                                        <i class="fa fa-phone"/> <field name="phone"/>
+                                                    </div>
+                                                    <div t-if="record.mobile.value">
+                                                        <i class="fa fa-mobile"/> <field name="mobile"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
+            </page>
+
+        </field>
+    </record>
+</odoo>

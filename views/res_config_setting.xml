@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="random_team_generator_setting_form_view" model="ir.ui.view">
+        <field name="name">Configuration</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app id="team_id" string="Équipe" data-string="random_team_generator" name="random_team_generator" groups="base.group_erp_manager">
+                    <block title="Taille équipe" name="team">
+                        <setting id="team_size" title="Taille équipe" help="Veuillez donner le nombre de membres par équipe">
+                            <field name="team_size"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_team_settings" model="ir.actions.act_window">
+        <field name="name">Équipes</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'random_team_generator'}</field>
+    </record>
+</odoo>

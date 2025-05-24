@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hériter de la vue de formulaire de la société et ajouter le bouton de génération des équipes -->
+    <record id="view_res_company_form_inherit_random_team_generator" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.random.team.generator</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_generate_teams" type="object" string="Générer les équipes" class="btn-primary" icon="fa-exchange"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+    <!-- Action pour ouvrir la vue de génération des équipes -->
+    <record id="action_generate_teams" model="ir.actions.act_window">
+        <field name="name">Générer les équipes</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">form,tree,kanban</field>
+        <field name="target">current</field>
+        <field name="context">{'default_team_lead_id': uid}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Cliquez sur le bouton pour générer des équipes aléatoires.
+            </p>
+        </field>
+    </record>
+    <!-- Action pour ouvrir la vue de configuration des équipes -->
+    <record id="action_random_team_generator_config" model="ir.actions.act_window">
+        <field name="name">Configuration des équipes</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'random_team_generator'}</field>
+    </record>
+</odoo>
+<!-- This file is part of Kavola. -->
