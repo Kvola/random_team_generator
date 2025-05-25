@@ -46,6 +46,8 @@
             <field name="organization_type" position="after">
                 <field name="min_age" invisible="not is_company or organization_type != 'group'"/>
                 <field name="max_age" invisible="not is_company or organization_type != 'group'"/> 
+                <field name="required_gender" invisible="not is_company or organization_type != 'group'"/>
+                <field name="marital_requirement" invisible="not is_company or organization_type != 'group'"/>
             </field>
 
             <!-- Étiquette "Nouveau membre" -->

@@ -122,7 +122,27 @@ class ResPartner(models.Model):
     
     # Champ pour suivre si l'alerte a déjà été envoyée aujourd'hui
     birthday_alert_sent = fields.Boolean(string="Alerte anniversaire envoyée", default=False)
-    
+
+    # Critères de sexe pour les groupes
+    required_gender = fields.Selection([
+        ('male', 'Hommes seulement'),
+        ('female', 'Femmes seulement'),
+        ('mixed', 'Mixte (hommes et femmes)'),
+    ], string='Sexe requis', 
+    default='mixed',
+    invisible=lambda self: not self._is_age_group(),
+    help="Définit si le groupe est réservé aux hommes, aux femmes ou mixte")
+
+    # Critère de situation matrimoniale pour les groupes
+    marital_requirement = fields.Selection([
+        ('any', 'Toutes situations'),
+        ('married_only', 'Mariés seulement'),
+        ('single_only', 'Célibataires seulement'),
+    ], string='Situation matrimoniale requise', 
+    default='any',
+    invisible=lambda self: not self._is_age_group(),
+    help="Définit si le groupe accepte seulement les personnes mariées, seulement les célibataires ou toutes situations")
+
     @api.depends('birthdate')
     def _compute_is_birthday(self):
         """Détermine si c'est l'anniversaire du contact aujourd'hui."""
@@ -240,20 +260,49 @@ class ResPartner(models.Model):
             self._assign_age_group()
     
     def _assign_age_group(self):
-        """Assigne automatiquement le groupe en fonction de l'âge."""
+        """Assigne automatiquement le groupe en fonction de l'âge, du sexe et de la situation matrimoniale."""
         if not self.is_company and self.age > 0:
-            # Trouver le groupe approprié en fonction de l'âge
-            age_group = self.env['res.partner'].search([
+            # Trouver le groupe approprié en fonction des critères
+            domain = [
                 ('is_company', '=', True),
                 ('organization_type', '=', 'group'),
                 ('min_age', '<=', self.age),
                 ('max_age', '>=', self.age)
-            ], limit=1)
+            ]
+            
+            # Ajouter les critères de sexe si définis
+            if self.gender:
+                # Recherche les groupes qui acceptent le sexe du membre ou qui sont mixtes
+                domain += ['|',
+                    ('required_gender', '=', 'mixed'),
+                    ('required_gender', '=', self.gender)
+                ]
+            
+            # Ajouter les critères de situation matrimoniale si définis
+            if self.marital_status:
+                # Recherche les groupes qui acceptent la situation du membre
+                domain += ['|',
+                    ('marital_requirement', '=', 'any'),
+                    '|',
+                    '&', ('marital_requirement', '=', 'married_only'), ('marital_status', '=', 'married'),
+                    '&', ('marital_requirement', '=', 'single_only'), ('marital_status', 'in', ['single', 'divorced', 'widowed', 'separated'])
+                ]
+            
+            age_group = self.env['res.partner'].search(domain, limit=1)
             
             if age_group:
                 self.group_id = age_group.id
     
     # ========== CONTRAINTES ET VALIDATIONS ==========
+    @api.constrains('required_gender', 'marital_requirement')
+    def _check_group_requirements(self):
+        """Vérifie que les critères du groupe sont cohérents."""
+        for group in self.filtered(lambda r: r._is_age_group()):
+            if group.required_gender not in ['male', 'female', 'mixed']:
+                raise ValidationError("Le sexe requis doit être 'Hommes seulement', 'Femmes seulement' ou 'Mixte'")
+            if group.marital_requirement not in ['any', 'married_only', 'single_only']:
+                raise ValidationError("La situation matrimoniale requise doit être 'Toutes situations', 'Mariés seulement' ou 'Célibataires seulement'")
+
     @api.constrains('min_age', 'max_age')
     def _check_age_range(self):
         """Vérifie que la tranche d'âge est valide"""
@@ -311,21 +360,34 @@ class ResPartner(models.Model):
         }
     
     def action_view_group_members_by_age(self):
-        """Action pour afficher les membres du groupe filtrés par tranche d'âge."""
+        """Action pour afficher les membres du groupe filtrés par tranche d'âge, sexe et situation matrimoniale."""
         if not self.is_company or self.organization_type != 'group':
             return False
+        
+        # Construction du domaine de base avec l'âge
+        domain = [
+            ('is_company', '=', False),
+            ('group_id', '=', self.id),
+            ('age', '>=', self.min_age),
+            ('age', '<=', self.max_age)
+        ]
+        
+        # Ajout du critère de sexe si nécessaire
+        if self.required_gender != 'mixed':
+            domain.append(('gender', '=', self.required_gender))
+        
+        # Ajout du critère de situation matrimoniale si nécessaire
+        if self.marital_requirement == 'married_only':
+            domain.append(('marital_status', '=', 'married'))
+        elif self.marital_requirement == 'single_only':
+            domain.append(('marital_status', 'in', ['single', 'divorced', 'widowed', 'separated']))
             
         return {
             'name': f'Membres du groupe {self.name} (Âge: {self.min_age}-{self.max_age})',
             'type': 'ir.actions.act_window',
             'res_model': 'res.partner',
             'view_mode': 'tree,form',
-            'domain': [
-                ('is_company', '=', False),
-                ('group_id', '=', self.id),
-                ('age', '>=', self.min_age),
-                ('age', '<=', self.max_age)
-            ],
+            'domain': domain,
             'context': {'default_group_id': self.id}
         }
     
