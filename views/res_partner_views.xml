@@ -13,57 +13,279 @@
 
             <!-- Ajout des relations spécialisées pour les contacts -->
             <field name="parent_id" position="after">
+                <field name="tribe_id" invisible="is_company"/>
                 <field name="prayer_cell_id" invisible="is_company"/>
                 <field name="group_id" invisible="is_company"/>
                 <field name="academy_id" invisible="is_company"/>
             </field>
 
+            <!-- Ajout des informations personnelles après le champ parent_id -->
+            <page name="contact_addresses" position="before">
+                <!-- Groupe d'informations personnelles -->
+                <page string="Informations personnelles" name="personal_info" invisible="is_company">
+                    <group string="Informations personnelles">
+                        <group>
+                            <field name="gender"/>
+                            <field name="birthdate"/>
+                            <field name="age" readonly="1"/>
+                            <field name="marital_status"/>
+                            <field name="spouse_id" invisible="marital_status != 'married'" />
+                        </group>
+                        <group>
+                            <field name="parent_person_id"/>
+                            <field name="children_count" readonly="1"/>
+                            <field name="arrival_date"/>
+                            <field name="is_new_member" invisible="1"/>
+                            <field name="is_birthday" readonly="1" invisible="not is_birthday"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+
+            <!-- Ajout des tranches d'âge pour les groupes -->
+            <field name="organization_type" position="after">
+                <field name="min_age" invisible="not is_company or organization_type != 'group'"/>
+                <field name="max_age" invisible="not is_company or organization_type != 'group'"/> 
+            </field>
+
+            <!-- Étiquette "Nouveau membre" -->
+            <!-- Ajout d'un badge pour les anniversaires -->
+            <field name="name" position="before">
+                <div class="oe_button_box" invisible="is_company or not is_new_member">
+                    <span class="badge badge-info o_field_widget o_readonly_modifier">
+                        <i class="fa fa-star"/> Nouveau membre
+                    </span>
+                </div>
+                <div class="oe_button_box" invisible="is_company or not is_birthday">
+                    <span class="badge badge-success o_field_widget o_readonly_modifier">
+                        <i class="fa fa-birthday-cake"/> Anniversaire!
+                    </span>
+                </div>
+            </field>
+
             <!-- Boutons intelligents -->
             <div name="button_box" position="inside">
-                <!-- Bouton Équipes -->
+                <!-- Bouton Enfants - visible pour les contacts individuels qui ont des enfants -->
+                <button name="action_view_children" type="object" class="oe_stat_button" icon="fa-child"
+                        invisible="children_count == 0 or is_company">
+                    <field name="children_count" widget="statinfo" string="Enfants"/>
+                </button>
+
+                <!-- Bouton Équipes - visible pour toutes les organisations qui ont des équipes -->
                 <button name="action_view_teams" type="object" class="oe_stat_button" icon="fa-users"
-                        invisible="not is_company or team_count == 0 or organization_type in ('prayer_cell', 'group', 'academy')">
+                        invisible="team_count == 0 or not is_company">
                     <field name="team_count" widget="statinfo" string="Équipes"/>
                 </button>
                 
-                <!-- Bouton Cellules de prière -->
+                <!-- Bouton Tribus - visible seulement pour les compagnies (pas d'organization_type ou organization_type vide) -->
+                <button name="action_view_tribes" type="object" class="oe_stat_button" icon="fa-sitemap"
+                        invisible="tribe_count == 0 or not is_company or organization_type">
+                    <field name="tribe_count" widget="statinfo" string="Tribus"/>
+                </button>
+                
+                <!-- Bouton Cellules de prière - visible pour les compagnies ET les tribus -->
                 <button name="action_view_prayer_cells" type="object" class="oe_stat_button" icon="fa-heart"
-                        invisible="not is_company or prayer_cell_count == 0 or organization_type in ('group', 'academy', 'company')">
+                        invisible="prayer_cell_count == 0 or not is_company or organization_type in ('group', 'academy')">
                     <field name="prayer_cell_count" widget="statinfo" string="Cellules"/>
                 </button>
                 
-                <!-- Bouton Groupes -->
-                <button name="action_view_groups" type="object" class="oe_stat_button" icon="fa-group"
-                        invisible="not is_company or group_count == 0 or organization_type in ('prayer_cell', 'academy', 'company')">
+                <!-- Bouton Groupes - visible seulement pour les compagnies -->
+                <button name="action_view_groups" type="object" class="oe_stat_button" icon="fa-object-group"
+                        invisible="group_count == 0 or not is_company or organization_type">
                     <field name="group_count" widget="statinfo" string="Groupes"/>
                 </button>
                 
-                <!-- Bouton Académies -->
+                <!-- Bouton Membres par âge - visible seulement pour les groupes -->
+                <button name="action_view_group_members_by_age" type="object" class="oe_stat_button" icon="fa-users"
+                        invisible="not is_company or organization_type != 'group'">
+                    <div widget="statinfo" string="Membres par âge"/>
+                </button>
+                
+                <!-- Bouton Académies - visible seulement pour les compagnies -->
                 <button name="action_view_academies" type="object" class="oe_stat_button" icon="fa-graduation-cap"
-                        invisible="not is_company or academy_count == 0 or organization_type in ('prayer_cell', 'group', 'company')">
+                        invisible="academy_count == 0 or not is_company or organization_type">
                     <field name="academy_count" widget="statinfo" string="Académies"/>
+                </button>
+                
+                <!-- Boutons pour les contacts individuels (non-compagnies) -->
+                <!-- Bouton Mes Équipes - visible pour les contacts individuels qui ont des équipes -->
+                <button name="action_view_my_teams" type="object" class="oe_stat_button" icon="fa-users"
+                        invisible="total_teams_count == 0 or is_company">
+                    <field name="total_teams_count" widget="statinfo" string="Mes Équipes"/>
+                </button>
+                
+                <!-- Boutons par type d'équipe pour les contacts individuels -->
+                <button name="%(action_view_company_teams)d" type="action" class="oe_stat_button" icon="fa-building"
+                        invisible="company_teams_count == 0 or is_company">
+                    <field name="company_teams_count" widget="statinfo" string="Équipes Entreprise"/>
+                </button>
+                
+                <button name="%(action_view_tribe_teams)d" type="action" class="oe_stat_button" icon="fa-sitemap"
+                        invisible="tribe_teams_count == 0 or is_company">
+                    <field name="tribe_teams_count" widget="statinfo" string="Équipes Tribu"/>
+                </button>
+                
+                <button name="%(action_view_prayer_cell_teams)d" type="action" class="oe_stat_button" icon="fa-heart"
+                        invisible="prayer_cell_teams_count == 0 or is_company">
+                    <field name="prayer_cell_teams_count" widget="statinfo" string="Équipes Cellule"/>
+                </button>
+                
+                <button name="%(action_view_group_teams)d" type="action" class="oe_stat_button" icon="fa-object-group"
+                        invisible="group_teams_count == 0 or is_company">
+                    <field name="group_teams_count" widget="statinfo" string="Équipes Groupe"/>
+                </button>
+                
+                <button name="%(action_view_academy_teams)d" type="action" class="oe_stat_button" icon="fa-graduation-cap"
+                        invisible="academy_teams_count == 0 or is_company">
+                    <field name="academy_teams_count" widget="statinfo" string="Équipes Académie"/>
                 </button>
             </div>
 
             <!-- Bouton Générer des équipes -->
             <sheet position="before">
                 <header>
-                    <button name="action_generate_teams" string="Générer des équipes" type="object" 
-                        class="btn-primary" invisible="not is_company or organization_type not in ('prayer_cell', 'group', 'academy')"/>
+                    <button name="generate_random_teams" string="Générer des équipes" type="object" 
+                        class="btn-primary" invisible="not is_company" icon="fa-random"/>
                 </header>
             </sheet>
 
             <!-- Masquer l'onglet contacts pour les organisations spécialisées -->
             <page name="contact_addresses" position="attributes">
-                <attribute name="invisible">is_company and organization_type in ('prayer_cell', 'group', 'academy')</attribute>
+                <attribute name="invisible">is_company and organization_type in ('tribe', 'prayer_cell', 'group', 'academy')</attribute>
             </page>
 
             <!-- Onglets avec les membres selon le type d'organisation -->
             <page name="contact_addresses" position="after">
 
+                <!-- Onglet Enfants - visible pour les contacts individuels qui ont des enfants -->
+                <page string="Enfants" name="children_tab" 
+                    invisible="is_company or children_count == 0">
+                    <field name="children_ids" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="avatar_128"/>
+                            <field name="gender"/>
+                            <field name="marital_status"/>
+                            <field name="birthdate"/>
+                            <field name="age"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                        <div class="oe_kanban_card oe_kanban_global_click" t-att-class="record.is_birthday ? 'oe_kanban_card_highlight' : ''">
+                                            <div class="oe_kanban_content">
+                                                <div t-if="record.is_birthday" class="oe_kanban_badge">
+                                                    <span class="badge badge-success">
+                                                        <i class="fa fa-birthday-cake"/> Anniversaire
+                                                    </span>
+                                                </div>
+                                                <div class="oe_kanban_details">
+                                                    <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
+                                                        class="oe_kanban_avatar float-start" alt="Avatar"/>
+                                                    <div class="oe_kanban_details_body">
+                                                        <strong><field name="name"/></strong>
+                                                        <div t-if="record.gender.value">
+                                                            <i class="fa fa-user"/> <field name="gender"/>
+                                                        </div>
+                                                        <div t-if="record.marital_status.value">
+                                                            <i class="fa fa-heart"/> <field name="marital_status"/>
+                                                        </div>
+                                                        <div t-if="record.birthdate.value">
+                                                            <i class="fa fa-birthday-cake"/> <field name="birthdate"/>
+                                                        </div>
+                                                        <div t-if="record.age.value">
+                                                            <i class="fa fa-calendar"/> <field name="age"/> ans
+                                                        </div>
+                                                        <div t-if="record.email.value">
+                                                            <i class="fa fa-envelope"/> <field name="email"/>
+                                                        </div>
+                                                        <div t-if="record.phone.value">
+                                                            <i class="fa fa-phone"/> <field name="phone"/>
+                                                        </div>
+                                                        <div t-if="record.mobile.value">
+                                                            <i class="fa fa-mobile"/> <field name="mobile"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
+                <!-- Onglet Membres de la tribu -->
+                <page string="Membres de la tribu" name="tribe_members" 
+                    invisible="organization_type != 'tribe' or not is_company">
+                    <field name="tribe_members" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="avatar_128"/>
+                            <field name="gender"/>
+                            <field name="marital_status"/>
+                            <field name="birthdate"/>
+                            <field name="age"/>
+                            <field name="is_new_member"/>
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_card oe_kanban_global_click" t-att-class="record.is_birthday ? 'oe_kanban_card_highlight' : ''">
+                                        <div class="oe_kanban_card oe_kanban_global_click">
+                                            <div class="oe_kanban_content">
+                                                <div t-if="record.is_birthday" class="oe_kanban_badge">
+                                                    <span class="badge badge-success">
+                                                        <i class="fa fa-birthday-cake"/> Anniversaire
+                                                    </span>
+                                                </div>
+                                                <div class="oe_kanban_details">
+                                                    <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
+                                                        class="oe_kanban_avatar float-start" alt="Avatar"/>
+                                                    <div class="oe_kanban_details_body">
+                                                        <strong><field name="name"/>
+                                                            <span t-if="record.is_new_member.raw_value" class="badge badge-info ml-2">
+                                                                <i class="fa fa-star"/> Nouveau
+                                                            </span>
+                                                        </strong>
+                                                        <div t-if="record.gender.value">
+                                                            <i class="fa fa-user"/> <field name="gender"/>
+                                                        </div>
+                                                        <div t-if="record.marital_status.value">
+                                                            <i class="fa fa-heart"/> <field name="marital_status"/>
+                                                        </div>
+                                                        <div t-if="record.birthdate.value">
+                                                            <i class="fa fa-birthday-cake"/> <field name="birthdate"/>
+                                                        </div>
+                                                        <div t-if="record.age.value">
+                                                            <i class="fa fa-calendar"/> <field name="age"/> ans
+                                                        </div>
+                                                        <div t-if="record.email.value">
+                                                            <i class="fa fa-envelope"/> <field name="email"/>
+                                                        </div>
+                                                        <div t-if="record.phone.value">
+                                                            <i class="fa fa-phone"/> <field name="phone"/>
+                                                        </div>
+                                                        <div t-if="record.mobile.value">
+                                                            <i class="fa fa-mobile"/> <field name="mobile"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
                 <!-- Onglet Membres de la cellule de prière -->
                 <page string="Membres de la cellule" name="prayer_cell_members" 
-                    invisible="organization_type != 'prayer_cell'">
+                    invisible="organization_type != 'prayer_cell' or not is_company">
                     <field name="prayer_cell_members" mode="kanban">
                         <kanban>
                             <field name="name"/>
@@ -71,15 +293,41 @@
                             <field name="phone"/>
                             <field name="mobile"/>
                             <field name="avatar_128"/>
+                            <field name="gender"/>
+                            <field name="marital_status"/>
+                            <field name="birthdate"/>
+                            <field name="age"/>
+                            <field name="is_new_member"/>
                             <templates>
                                 <t t-name="kanban-box">
-                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                    <div class="oe_kanban_card oe_kanban_global_click" t-att-class="record.is_birthday ? 'oe_kanban_card_highlight' : ''">
                                         <div class="oe_kanban_content">
+                                            <div t-if="record.is_birthday" class="oe_kanban_badge">
+                                                <span class="badge badge-success">
+                                                    <i class="fa fa-birthday-cake"/> Anniversaire
+                                                </span>
+                                            </div>
                                             <div class="oe_kanban_details">
                                                 <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
                                                     class="oe_kanban_avatar float-start" alt="Avatar"/>
                                                 <div class="oe_kanban_details_body">
-                                                    <strong><field name="name"/></strong>
+                                                    <strong><field name="name"/>
+                                                        <span t-if="record.is_new_member.raw_value" class="badge badge-info ml-2">
+                                                            <i class="fa fa-star"/> Nouveau
+                                                        </span>
+                                                    </strong>
+                                                    <div t-if="record.gender.value">
+                                                        <i class="fa fa-user"/> <field name="gender"/>
+                                                    </div>
+                                                    <div t-if="record.marital_status.value">
+                                                        <i class="fa fa-heart"/> <field name="marital_status"/>
+                                                    </div>
+                                                    <div t-if="record.birthdate.value">
+                                                        <i class="fa fa-birthday-cake"/> <field name="birthdate"/>
+                                                    </div>
+                                                    <div t-if="record.age.value">
+                                                        <i class="fa fa-calendar"/> <field name="age"/> ans
+                                                    </div>
                                                     <div t-if="record.email.value">
                                                         <i class="fa fa-envelope"/> <field name="email"/>
                                                     </div>
@@ -101,7 +349,7 @@
 
                 <!-- Onglet Membres du groupe -->
                 <page string="Membres du groupe" name="group_members" 
-                    invisible="organization_type != 'group'">
+                    invisible="organization_type != 'group' or not is_company">
                     <field name="group_members" mode="kanban">
                         <kanban>
                             <field name="name"/>
@@ -109,15 +357,41 @@
                             <field name="phone"/>
                             <field name="mobile"/>
                             <field name="avatar_128"/>
+                            <field name="gender"/>
+                            <field name="marital_status"/>
+                            <field name="birthdate"/>
+                            <field name="age"/>
+                            <field name="is_new_member"/>
                             <templates>
                                 <t t-name="kanban-box">
-                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                    <div class="oe_kanban_card oe_kanban_global_click" t-att-class="record.is_birthday ? 'oe_kanban_card_highlight' : ''">
                                         <div class="oe_kanban_content">
+                                            <div t-if="record.is_birthday" class="oe_kanban_badge">
+                                                <span class="badge badge-success">
+                                                    <i class="fa fa-birthday-cake"/> Anniversaire
+                                                </span>
+                                            </div>
                                             <div class="oe_kanban_details">
                                                 <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
                                                     class="oe_kanban_avatar float-start" alt="Avatar"/>
                                                 <div class="oe_kanban_details_body">
-                                                    <strong><field name="name"/></strong>
+                                                    <strong><field name="name"/>
+                                                        <span t-if="record.is_new_member.raw_value" class="badge badge-info ml-2">
+                                                            <i class="fa fa-star"/> Nouveau
+                                                        </span>
+                                                    </strong>
+                                                    <div t-if="record.gender.value">
+                                                        <i class="fa fa-user"/> <field name="gender"/>
+                                                    </div>
+                                                    <div t-if="record.marital_status.value">
+                                                        <i class="fa fa-heart"/> <field name="marital_status"/>
+                                                    </div>
+                                                    <div t-if="record.birthdate.value">
+                                                        <i class="fa fa-birthday-cake"/> <field name="birthdate"/>
+                                                    </div>
+                                                    <div t-if="record.age.value">
+                                                        <i class="fa fa-calendar"/> <field name="age"/> ans
+                                                    </div>
                                                     <div t-if="record.email.value">
                                                         <i class="fa fa-envelope"/> <field name="email"/>
                                                     </div>
@@ -139,7 +413,7 @@
 
                 <!-- Onglet Membres de l'académie -->
                 <page string="Membres de l'académie" name="academy_members" 
-                    invisible="organization_type != 'academy'">
+                    invisible="organization_type != 'academy' or not is_company">
                     <field name="academy_members" mode="kanban">
                         <kanban>
                             <field name="name"/>
@@ -147,15 +421,41 @@
                             <field name="phone"/>
                             <field name="mobile"/>
                             <field name="avatar_128"/>
+                            <field name="gender"/>
+                            <field name="marital_status"/>
+                            <field name="birthdate"/>
+                            <field name="age"/>
+                            <field name="is_new_member"/>
                             <templates>
                                 <t t-name="kanban-box">
-                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                    <div class="oe_kanban_card oe_kanban_global_click" t-att-class="record.is_birthday ? 'oe_kanban_card_highlight' : ''">
                                         <div class="oe_kanban_content">
+                                            <div t-if="record.is_birthday" class="oe_kanban_badge">
+                                                <span class="badge badge-success">
+                                                    <i class="fa fa-birthday-cake"/> Anniversaire
+                                                </span>
+                                            </div>
                                             <div class="oe_kanban_details">
                                                 <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
                                                     class="oe_kanban_avatar float-start" alt="Avatar"/>
                                                 <div class="oe_kanban_details_body">
-                                                    <strong><field name="name"/></strong>
+                                                    <strong><field name="name"/>
+                                                        <span t-if="record.is_new_member.raw_value" class="badge badge-info ml-2">
+                                                            <i class="fa fa-star"/> Nouveau
+                                                        </span>
+                                                    </strong>
+                                                    <div t-if="record.gender.value">
+                                                        <i class="fa fa-user"/> <field name="gender"/>
+                                                    </div>
+                                                    <div t-if="record.marital_status.value">
+                                                        <i class="fa fa-heart"/> <field name="marital_status"/>
+                                                    </div>
+                                                    <div t-if="record.birthdate.value">
+                                                        <i class="fa fa-birthday-cake"/> <field name="birthdate"/>
+                                                    </div>
+                                                    <div t-if="record.age.value">
+                                                        <i class="fa fa-calendar"/> <field name="age"/> ans
+                                                    </div>
                                                     <div t-if="record.email.value">
                                                         <i class="fa fa-envelope"/> <field name="email"/>
                                                     </div>
@@ -175,9 +475,9 @@
                     </field>
                 </page>
 
-                <!-- Onglet Contacts d'entreprise (modifié pour être plus explicite) -->
+                <!-- Onglet Contacts d'entreprise -->
                 <page string="Contacts d'entreprise" name="company_contacts" 
-                    invisible="not is_company">
+                    invisible="not is_company or organization_type != 'company'">
                     <field name="company_contacts" mode="kanban">
                         <kanban>
                             <field name="name"/>
@@ -185,15 +485,41 @@
                             <field name="phone"/>
                             <field name="mobile"/>
                             <field name="avatar_128"/>
+                            <field name="gender"/>
+                            <field name="marital_status"/>
+                            <field name="birthdate"/>
+                            <field name="age"/>
+                            <field name="is_new_member"/>
                             <templates>
                                 <t t-name="kanban-box">
-                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                    <div class="oe_kanban_card oe_kanban_global_click" t-att-class="record.is_birthday ? 'oe_kanban_card_highlight' : ''">
                                         <div class="oe_kanban_content">
+                                            <div t-if="record.is_birthday" class="oe_kanban_badge">
+                                                <span class="badge badge-success">
+                                                    <i class="fa fa-birthday-cake"/> Anniversaire
+                                                </span>
+                                            </div>
                                             <div class="oe_kanban_details">
                                                 <img t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" 
                                                     class="oe_kanban_avatar float-start" alt="Avatar"/>
                                                 <div class="oe_kanban_details_body">
-                                                    <strong><field name="name"/></strong>
+                                                    <strong><field name="name"/>
+                                                        <span t-if="record.is_new_member.raw_value" class="badge badge-info ml-2">
+                                                            <i class="fa fa-star"/> Nouveau
+                                                        </span>
+                                                    </strong>
+                                                    <div t-if="record.gender.value">
+                                                        <i class="fa fa-user"/> <field name="gender"/>
+                                                    </div>
+                                                    <div t-if="record.marital_status.value">
+                                                        <i class="fa fa-heart"/> <field name="marital_status"/>
+                                                    </div>
+                                                    <div t-if="record.birthdate.value">
+                                                        <i class="fa fa-birthday-cake"/> <field name="birthdate"/>
+                                                    </div>
+                                                    <div t-if="record.age.value">
+                                                        <i class="fa fa-calendar"/> <field name="age"/> ans
+                                                    </div>
                                                     <div t-if="record.email.value">
                                                         <i class="fa fa-envelope"/> <field name="email"/>
                                                     </div>
@@ -212,9 +538,7 @@
                         </kanban>
                     </field>
                 </page>
-
             </page>
-
         </field>
     </record>
 </odoo>

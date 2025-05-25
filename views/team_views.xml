@@ -5,9 +5,15 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="team_type"/>
                 <field name="team_lead_id"/>
-                <field name="team_lead_phone" />
+                <field name="team_lead_phone"/>
                 <field name="members_ids" widget="many2many_tags"/>
+                <field name="company_id" column_invisible="context.get('hide_organization_fields', False)"/>
+                <field name="tribe_id" column_invisible="context.get('hide_organization_fields', False)"/>
+                <field name="prayer_cell_id" column_invisible="context.get('hide_organization_fields', False)"/>
+                <field name="group_id" column_invisible="context.get('hide_organization_fields', False)"/>
+                <field name="academy_id" column_invisible="context.get('hide_organization_fields', False)"/>
             </tree>
         </field>
     </record>
@@ -19,9 +25,22 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="name"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="team_type"/>
+                        </group>
+                        <group>
+                            <field name="company_id" invisible="team_type != 'company'"/>
+                            <field name="tribe_id" invisible="team_type != 'tribe'"/>
+                            <field name="prayer_cell_id" invisible="team_type != 'prayer_cell'"/>
+                            <field name="group_id" invisible="team_type != 'group'"/>
+                            <field name="academy_id" invisible="team_type != 'academy'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="members_ids" widget="many2many_tags"/>
                         <field name="team_lead_id" domain="[('id', 'in', members_ids)]"/>
-                        <field name="members_ids"/>
+                        <field name="team_lead_phone" readonly="1"/>
                     </group>
                 </sheet>
             </form>
@@ -30,8 +49,8 @@
     
     <record id="action_generate_teams_mass" model="ir.actions.server">
         <field name="name">Générer Équipes</field>
-        <field name="model_id" ref="random_team_generator.model_random_team" />
-        <field name="binding_model_id" ref="random_team_generator.model_random_team" />
+        <field name="model_id" ref="random_team_generator.model_random_team"/>
+        <field name="binding_model_id" ref="random_team_generator.model_random_team"/>
         <field name="binding_view_types">list</field>
         <field name="state">code</field>
         <field name="code">
@@ -45,10 +64,15 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile o_kanban_team_list" sample="1">
                 <field name="name"/>
+                <field name="team_type"/>
                 <field name="team_lead_id"/>
                 <field name="team_lead_phone"/>
                 <field name="members_ids"/>
-                <field name="color"/>
+                <field name="company_id"/>
+                <field name="tribe_id"/>
+                <field name="prayer_cell_id"/>
+                <field name="group_id"/>
+                <field name="academy_id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click"
@@ -60,6 +84,11 @@
                                     <h4 class="mb-1 fw-bold">
                                         <field name="name"/>
                                     </h4>
+                                    <div class="mb-1">
+                                        <span class="badge badge-info">
+                                            <field name="team_type"/>
+                                        </span>
+                                    </div>
                                     <small class="text-muted">
                                         <t t-esc="record.members_ids.raw_value.length"/> membre<t t-if="record.members_ids.raw_value.length != 1">s</t>
                                     </small>
@@ -68,6 +97,36 @@
                                     <a class="o_kanban_manage_toggle_button" href="#" data-toggle="dropdown">
                                         <i class="fa fa-ellipsis-v" role="img" aria-label="Manage"/>
                                     </a>
+                                </div>
+                            </div>
+
+                            <!-- Organisation -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-building me-2 text-muted"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Organisation</small>
+                                        <span class="fw-medium">
+                                            <t t-if="record.team_type.raw_value == 'company' and record.company_id.value">
+                                                <field name="company_id"/>
+                                            </t>
+                                            <t t-elif="record.team_type.raw_value == 'tribe' and record.tribe_id.value">
+                                                <field name="tribe_id"/>
+                                            </t>
+                                            <t t-elif="record.team_type.raw_value == 'prayer_cell' and record.prayer_cell_id.value">
+                                                <field name="prayer_cell_id"/>
+                                            </t>
+                                            <t t-elif="record.team_type.raw_value == 'group' and record.group_id.value">
+                                                <field name="group_id"/>
+                                            </t>
+                                            <t t-elif="record.team_type.raw_value == 'academy' and record.academy_id.value">
+                                                <field name="academy_id"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="text-muted fst-italic">Non définie</span>
+                                            </t>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -122,13 +181,72 @@
         </field>
     </record>
 
+    <!-- Action principale pour les équipes -->
     <record id="action_random_team" model="ir.actions.act_window">
         <field name="name">Équipes</field>
         <field name="res_model">random.team</field>
         <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_random_team_dashboard"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre première équipe !
+            </p>
+            <p>
+                Organisez vos membres en équipes selon différents types d'organisations.
+            </p>
+        </field>
     </record>
 
-    <menuitem id="menu_random_team_root" name="Team Management" sequence="10"/>
-    <menuitem id="menu_random_team" name="Teams" parent="menu_random_team_root" action="action_random_team"/>
+    <!-- Actions pour les boutons d'équipes des contacts individuels -->
+    <record id="action_view_company_teams" model="ir.actions.act_window">
+        <field name="name">Mes Équipes Entreprise</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'company')]</field>
+        <field name="context">{'default_team_type': 'company', 'hide_organization_fields': True}</field>
+    </record>
+
+    <record id="action_view_tribe_teams" model="ir.actions.act_window">
+        <field name="name">Mes Équipes Tribu</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'tribe')]</field>
+        <field name="context">{'default_team_type': 'tribe', 'hide_organization_fields': True}</field>
+    </record>
+
+    <record id="action_view_prayer_cell_teams" model="ir.actions.act_window">
+        <field name="name">Mes Équipes Cellule</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'prayer_cell')]</field>
+        <field name="context">{'default_team_type': 'prayer_cell', 'hide_organization_fields': True}</field>
+    </record>
+
+    <record id="action_view_group_teams" model="ir.actions.act_window">
+        <field name="name">Mes Équipes Groupe</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'group')]</field>
+        <field name="context">{'default_team_type': 'group', 'hide_organization_fields': True}</field>
+    </record>
+
+    <record id="action_view_academy_teams" model="ir.actions.act_window">
+        <field name="name">Mes Équipes Académie</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'academy')]</field>
+        <field name="context">{'default_team_type': 'academy', 'hide_organization_fields': True}</field>
+    </record>
+
+    <!-- Configuration des équipes -->
+    <record id="action_team_settings_off" model="ir.actions.act_window">
+        <field name="name">Configuration des équipes</field>
+        <field name="res_model">random.team</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_random_team_root" name="Gestion des équipes" sequence="10"/>
+    <menuitem id="menu_random_team" name="Équipes" parent="menu_random_team_root" action="action_random_team"/>
     <menuitem id="menu_team_settings" name="Configuration" parent="menu_random_team_root" action="action_team_settings"/>
 </odoo>

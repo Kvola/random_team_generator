@@ -12,7 +12,7 @@
         'views/res_config_setting.xml',
         'views/team_views.xml',
         'views/res_partner_views.xml',
-        #'views/res_company_views.xml',
+        'data/ir_cron.xml',
     ],
     'installable': True,
     'application': True,
