@@ -12,6 +12,11 @@
                             <field name="team_size"/>
                         </setting>
                     </block>
+                    <block title="Durée du statut 'Nouveau membre'" name="new_member">
+                        <setting id="new_member_duration" title="Durée du statut 'Nouveau membre'" help="Veuillez donner la durée du statut 'Nouveau membre' en jours">
+                            <field name="new_member_duration"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

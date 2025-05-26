@@ -1,0 +1,6 @@
+<odoo>
+    <record id="group_res_partner_portal" model="res.groups">
+        <field name="name">Partenaire Portail</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+</odoo>

@@ -40,6 +40,32 @@
                         </group>
                     </group>
                 </page>
+
+                <!-- Onglet spécifique pour les églises -->
+                <page string="Informations Église" name="church_info" invisible="not is_church">
+                    <group>
+                        <field name="parent_church_id"/>
+                        <field name="main_pastor_id"/>
+                        <field name="assistant_pastor_ids" widget="many2many_tags"/>
+                    </group>
+                </page>
+
+                <!-- Onglet pour les rôles dans l'église (pour les membres) -->
+                <page string="Rôles dans l'église" name="church_roles" invisible="is_company or not is_in_a_church">
+                    <group>
+                        <field name="church_id"/>
+                        <group>
+                            <field name="is_pastor"/>
+                            <field name="is_elder"/>
+                            <field name="is_deacon"/>
+                        </group>
+                        <group>
+                            <field name="is_missionary"/>
+                            <field name="is_leader"/>
+                            <field name="is_pastor_wife" invisible="[(gender,'!=','female')]"/>
+                        </group>
+                    </group>
+                </page>
             </page>
 
             <!-- Ajout des tranches d'âge pour les groupes -->
@@ -48,6 +74,9 @@
                 <field name="max_age" invisible="not is_company or organization_type != 'group'"/> 
                 <field name="required_gender" invisible="not is_company or organization_type != 'group'"/>
                 <field name="marital_requirement" invisible="not is_company or organization_type != 'group'"/>
+                <!-- Dans le fichier XML, après le champ organization_type -->
+                <field name="is_church" invisible="not is_company or organization_type != 'company'"/>
+                <field name="is_in_a_church" invisible="1"/>
             </field>
 
             <!-- Étiquette "Nouveau membre" -->
@@ -63,10 +92,22 @@
                         <i class="fa fa-birthday-cake"/> Anniversaire!
                     </span>
                 </div>
+                <!-- Nouveau badge pour église -->
+                <div class="oe_button_box" invisible="not is_church">
+                    <span class="badge badge-warning o_field_widget o_readonly_modifier">
+                        <i class="fa fa-church"/> Église
+                    </span>
+                </div>
             </field>
 
             <!-- Boutons intelligents -->
             <div name="button_box" position="inside">
+                <!-- Dans la section button_box -->
+                <button name="action_view_child_churches" type="object" class="oe_stat_button" icon="fa-building"
+                        invisible="not is_church">
+                    <field name="child_church_count" widget="statinfo" string="Églises filles"/>
+                </button>
+
                 <!-- Bouton Enfants - visible pour les contacts individuels qui ont des enfants -->
                 <button name="action_view_children" type="object" class="oe_stat_button" icon="fa-child"
                         invisible="children_count == 0 or is_company">
@@ -158,7 +199,6 @@
 
             <!-- Onglets avec les membres selon le type d'organisation -->
             <page name="contact_addresses" position="after">
-
                 <!-- Onglet Enfants - visible pour les contacts individuels qui ont des enfants -->
                 <page string="Enfants" name="children_tab" 
                     invisible="is_company or children_count == 0">
@@ -541,6 +581,28 @@
                     </field>
                 </page>
             </page>
+
+            <!-- Ajout des responsables dans les onglets correspondants -->
+            <xpath expr="//page[@name='group_members']" position="inside">
+                <group string="Responsables">
+                    <field name="group_leader_id"/>
+                    <field name="group_assistant_leader_ids" widget="many2many_tags"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//page[@name='prayer_cell_members']" position="inside">
+                <group string="Responsables">
+                    <field name="prayer_cell_leader_id"/>
+                    <field name="prayer_cell_assistant_leader_ids" widget="many2many_tags"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//page[@name='academy_members']" position="inside">
+                <group string="Responsables">
+                    <field name="academy_leader_id"/>
+                    <field name="academy_assistant_leader_ids" widget="many2many_tags"/>
+                </group>
+            </xpath>
         </field>
     </record>
 </odoo>

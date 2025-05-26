@@ -1,0 +1,5 @@
+<odoo>
+    <menuitem id="menu_my_profile" name="Mon profil"
+              parent="portal.portal_my_home"
+              action=""/>
+</odoo>

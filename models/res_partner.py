@@ -143,6 +143,111 @@ class ResPartner(models.Model):
     invisible=lambda self: not self._is_age_group(),
     help="Définit si le groupe accepte seulement les personnes mariées, seulement les célibataires ou toutes situations")
 
+    # Pour les églises
+    is_church = fields.Boolean(string="Est une église")
+    is_in_a_church = fields.Boolean(string="Est dans une église", 
+    related='parent_id.is_church',
+    readonly=True,
+    store=True
+    )
+    main_pastor_id = fields.Many2one('res.partner', string="Pasteur principal",
+                                domain="[('is_pastor','=',True), ('church_id','=',id)]")
+    # Pour les pasteurs adjoints
+    assistant_pastor_ids = fields.Many2many(
+        'res.partner', 
+        'church_assistant_pastor_rel',  # Nom explicite de la table de relation
+        'church_id', 
+        'pastor_id',
+        string="Pasteurs adjoints",
+        domain="[('is_pastor','=',True), ('church_id','=',id)]"
+    )
+    parent_church_id = fields.Many2one('res.partner', string="Église mère",
+                                    domain="[('is_church','=',True)]")
+
+    # Pour les membres
+    is_pastor = fields.Boolean(string="Pasteur")
+    is_elder = fields.Boolean(string="Ancien")
+    is_deacon = fields.Boolean(string="Diacre")
+    is_missionary = fields.Boolean(string="Missionnaire")
+    is_leader = fields.Boolean(string="Responsable")
+    is_pastor_wife = fields.Boolean(string="Femme de pasteur")
+    church_id = fields.Many2one('res.partner', string="Église",
+                            domain="[('is_church','=',True)]")
+
+    # Responsables des organisations
+    group_leader_id = fields.Many2one('res.partner', string="Responsable du groupe",
+                                    domain="[('is_leader','=',True), ('group_id','=',id)]")
+    # Pour les responsables adjoints de groupe
+    group_assistant_leader_ids = fields.Many2many(
+        'res.partner',
+        'group_assistant_leader_rel',
+        'group_id',
+        'leader_id',
+        string="Responsables adjoints du groupe",
+        domain="[('is_leader','=',True), ('group_id','=',id)]"
+    )
+
+    prayer_cell_leader_id = fields.Many2one('res.partner', string="Responsable de la cellule",
+                                        domain="[('is_leader','=',True), ('prayer_cell_id','=',id)]")
+    # Pour les responsables adjoints de cellule
+    prayer_cell_assistant_leader_ids = fields.Many2many(
+        'res.partner',
+        'cell_assistant_leader_rel',
+        'cell_id',
+        'leader_id',
+        string="Responsables adjoints de la cellule",
+        domain="[('is_leader','=',True), ('prayer_cell_id','=',id)]"
+    )
+
+    academy_leader_id = fields.Many2one('res.partner', string="Responsable de l'académie",
+                                    domain="[('is_leader','=',True), ('academy_id','=',id)]")
+    # Pour les responsables adjoints d'académie
+    academy_assistant_leader_ids = fields.Many2many(
+        'res.partner',
+        'academy_assistant_leader_rel',
+        'academy_id',
+        'leader_id',
+        string="Responsables adjoints de l'académie",
+        domain="[('is_leader','=',True), ('academy_id','=',id)]"
+    )
+    
+    # Champ calculé pour compter les églises filles
+    child_church_count = fields.Integer(string="Nombre d'églises filles", compute='_compute_child_church_count')
+
+    def _compute_child_church_count(self):
+        for partner in self:
+            partner.child_church_count = self.search_count([
+                ('parent_church_id', '=', partner.id),
+                ('is_church', '=', True)
+            ])
+
+    # Action pour voir les églises filles
+    def action_view_child_churches(self):
+        self.ensure_one()
+        return {
+            'name': f'Églises filles de {self.name}',
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('parent_church_id', '=', self.id), ('is_church', '=', True)],
+            'context': {'default_parent_church_id': self.id, 'default_is_church': True}
+        }
+
+    # Contrainte pour la femme de pasteur
+    @api.constrains('is_pastor_wife', 'spouse_id')
+    def _check_pastor_wife(self):
+        for partner in self:
+            if partner.is_pastor_wife and (not partner.spouse_id or not partner.spouse_id.is_pastor):
+                raise ValidationError("Une femme de pasteur doit avoir un conjoint qui est pasteur")
+
+    # Mise à jour automatique quand on définit le conjoint
+    @api.onchange('spouse_id')
+    def _onchange_spouse_id(self):
+        if self.gender == 'female' and self.spouse_id and self.spouse_id.is_pastor:
+            self.is_pastor_wife = True
+        elif self.gender == 'female' and not (self.spouse_id and self.spouse_id.is_pastor):
+            self.is_pastor_wife = False
+
     @api.depends('birthdate')
     def _compute_is_birthday(self):
         """Détermine si c'est l'anniversaire du contact aujourd'hui."""
@@ -243,12 +348,13 @@ class ResPartner(models.Model):
     
     @api.depends('arrival_date')
     def _compute_is_new_member(self):
-        """Détermine si le membre est nouveau (moins d'un mois)."""
+        """Détermine si le membre est nouveau selon la durée configurée"""
+        duration = int(self.env['ir.config_parameter'].sudo().get_param('random_team_generator.new_member_duration', 30))
         for partner in self:
             if partner.arrival_date and not partner.is_company:
                 today = fields.Date.context_today(self)
-                one_month_ago = today - timedelta(days=30)
-                partner.is_new_member = partner.arrival_date > one_month_ago
+                limit_date = today - timedelta(days=duration)
+                partner.is_new_member = partner.arrival_date > limit_date
             else:
                 partner.is_new_member = False
     
@@ -694,7 +800,7 @@ class ResPartner(models.Model):
     @api.model
     def _generate_teams_for_organization(self, organization_id, organization_type='company'):
         """Génère des équipes aléaoires pour une organisation."""
-        team_size = int(self.env['ir.config_parameter'].sudo().get_param('random_team.team_size', default=3))
+        team_size = int(self.env['ir.config_parameter'].sudo().get_param('random_team_generator.team_size', default=3))
         
         # Récupère tous les membres de l'organisation
         members = self._get_members_by_type(organization_type, organization_id)

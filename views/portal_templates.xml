@@ -1,0 +1,71 @@
+<odoo>
+    <template id="portal_my_profile" name="Mon profil">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h1>Mon profil</h1>
+                <p><strong>Nom :</strong> <t t-esc="partner.name"/></p>
+                <p><strong>Sexe :</strong> <t t-esc="partner.gender"/></p>
+                <p><strong>Date de naissance :</strong> <t t-esc="partner.birthdate"/></p>
+                <p><strong>Âge :</strong> <t t-esc="partner.age"/></p>
+                <p><strong>Situation matrimoniale :</strong> <t t-esc="partner.marital_status"/></p>
+                <p><strong>Église :</strong> <t t-esc="partner.church_id.name"/></p>
+                <p><strong>Groupe :</strong> <t t-esc="partner.group_id.name"/></p>
+                <p><strong>Cellule de prière :</strong> <t t-esc="partner.prayer_cell_id.name"/></p>
+                <p><strong>Académie :</strong> <t t-esc="partner.academy_id.name"/></p>
+            </div>
+        </t>
+    </template>
+    <template id="portal_contact_list" name="Liste de mes enfants">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h1>Mes enfants</h1>
+                <a href="/my/contacts/new" class="btn btn-primary">Ajouter</a>
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Nom</th><th>Sexe</th><th>Âge</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="children" t-as="child">
+                            <tr>
+                                <td><t t-esc="child.name"/></td>
+                                <td><t t-esc="child.gender"/></td>
+                                <td><t t-esc="child.age"/></td>
+                                <td>
+                                    <a t-att-href="'/my/contacts/%d/edit' % child.id" class="btn btn-secondary btn-sm">Modifier</a>
+                                    <a t-att-href="'/my/contacts/%d/delete' % child.id" class="btn btn-danger btn-sm">Supprimer</a>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+    <template id="portal_contact_form" name="Formulaire Contact">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h1>
+                    <t t-if="create">Créer</t>
+                    <t t-else="">Modifier</t> un contact
+                </h1>
+                <form method="post">
+                    <input type="text" name="name" class="form-control mb-2" placeholder="Nom"
+                        t-att-value="contact.name if not create else ''"/>
+                    <select name="gender" class="form-control mb-2">
+                        <option value="male" t-att-selected="'male' == (contact.gender if not create else '')">Homme</option>
+                        <option value="female" t-att-selected="'female' == (contact.gender if not create else '')">Femme</option>
+                    </select>
+                    <input type="date" name="birthdate" class="form-control mb-2" t-att-value="contact.birthdate if not create else ''"/>
+                    <select name="marital_status" class="form-control mb-3">
+                        <option value="single">Célibataire</option>
+                        <option value="married">Marié(e)</option>
+                        <option value="divorced">Divorcé(e)</option>
+                        <option value="widowed">Veuf/Veuve</option>
+                        <option value="separated">Séparé(e)</option>
+                    </select>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </form>
+            </div>
+        </t>
+    </template>
+</odoo>
