@@ -15,6 +15,7 @@
         'views/team_views.xml',
         'views/res_partner_views.xml',
         'views/portal_templates.xml',
+        'reports/reports.xml',
         'data/ir_cron.xml',
         'views/menu.xml',
     ],

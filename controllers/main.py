@@ -6,17 +6,37 @@ from odoo.exceptions import ValidationError
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
-    # Dans votre méthode de traitement du formulaire
-    def process_form_data(self, **post):
-        # Reconstruction de la date de naissance
-        if post.get('birth_day') and post.get('birth_month') and post.get('birth_year'):
-            birthdate = f"{post['birth_year']}-{post['birth_month'].zfill(2)}-{post['birth_day'].zfill(2)}"
-            post['birthdate'] = birthdate
+    @http.route('/eglises/pdf', type='http', auth="public", website=True)
+    def pdf_churches(self, **post):
+        churches = request.env['res.partner'].sudo().search([
+            ('is_church', '=', True),
+            ('active', '=', True)
+        ], order='name')
         
-        # Même chose pour la date de salut
-        if post.get('arrival_day') and post.get('arrival_month') and post.get('arrival_year'):
-            arrival_date = f"{post['arrival_year']}-{post['arrival_month'].zfill(2)}-{post['arrival_day'].zfill(2)}"
-            post['arrival_date'] = arrival_date
+        pdf = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            'random_team_generator.action_report_church_list', 
+            [0],  # On passe une liste vide car nous fournissons nos propres données
+            data={'churches': churches}
+        )
+        
+        pdfhttpheaders = [
+            ('Content-Type', 'application/pdf'),
+            ('Content-Length', len(pdf[0])),
+            ('Content-Disposition', 'attachment; filename=liste_eglises.pdf')
+        ]
+        
+        return request.make_response(pdf[0], headers=pdfhttpheaders)
+
+    @http.route('/eglises', type='http', auth="public", website=True)
+    def list_churches(self, **post):
+        churches = request.env['res.partner'].sudo().search([
+            ('is_church', '=', True),
+            ('active', '=', True)
+        ], order='name')
+        
+        return request.render("random_team_generator.church_list", {
+            'churches': churches
+        })
 
     @http.route('/inscription', type='http', auth="public", website=True, csrf=False)
     def inscription_complete_form(self, **post):

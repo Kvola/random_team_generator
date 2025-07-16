@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_church_list_landscape" model="report.paperformat">
+        <field name="name">Church List Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <template id="church_list_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <style>
+                            .header-title {
+                                font-size: 24px;
+                                font-weight: bold;
+                                color: #2c3e50;
+                                margin-bottom: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            }
+                            .header-subtitle {
+                                font-size: 12px;
+                                color: #7f8c8d;
+                                margin-bottom: 20px;
+                            }
+                            .church-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 20px;
+                                font-size: 14px;
+                            }
+                            .church-table th {
+                                background: #00477a !important;
+                                color: white;
+                                font-weight: bold;
+                                padding: 12px 8px;
+                                text-align: center;
+                                border: 1px solid #2980b9;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                            }
+                            .church-table td {
+                                padding: 10px 8px;
+                                border: 1px solid #bdc3c7;
+                                vertical-align: top;
+                                line-height: 1.4;
+                            }
+                            .church-table tbody tr:nth-child(even) {
+                                background-color: #f8f9fa;
+                                font-size: 16px;
+                            }
+                            .church-table tbody tr:hover {
+                                background-color: #e3f2fd;
+                            }
+                            .church-name {
+                                font-weight: bold;
+                                color: #2c3e50;
+                                font-size: 12px;
+                            }
+                            .region-name {
+                                color: #34495e;
+                                font-weight: 500;
+                            }
+                            .pastor-info {
+                                margin-bottom: 5px;
+                            }
+                            .pastor-name {
+                                font-weight: 500;
+                                color: #2c3e50;
+                            }
+                            .pastor-phone {
+                                color: #7f8c8d;
+                                font-size: 10px;
+                                font-style: italic;
+                            }
+                            .assistant-pastor {
+                                display: block;
+                                margin-bottom: 3px;
+                                padding: 2px 0;
+                            }
+                            .empty-cell {
+                                text-align: center;
+                                color: #95a5a6;
+                                font-style: italic;
+                            }
+                            .summary-info {
+                                margin-top: 20px;
+                                padding: 10px;
+                                background-color: #ecf0f1;
+                                border-radius: 5px;
+                                font-size: 10px;
+                                color: #2c3e50;
+                            }
+                        </style>
+
+                        <div class="header" style="text-align: center; margin-bottom: 20px;">
+                            <h1 class="header-title">Liste des Églises</h1>
+                            <p class="header-subtitle">
+                                Date d'édition : <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                                | Total : <span t-esc="len(churches)" /> église(s)
+                            </p>
+                        </div>
+
+                        <table class="church-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Église</th>
+                                    <th style="width: 15%;">Région</th>
+                                    <th style="width: 20%;">Pasteur Régional</th>
+                                    <th style="width: 20%;">Pasteur Principal</th>
+                                    <th style="width: 20%;">Pasteurs Adjoints</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="churches" t-as="church">
+                                    <tr>
+                                        <td>
+                                            <div class="church-name" t-esc="church.name" />
+                                        </td>
+                                        
+                                        <td>
+                                            <div class="region-name">
+                                                <t t-if="church.region_id.name">
+                                                    <span t-esc="church.region_id.name" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="empty-cell">Non définie</span>
+                                                </t>
+                                            </div>
+                                        </td>
+                                        
+                                        <td>
+                                            <t t-if="church.region_id.regional_pastor_id">
+                                                <div class="pastor-info">
+                                                    <div class="pastor-name" t-esc="church.region_id.regional_pastor_id.name" />
+                                                    <t t-if="church.region_id.regional_pastor_id.phone">
+                                                        <div class="pastor-phone">
+                                                            <i class="fa fa-phone" aria-hidden="true"></i> <span t-esc="church.region_id.regional_pastor_id.phone" />
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="empty-cell">Non assigné</span>
+                                            </t>
+                                        </td>
+                                        
+                                        <td>
+                                            <t t-if="church.main_pastor_id">
+                                                <div class="pastor-info">
+                                                    <div class="pastor-name" t-esc="church.main_pastor_id.name" />
+                                                    <t t-if="church.main_pastor_id.phone">
+                                                        <div class="pastor-phone">
+                                                            <i class="fa fa-phone" aria-hidden="true"></i> <span t-esc="church.main_pastor_id.phone" />
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="empty-cell">Non assigné</span>
+                                            </t>
+                                        </td>
+                                        
+                                        <td>
+                                            <t t-if="church.assistant_pastor_ids">
+                                                <t t-foreach="church.assistant_pastor_ids" t-as="pastor">
+                                                    <div class="assistant-pastor">
+                                                        <span class="pastor-name" t-esc="pastor.name" />
+                                                        <t t-if="pastor.phone">
+                                                            <div class="pastor-phone">
+                                                                <i class="fa fa-phone" aria-hidden="true"></i>  <span t-esc="pastor.phone" />
+                                                            </div>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="empty-cell">Aucun</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Résumé en bas de page -->
+                        <div class="summary-info">
+                            <strong>Résumé :</strong> 
+                            <span t-esc="len(churches)" /> église(s) répertoriée(s) 
+                            | Rapport généré le <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_church_list" model="ir.actions.report">
+        <field name="name">Liste des églises</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">random_team_generator.church_list_pdf</field>
+        <field name="report_file">random_team_generator.church_list_pdf</field>
+        <field name="print_report_name">'liste_eglises_' + datetime.datetime.now().strftime('%Y%m%d') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_res_partner" />
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="random_team_generator.paperformat_church_list_landscape" />
+    </record>
+</odoo>
