@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_random_team_user,access_random_team_user,model_random_team,,1,1,0,1
+access_random_team_user,access_random_team_user,model_random_team,,1,1,1,1
+access_random_task_user,access_random_task_user,model_random_task,,1,1,1,1
 access_res_partner_portal_user,res.partner portal,model_res_partner,base.group_portal,1,1,1,1

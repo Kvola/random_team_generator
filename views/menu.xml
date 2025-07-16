@@ -1,5 +1,11 @@
 <odoo>
-    <menuitem id="menu_my_profile" name="Mon profil"
-              parent="portal.portal_my_home"
-              action=""/>
+    <!-- Menus -->
+    <menuitem id="menu_random_team_root" name="Gestion des équipes" sequence="10"/>
+    <menuitem id="menu_random_team" name="Équipes" parent="menu_random_team_root" action="action_random_team"/>
+    <menuitem id="menu_waiting_register_people" name="Inscriptions en attente" parent="menu_random_team_root" action="action_waiting_register_people_form"  sequence="20"/>
+    <menuitem id="menu_team_settings" name="Configurations" parent="menu_random_team_root" sequence="30"/>
+
+    <!-- Sous menus configuration -->
+    <menuitem id="menu_setting" name="Paramètres" parent="menu_team_settings" action="action_team_settings" sequence="10"/>
+    <menuitem id="menu_random_task" name="Tâches" parent="menu_team_settings" action="action_random_task" sequence="20"/>
 </odoo>

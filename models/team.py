@@ -1,6 +1,13 @@
 from odoo import models, fields, api
 import random
 
+class RandomTask(models.Model):
+    _name = 'random.task'
+    _description = 'Random Task'
+
+    name = fields.Char(string='Nom de la tâche', required=True)
+    description = fields.Text(string='Description')
+
 class Team(models.Model):
     _name = 'random.team'
     _description = 'Team'
@@ -9,14 +16,26 @@ class Team(models.Model):
     members_ids = fields.Many2many('res.partner', string='Membres')
     team_lead_id = fields.Many2one('res.partner', string='Responsable')
     team_lead_phone = fields.Char(string='Téléphone (Responsable)', related='team_lead_id.phone', readonly=True, store=True)
-    
+    task_ids = fields.Many2many('random.task', string='Tâches')
+    description = fields.Text(string='Description', compute='_compute_description', store=True)
+
+    # Décrire les tâches liées à l'équipe
+    @api.depends('task_ids')
+    def _compute_description(self):
+        """Compute the description based on the tasks assigned to the team."""
+        for team in self:
+            if team.task_ids:
+                task_descriptions = ', '.join(task.description for task in team.task_ids)
+                team.description = f'{task_descriptions}' if task_descriptions else 'Aucune tâche assignée.'
+            
+
     # Champs pour identifier le type d'équipe et l'organisation parent
     team_type = fields.Selection([
         ('company', 'Équipe Compagnie'),
         ('tribe', 'Équipe Tribu'),
         ('prayer_cell', 'Équipe Cellule de prière'),
         ('group', 'Équipe Groupe'),
-        ('academy', 'Équipe Académie'),
+        ('academy', 'Équipe Structure'),
     ], string='Type d\'équipe', required=True, default='company')
     
     # Relations vers les organisations
@@ -28,8 +47,56 @@ class Team(models.Model):
                                    domain=[('organization_type', '=', 'prayer_cell')])
     group_id = fields.Many2one('res.partner', string='Groupe', 
                               domain=[('organization_type', '=', 'group')])
-    academy_id = fields.Many2one('res.partner', string='Académie', 
+    academy_id = fields.Many2one('res.partner', string='Structure', 
                                 domain=[('organization_type', '=', 'academy')])
+
+    @api.depends('team_type', 'company_id', 'tribe_id', 'prayer_cell_id', 'group_id', 'academy_id')
+    def _compute_members_domain(self):
+        """Calcule le domaine pour les membres disponibles selon le type d'équipe et l'organisation."""
+        for team in self:
+            organization_id = team._get_organization_id(team)
+            
+            # Domaine de base : exclure les entreprises
+            domain = [('is_company', '=', False)]
+            
+            if organization_id and team.team_type:
+                # Trouver les membres déjà assignés à d'autres équipes du même type dans la même organisation
+                existing_teams = self.env['random.team'].search([
+                    ('id', '!=', team.id if team.id else False),
+                    ('team_type', '=', team.team_type if team.team_type else False),
+                ])
+                
+                # Filtrer par organisation et récupérer les membres déjà assignés
+                assigned_member_ids = []
+                for existing_team in existing_teams:
+                    existing_org_id = team._get_organization_id(existing_team)
+                    if existing_org_id == organization_id:
+                        assigned_member_ids.extend(existing_team.members_ids.ids)
+                
+                # Exclure les membres déjà assignés
+                if assigned_member_ids:
+                    domain.append(('id', 'not in', assigned_member_ids))
+                
+                # Ajouter un filtre d'organisation si nécessaire selon le type d'équipe
+                if team.team_type == 'company' and team.company_id:
+                    # Pour les équipes company, on peut filtrer par church_id si nécessaire
+                    pass
+                elif team.team_type == 'tribe' and team.tribe_id:
+                    # Pour les équipes tribu, filtrer par tribe_id si le champ existe sur res.partner
+                    domain.append(('tribe_id', '=', team.tribe_id.id))
+                elif team.team_type == 'prayer_cell' and team.prayer_cell_id:
+                    # Pour les équipes cellule de prière
+                    domain.append(('prayer_cell_id', '=', team.prayer_cell_id.id))
+                elif team.team_type == 'group' and team.group_id:
+                    # Pour les équipes groupe
+                    domain.append(('group_id', '=', team.group_id.id))
+                elif team.team_type == 'academy' and team.academy_id:
+                    # Pour les équipes structure
+                    domain.append(('academy_id', '=', team.academy_id.id))
+            
+            team.members_domain = str(domain)
+
+    members_domain = fields.Char(compute='_compute_members_domain', store=False)
 
     @api.constrains('members_ids', 'team_type', 'company_id', 'tribe_id', 'prayer_cell_id', 'group_id', 'academy_id')
     def _check_unique_member_per_organization_team(self):
@@ -94,7 +161,7 @@ class Team(models.Model):
             if team.members_ids:
                 member = team.members_ids[0]
                 if team.team_type == 'company':
-                    team.company_id = member.parent_id.id if member.parent_id else False
+                    team.company_id = member.church_id.id if member.church_id else False
                 elif team.team_type == 'tribe':
                     team.tribe_id = member.tribe_id.id if member.tribe_id else False
                 elif team.team_type == 'prayer_cell':

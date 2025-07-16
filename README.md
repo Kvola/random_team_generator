@@ -8,7 +8,7 @@
   - Tribu 
   - Cellule de prière
   - Groupe (avec critères d'âge/sexe/situation matrimoniale)
-  - Académie
+  - Structure
 - **Hiérarchie** : Églises mères/filles avec gestion des responsables
 
 ### 👥 Gestion des Membres

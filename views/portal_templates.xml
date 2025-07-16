@@ -1,17 +1,586 @@
 <odoo>
+    <record id="menu_inscription_ebng" model="website.menu">
+        <field name="name">S'inscrire</field>
+        <field name="url">/inscription</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">50</field>
+    </record>
+    <!-- Formulaire d'inscription complet -->
+    <template id="inscription_form" name="Formulaire d'inscription complet">
+        <t t-call="website.layout">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"/>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"/>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <style>
+                @media (max-width: 768px) {
+                    .date-selectors .row {
+                        gap: 10px;
+                    }
+                    
+                    .date-selectors select {
+                        font-size: 16px; /* Évite le zoom sur iOS */
+                        padding: 12px;
+                        border-radius: 8px;
+                    }
+                    
+                    .date-selectors .col-4 {
+                        margin-bottom: 10px;
+                    }
+                }
+
+                /* Amélioration générale des sélecteurs */
+                .form-select {
+                    font-size: 16px;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    background-color: white;
+                    touch-action: manipulation;
+                }
+
+                .form-select:focus {
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                }
+
+                /* Personnalisation Select2 */
+                .select2-container--bootstrap-5 .select2-selection {
+                    min-height: 48px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 16px;
+                }
+
+                .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+                    padding: 12px;
+                    line-height: 1.5;
+                }
+
+                .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+                    height: 46px;
+                    right: 12px;
+                }
+
+                .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                }
+
+                .select2-dropdown {
+                    border: 2px solid #007bff;
+                    border-radius: 8px;
+                }
+
+                .select2-search--dropdown .select2-search__field {
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    padding: 8px 12px;
+                    font-size: 14px;
+                }
+
+                .select2-results__option {
+                    padding: 10px 12px;
+                    font-size: 14px;
+                }
+
+                .select2-results__option--highlighted {
+                    background-color: #007bff;
+                    color: white;
+                }
+
+                /* Style spécial pour les sélecteurs de date */
+                .date-selector {
+                    min-height: 48px;
+                }
+
+                .searchable-select {
+                    width: 100%;
+                }
+
+                /* Amélioration pour mobile */
+                @media (max-width: 768px) {
+                    .select2-container--bootstrap-5 .select2-selection {
+                        min-height: 52px;
+                        font-size: 16px;
+                    }
+                    
+                    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+                        padding: 14px;
+                    }
+                    
+                    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+                        height: 50px;
+                    }
+                }
+
+                /* Indicateur de champ obligatoire */
+                .required-field label::after {
+                    content: " *";
+                    color: #dc3545;
+                    font-weight: bold;
+                }
+            </style>
+            
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="text-center">Formulaire d'identification du juste</h3>
+                            </div>
+                            
+                            <div class="card-body">
+                                <t t-if="error">
+                                    <div class="alert alert-danger" t-esc="error"/>
+                                </t>
+                                
+                                <form method="post" class="mt-3">
+                                    <!-- Section Informations personnelles -->
+                                    <h4 class="border-bottom pb-2 mb-3">Informations personnelles</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3 required-field">
+                                            <label class="form-label">Nom complet</label>
+                                            <input type="text" name="name" class="form-control" 
+                                                t-att-value="values.get('name', '')" required="required"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" name="email" class="form-control" 
+                                                t-att-value="values.get('email', '')"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Téléphone</label>
+                                            <input type="tel" name="phone" class="form-control" 
+                                                t-att-value="values.get('phone', '')"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3 required-field">
+                                            <label class="form-label">Sexe</label>
+                                            <select name="gender" class="form-select searchable-select" required="required">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <option value="male" t-att-selected="'male' == values.get('gender', '')">Homme</option>
+                                                <option value="female" t-att-selected="'female' == values.get('gender', '')">Femme</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <!-- Date de naissance -->
+                                        <div class="col-md-6 mb-3 required-field">
+                                            <label class="form-label">Date de naissance</label>
+                                            <div class="row date-selectors">
+                                                <div class="col-4">
+                                                    <select name="birth_day" class="form-select date-selector" required="required">
+                                                        <option value="">Jour</option>
+                                                        <t t-foreach="range(1, 32)" t-as="day">
+                                                            <option t-att-value="day" 
+                                                                    t-att-selected="str(day) == values.get('birth_day', '')">
+                                                                <t t-esc="day"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="birth_month" class="form-select date-selector" required="required">
+                                                        <option value="">Mois</option>
+                                                        <option value="1" t-att-selected="'1' == values.get('birth_month', '')">Janvier</option>
+                                                        <option value="2" t-att-selected="'2' == values.get('birth_month', '')">Février</option>
+                                                        <option value="3" t-att-selected="'3' == values.get('birth_month', '')">Mars</option>
+                                                        <option value="4" t-att-selected="'4' == values.get('birth_month', '')">Avril</option>
+                                                        <option value="5" t-att-selected="'5' == values.get('birth_month', '')">Mai</option>
+                                                        <option value="6" t-att-selected="'6' == values.get('birth_month', '')">Juin</option>
+                                                        <option value="7" t-att-selected="'7' == values.get('birth_month', '')">Juillet</option>
+                                                        <option value="8" t-att-selected="'8' == values.get('birth_month', '')">Août</option>
+                                                        <option value="9" t-att-selected="'9' == values.get('birth_month', '')">Septembre</option>
+                                                        <option value="10" t-att-selected="'10' == values.get('birth_month', '')">Octobre</option>
+                                                        <option value="11" t-att-selected="'11' == values.get('birth_month', '')">Novembre</option>
+                                                        <option value="12" t-att-selected="'12' == values.get('birth_month', '')">Décembre</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="birth_year" class="form-select date-selector" required="required">
+                                                        <option value="">Année</option>
+                                                        <t t-foreach="range(2025, 1919, -1)" t-as="year">
+                                                            <option t-att-value="year" 
+                                                                    t-att-selected="str(year) == values.get('birth_year', '')">
+                                                                <t t-esc="year"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3 required-field">
+                                            <label class="form-label">Situation matrimoniale</label>
+                                            <select name="marital_status" class="form-select searchable-select" required="required">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <option value="single" t-att-selected="'single' == values.get('marital_status', '')">Célibataire</option>
+                                                <option value="married" t-att-selected="'married' == values.get('marital_status', '')">Marié(e)</option>
+                                                <option value="divorced" t-att-selected="'divorced' == values.get('marital_status', '')">Divorcé(e)</option>
+                                                <option value="widowed" t-att-selected="'widowed' == values.get('marital_status', '')">Veuf/Veuve</option>
+                                                <option value="separated" t-att-selected="'separated' == values.get('marital_status', '')">Séparé(e)</option>
+                                                <option value="cohabiting" t-att-selected="'cohabiting' == values.get('marital_status', '')">En concubinage</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section Lieu d'habitation et profession -->
+                                    <h4 class="border-bottom pb-2 mb-3 mt-4">Lieu d'habitation et profession</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Lieu d'habitation</label>
+                                            <input type="text" name="street2" class="form-control" 
+                                                placeholder="Adresse, quartier, ville"
+                                                t-att-value="values.get('street2', '')"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Profession</label>
+                                            <input type="text" name="profession" class="form-control" 
+                                                placeholder="Votre profession ou métier"
+                                                t-att-value="values.get('function', '')"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Affiliation -->
+                                    <h4 class="border-bottom pb-2 mb-3 mt-4">Affiliation</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3 required-field">
+                                            <label class="form-label">Église</label>
+                                            <select name="church_id" class="form-select searchable-select" required="required">
+                                                <option value="">-- Sélectionnez votre église --</option>
+                                                <t t-foreach="churches" t-as="church">
+                                                    <option t-att-value="church.id" 
+                                                            t-att-selected="str(church.id) == values.get('church_id', '')">
+                                                        <t t-esc="church.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <!-- Date de salut -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Date de salut</label>
+                                            <div class="row date-selectors">
+                                                <div class="col-4">
+                                                    <select name="arrival_day" class="form-select date-selector">
+                                                        <option value="">Jour</option>
+                                                        <t t-foreach="range(1, 32)" t-as="day">
+                                                            <option t-att-value="day" 
+                                                                    t-att-selected="str(day) == values.get('arrival_day', '')">
+                                                                <t t-esc="day"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="arrival_month" class="form-select date-selector">
+                                                        <option value="">Mois</option>
+                                                        <option value="1" t-att-selected="'1' == values.get('arrival_month', '')">Janvier</option>
+                                                        <option value="2" t-att-selected="'2' == values.get('arrival_month', '')">Février</option>
+                                                        <option value="3" t-att-selected="'3' == values.get('arrival_month', '')">Mars</option>
+                                                        <option value="4" t-att-selected="'4' == values.get('arrival_month', '')">Avril</option>
+                                                        <option value="5" t-att-selected="'5' == values.get('arrival_month', '')">Mai</option>
+                                                        <option value="6" t-att-selected="'6' == values.get('arrival_month', '')">Juin</option>
+                                                        <option value="7" t-att-selected="'7' == values.get('arrival_month', '')">Juillet</option>
+                                                        <option value="8" t-att-selected="'8' == values.get('arrival_month', '')">Août</option>
+                                                        <option value="9" t-att-selected="'9' == values.get('arrival_month', '')">Septembre</option>
+                                                        <option value="10" t-att-selected="'10' == values.get('arrival_month', '')">Octobre</option>
+                                                        <option value="11" t-att-selected="'11' == values.get('arrival_month', '')">Novembre</option>
+                                                        <option value="12" t-att-selected="'12' == values.get('arrival_month', '')">Décembre</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="arrival_year" class="form-select date-selector">
+                                                        <option value="">Année</option>
+                                                        <t t-foreach="range(2025, 1949, -1)" t-as="year">
+                                                            <option t-att-value="year" 
+                                                                    t-att-selected="str(year) == values.get('arrival_year', '')">
+                                                                <t t-esc="year"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Fonction</label>
+                                            <select name="function_type" class="form-select searchable-select">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <option value="member" t-att-selected="'member' == values.get('function_type', '')">Membre</option>
+                                                <option value="pastor" t-att-selected="'pastor' == values.get('function_type', '')">Pasteur</option>
+                                                <option value="elder" t-att-selected="'elder' == values.get('function_type', '')">Ancien</option>
+                                                <option value="deacon" t-att-selected="'deacon' == values.get('function_type', '')">Diacre</option>
+                                                <option value="missionary" t-att-selected="'missionary' == values.get('function_type', '')">Missionnaire</option>
+                                                <option value="leader" t-att-selected="'leader' == values.get('function_type', '')">Responsable</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section Groupes -->
+                                    <h4 class="border-bottom pb-2 mb-3 mt-4">Affiliation aux structures</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Tribu</label>
+                                            <select name="tribe_id" class="form-select searchable-select">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <t t-foreach="tribes" t-as="tribe">
+                                                    <option t-att-value="tribe.id" 
+                                                            t-att-selected="str(tribe.id) == values.get('tribe_id', '')">
+                                                        <t t-esc="tribe.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Cellule de prière</label>
+                                            <select name="prayer_cell_id" class="form-select searchable-select">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <t t-foreach="prayer_cells" t-as="cell">
+                                                    <option t-att-value="cell.id" 
+                                                            t-att-selected="str(cell.id) == values.get('prayer_cell_id', '')">
+                                                        <t t-esc="cell.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Groupe</label>
+                                            <select name="group_id" class="form-select searchable-select">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <t t-foreach="groups" t-as="group">
+                                                    <option t-att-value="group.id" 
+                                                            t-att-selected="str(group.id) == values.get('group_id', '')">
+                                                        <t t-esc="group.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Autre structure</label>
+                                            <select name="academy_id" class="form-select searchable-select">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <t t-foreach="academies" t-as="academy">
+                                                    <option t-att-value="academy.id" 
+                                                            t-att-selected="str(academy.id) == values.get('academy_id', '')">
+                                                        <t t-esc="academy.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Commentaires -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Commentaires</label>
+                                        <textarea name="comment" class="form-control" rows="3"
+                                                t-att-value="values.get('comment', '')"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input type="checkbox" class="form-check-input" id="accept_terms" name="accept_terms" required="required"/>
+                                        <label class="form-check-label" for="accept_terms">
+                                            J'accepte les conditions d'utilisation et la politique de confidentialité
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="text-center mt-4">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-paper-plane me-2"></i> Soumettre l'inscription
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Page de succès après inscription -->
+    <template id="inscription_success" name="Inscription réussie">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card text-center">
+                            <div class="card-header bg-success text-white">
+                                <h3>Inscription enregistrée</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <i class="fa fa-check-circle fa-5x text-success"></i>
+                                </div>
+                                <h4 class="card-title">Merci <t t-esc="partner.name"/> !</h4>
+                                <p class="card-text">
+                                    Votre inscription a bien été enregistrée. Un responsable va la valider prochainement.
+                                </p>
+                                <p>
+                                    Vous recevrez un email de confirmation une fois votre compte activé.
+                                </p>
+                                <a href="/" class="btn btn-primary">
+                                    Retour à l'accueil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="portal_my_home_inherit" name="My Portal" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[@id='portal_common_category']" position="after">
+            <div class="o_portal_category row g-2 mt-3">
+                <t t-call="portal.portal_docs_entry" t-if="False"/>
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/random_team_generator/static/src/img/user-profile.svg'"/>
+                    <t t-set="title">Mon profil</t>
+                    <t t-set="text">Configurez vos paramètres de profil</t>
+                    <t t-set="url" t-value="'/my/profile'"/>
+                    <t t-set="config_card" t-value="True"/>
+                </t>
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/web/static/src/img/icons/children.svg'"/>
+                    <t t-set="title">Mes enfants (père)</t>
+                    <t t-set="text">Liste des enfants pour lesquels vous êtes déclaré comme père</t>
+                    <t t-set="url" t-value="'/my/fathered-children'"/>
+                    <t t-set="config_card" t-value="True"/>
+                </t>
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="icon" t-value="'/web/static/src/img/icons/children.svg'"/>
+                    <t t-set="title">Mes enfants (mère)</t>
+                    <t t-set="text">Liste des enfants pour lesquels vous êtes déclarée comme mère</t>
+                    <t t-set="url" t-value="'/my/mothered-children'"/>
+                    <t t-set="config_card" t-value="True"/>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
     <template id="portal_my_profile" name="Mon profil">
         <t t-call="portal.portal_layout">
             <div class="container">
                 <h1>Mon profil</h1>
-                <p><strong>Nom :</strong> <t t-esc="partner.name"/></p>
-                <p><strong>Sexe :</strong> <t t-esc="partner.gender"/></p>
-                <p><strong>Date de naissance :</strong> <t t-esc="partner.birthdate"/></p>
-                <p><strong>Âge :</strong> <t t-esc="partner.age"/></p>
-                <p><strong>Situation matrimoniale :</strong> <t t-esc="partner.marital_status"/></p>
-                <p><strong>Église :</strong> <t t-esc="partner.church_id.name"/></p>
-                <p><strong>Groupe :</strong> <t t-esc="partner.group_id.name"/></p>
-                <p><strong>Cellule de prière :</strong> <t t-esc="partner.prayer_cell_id.name"/></p>
-                <p><strong>Académie :</strong> <t t-esc="partner.academy_id.name"/></p>
+                
+                <form method="post" action="/my/profile/update">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="name" class="form-control" t-att-value="partner.name"/>
+                            <t t-if="error.get('name')">
+                                <div class="text-danger">Ce champ est obligatoire</div>
+                            </t>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sexe</label>
+                            <select name="gender" class="form-control">
+                                <option value="">-- Sélectionnez --</option>
+                                <option value="male" t-att-selected="'selected' if partner.gender == 'male' else None">Homme</option>
+                                <option value="female" t-att-selected="'selected' if partner.gender == 'female' else None">Femme</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date de naissance</label>
+                            <input type="date" name="birthdate" class="form-control" 
+                                t-att-value="partner.birthdate and partner.birthdate.strftime('%Y-%m-%d') or ''"/>
+                            <t t-if="error.get('birthdate')">
+                                <div class="text-danger">Format de date invalide (JJ/MM/AAAA)</div>
+                            </t>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Âge</label>
+                            <input type="text" class="form-control" t-att-value="partner.age" disabled="disabled"/>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Situation matrimoniale</label>
+                            <select name="marital_status" class="form-control">
+                                <option value="single" t-att-selected="'selected' if partner.marital_status == 'single' else None">Célibataire</option>
+                                <option value="married" t-att-selected="'selected' if partner.marital_status == 'married' else None">Marié(e)</option>
+                                <option value="divorced" t-att-selected="'selected' if partner.marital_status == 'divorced' else None">Divorcé(e)</option>
+                                <option value="widowed" t-att-selected="'selected' if partner.marital_status == 'widowed' else None">Veuf/Veuve</option>
+                                <option value="separated" t-att-selected="'selected' if partner.marital_status == 'separated' else None">Séparé(e)</option>
+                                <option value="cohabiting" t-att-selected="'selected' if partner.marital_status == 'cohabiting' else None">Concubinage</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Père</label>
+                            <input type="text" class="form-control" t-att-value="partner.father_id.name"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Mère</label>
+                            <input type="text" class="form-control" t-att-value="partner.mother_id.name"/>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Organisation</label>
+                            <input type="text" class="form-control" t-att-value="partner.parent_id.name" disabled="disabled"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Église</label>
+                            <input type="text" class="form-control" t-att-value="partner.church_id.name" disabled="disabled"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Date de salut</label>
+                            <input type="date" name="arrival_date" class="form-control"
+                                t-att-value="partner.arrival_date and partner.arrival_date.strftime('%Y-%m-%d') or ''"/>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Tribu</label>
+                            <input type="text" class="form-control" t-att-value="partner.tribe_id.name" disabled="disabled"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Groupe</label>
+                            <input type="text" class="form-control" t-att-value="partner.group_id.name" disabled="disabled"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Cellule de prière</label>
+                            <input type="text" class="form-control" t-att-value="partner.prayer_cell_id.name" disabled="disabled"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Structure</label>
+                            <input type="text" class="form-control" t-att-value="partner.academy_id.name" disabled="disabled"/>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Père</label>
+                            <input type="text" class="form-control" t-att-value="partner.father_id.name" disabled="disabled"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Mère</label>
+                            <input type="text" class="form-control" t-att-value="partner.mother_id.name" disabled="disabled"/>
+                        </div>
+                    </div>
+
+                    <t t-if="error_message">
+                        <div class="alert alert-danger">
+                            <t t-foreach="error_message" t-as="msg">
+                                <div><t t-esc="msg"/></div>
+                            </t>
+                        </div>
+                    </t>
+                    
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </form>
             </div>
         </t>
     </template>
@@ -62,9 +631,74 @@
                         <option value="divorced">Divorcé(e)</option>
                         <option value="widowed">Veuf/Veuve</option>
                         <option value="separated">Séparé(e)</option>
+                        <option value="cohabiting">Concubinage</option>
                     </select>
                     <button type="submit" class="btn btn-success">Enregistrer</button>
                 </form>
+            </div>
+        </t>
+    </template>
+    <template id="portal_fathered_children" name="Mes enfants (père)">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h1>Mes enfants (père)</h1>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Sexe</th>
+                            <th>Date de naissance</th>
+                            <th>Âge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="children" t-as="child">
+                            <tr>
+                                <td><t t-esc="child.name"/></td>
+                                <td><t t-esc="child.gender"/></td>
+                                <td><t t-esc="child.birthdate"/></td>
+                                <td><t t-esc="child.age"/> ans</td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="mt-4 text-center">
+                    <a href="/my" class="btn btn-secondary">
+                        <i class="fa fa-arrow-left me-2"></i> Retour au tableau de bord
+                    </a>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="portal_mothered_children" name="Mes enfants (mère)">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <h1>Mes enfants (mère)</h1>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Sexe</th>
+                            <th>Date de naissance</th>
+                            <th>Âge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="children" t-as="child">
+                            <tr>
+                                <td><t t-esc="child.name"/></td>
+                                <td><t t-esc="child.gender"/></td>
+                                <td><t t-esc="child.birthdate"/></td>
+                                <td><t t-esc="child.age"/> ans</td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="mt-4 text-center">
+                    <a href="/my" class="btn btn-secondary">
+                        <i class="fa fa-arrow-left me-2"></i> Retour au tableau de bord
+                    </a>
+                </div>
             </div>
         </t>
     </template>
