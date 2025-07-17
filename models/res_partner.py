@@ -93,78 +93,70 @@ class ResPartner(models.Model):
     @api.depends_context("church_id")
     def _compute_tribe_domain(self):
         for rec in self:
-            rec.tribe_domain = [
-                ("organization_type", "=", "tribe"),
-                ("tribe_church_id", "=", rec.church_id.id),
-            ] if rec.church_id else []
+            if rec.church_id:
+                rec.tribe_domain = [
+                    ("organization_type", "=", "tribe"),
+                    ("tribe_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.tribe_domain = []  # ✅ Jamais False
 
     tribe_domain = fields.Char(compute="_compute_tribe_domain")
     tribe_id = fields.Many2one(
         "res.partner",
         string="Tribu",
     )
-    @api.constrains('tribe_domain')
-    def _check_tribe_domain(self):
-        for record in self:
-            if not record.tribe_domain:
-                raise ValidationError("Veuillez enregistrer une église. La tribu ne peut pas être vide.")
 
     @api.depends_context("tribe_id")
     def _compute_prayer_cell_domain(self):
         for rec in self:
-            rec.prayer_cell_domain = [
-                ("organization_type", "=", "prayer_cell"),
-                ("prayer_cell_tribe_id", "=", rec.tribe_id.id),
-            ] if rec.tribe_id else  []
+            if rec.tribe_id:
+                rec.prayer_cell_domain = [
+                    ("organization_type", "=", "prayer_cell"),
+                    ("prayer_cell_tribe_id", "=", rec.tribe_id.id),
+                ]
+            else:
+                rec.prayer_cell_domain = []
 
     prayer_cell_domain = fields.Char(compute="_compute_prayer_cell_domain")
     prayer_cell_id = fields.Many2one(
         "res.partner",
         string="Cellule de prière",
     )
-    @api.constrains('prayer_cell_domain')
-    def _check_prayer_cell_domain(self):
-        for record in self:
-            if not record.prayer_cell_domain:
-                raise ValidationError("Veuillez enregistrer une tribu. La cellule de prière ne peut pas être vide.")
 
     @api.depends_context("church_id")
     def _compute_group_domain(self):
         for rec in self:
-            rec.group_domain = [
-                ("organization_type", "=", "group"),
-                ("group_church_id", "=", rec.church_id.id),
-            ] if rec.church_id else  []
+            if rec.church_id:
+                rec.group_domain = [
+                    ("organization_type", "=", "group"),
+                    ("group_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.group_domain = []
 
     group_domain = fields.Char(compute="_compute_group_domain")
     group_id = fields.Many2one(
         "res.partner",
         string="Groupe",
     )
-    @api.constrains('group_domain')
-    def _check_group_domain(self):
-        for record in self:
-            if not record.group_domain:
-                raise ValidationError("Veuillez enregistrer une église. Le groupe ne peut pas être vide.")
 
     @api.depends_context("church_id")
     def _compute_academy_domain(self):
         for rec in self:
-            rec.academy_domain = [
-                ("organization_type", "=", "academy"),
-                ("academy_church_id", "=", rec.church_id.id),
-            ] if rec.church_id else []
+            if rec.church_id:
+                rec.academy_domain = [
+                    ("organization_type", "=", "academy"),
+                    ("academy_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.academy_domain = []
 
     academy_domain = fields.Char(compute="_compute_academy_domain")
     academy_id = fields.Many2one(
         "res.partner",
         string="Autre Structure",
     )
-    @api.constrains('academy_domain')
-    def _check_academy_domain(self):
-        for record in self:
-            if not record.academy_domain:
-                raise ValidationError("Veuillez enregistrer une église. L'académie ne peut pas être vide.")
 
     region_id = fields.Many2one(
         "res.partner", string="Région", domain="[('organization_type', '=', 'region')]"
@@ -174,21 +166,21 @@ class ResPartner(models.Model):
     @api.depends_context("region_id")
     def _compute_regional_capital_domain(self):
         for rec in self:
-            rec.regional_capital_domain = [
-                ("organization_type", "=", "company"),
-                ("region_id", "=", rec.region_id.id),
-            ] if rec.region_id else []
+            if rec.region_id:
+                # Filtre pour les partenaires de type "company" dans la même région
+                rec.regional_capital_domain = [
+                    ("organization_type", "=", "company"),
+                    ("region_id", "=", rec.region_id.id),
+                ]
+            else:
+                rec.regional_capital_domain = []
+                
     regional_capital_domain = fields.Char(compute="_compute_regional_capital_domain")
     regional_capital_id = fields.Many2one(
         "res.partner",
         string="Chef-lieu de région",
     )
-    @api.constrains('regional_capital_domain')
-    def _check_regional_capital_domain(self):
-        for record in self:
-            if not record.regional_capital_domain:
-                raise ValidationError("Veuillez enregistrer une région. Le chef-lieu de région ne peut pas être vide.")
-                
+
     regional_pastor_id = fields.Many2one(
         "res.partner",
         string="Pasteur régional",
