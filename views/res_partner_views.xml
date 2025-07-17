@@ -22,7 +22,7 @@
             <!-- Ajout des relations spécialisées pour les contacts -->
             <field name="parent_id" position="after">
                 <field name="church_id" invisible="is_company" placeholder="Église"/>
-                <field name="tribe_id" invisible="is_company" placeholder="Tribu"/>
+                <field name="tribe_id" invisible="is_company" domain="[('organization_type', '=', 'tribe'),('tribe_church_id', '=', church_id.id)]" placeholder="Tribu"/>
                 <field name="prayer_cell_id" invisible="is_company" placeholder="Cellule de prière"/>
                 <field name="group_id" invisible="is_company" placeholder="Groupe"/>
                 <field name="academy_id" invisible="is_company" placeholder="Structure"/>

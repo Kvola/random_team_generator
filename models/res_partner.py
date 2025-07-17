@@ -93,10 +93,6 @@ class ResPartner(models.Model):
     tribe_id = fields.Many2one(
         "res.partner",
         string="Tribu",
-        domain=lambda self: [
-            ("organization_type", "=", "tribe"),
-            ("tribe_church_id", "=", self.church_id.id if self.church_id else False),
-        ],
     )
     prayer_cell_id = fields.Many2one(
         "res.partner",
