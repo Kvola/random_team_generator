@@ -25,6 +25,9 @@ class RandomPrayerCell(models.Model):
 
 
 # Extension du modèle res.partner pour la gestion des équipes et informations personnelles
+from odoo import models, fields, api
+
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
@@ -48,11 +51,13 @@ class ResPartner(models.Model):
         string="Église de la tribu",
         domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
     )
+    
     prayer_cell_tribe_id = fields.Many2one(
         "res.partner",
         string="Tribu de la cellule",
         domain="[('organization_type', '=', 'tribe')]",
     )
+    
     prayer_cell_church_id = fields.Many2one(
         "res.partner",
         string="Église de la cellule",
@@ -60,11 +65,13 @@ class ResPartner(models.Model):
         store=True,
         readonly=True,
     )
+    
     group_church_id = fields.Many2one(
         "res.partner",
         string="Église du groupe",
         domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
     )
+    
     academy_church_id = fields.Many2one(
         "res.partner",
         string="Église de la structure",
@@ -74,13 +81,12 @@ class ResPartner(models.Model):
     prayer_cell_type_id = fields.Many2one(
         "random.prayer.cell",
         string="Type de cellule de prière",
-        domain="[('id', '!=', False)]",
         help="Type de cellule de prière pour cette organisation",
     )
+    
     tribe_type_id = fields.Many2one(
         "random.tribe",
         string="Type de tribu",
-        domain="[('id', '!=', False)]",
         help="Type de tribu pour cette organisation",
     )
 
@@ -90,46 +96,64 @@ class ResPartner(models.Model):
         string="Église",
         domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
     )
+    
+    # Champs computés pour les domaines dynamiques
+    tribe_domain = fields.Char(
+        compute='_compute_tribe_domain',
+        store=False,
+    )
+    
+    prayer_cell_domain = fields.Char(
+        compute='_compute_prayer_cell_domain',
+        store=False,
+    )
+    
+    group_domain = fields.Char(
+        compute='_compute_group_domain',
+        store=False,
+    )
+    
+    academy_domain = fields.Char(
+        compute='_compute_academy_domain',
+        store=False,
+    )
+    
+    regional_capital_domain = fields.Char(
+        compute='_compute_regional_capital_domain',
+        store=False,
+    )
+    
     tribe_id = fields.Many2one(
         "res.partner",
         string="Tribu",
     )
+    
     prayer_cell_id = fields.Many2one(
         "res.partner",
         string="Cellule de prière",
-        domain=lambda self: [
-            ("organization_type", "=", "prayer_cell"),
-            ("prayer_cell_church_id", "=", self.church_id.id if self.church_id else False),
-        ],
     )
+    
     group_id = fields.Many2one(
         "res.partner",
         string="Groupe",
-        domain=lambda self: [
-            ("organization_type", "=", "group"),
-            ("group_church_id", "=", self.church_id.id if self.church_id else False),
-        ],
     )
+    
     academy_id = fields.Many2one(
         "res.partner",
         string="Autre Structure",
-        domain=lambda self: [
-            ("organization_type", "=", "academy"),
-            ("academy_church_id", "=", self.church_id.id if self.church_id else False),
-        ],
     )
 
     region_id = fields.Many2one(
-        "res.partner", string="Région", domain="[('organization_type', '=', 'region')]"
+        "res.partner", 
+        string="Région", 
+        domain="[('organization_type', '=', 'region')]"
     )
+    
     regional_capital_id = fields.Many2one(
         "res.partner",
         string="Chef-lieu de région",
-        domain=lambda self: [
-            ("organization_type", "=", "company"),
-            ("region_id", "=", self.region_id.id if self.region_id else False),
-        ],
     )
+    
     regional_pastor_id = fields.Many2one(
         "res.partner",
         string="Pasteur régional",
@@ -137,6 +161,148 @@ class ResPartner(models.Model):
         store=True,
         readonly=True,
     )
+
+    # Méthodes compute pour les domaines dynamiques
+    @api.depends('church_id')
+    def _compute_tribe_domain(self):
+        for record in self:
+            if record.church_id:
+                domain = [
+                    ('organization_type', '=', 'tribe'),
+                    ('tribe_church_id', '=', record.church_id.id)
+                ]
+            else:
+                domain = [('organization_type', '=', 'tribe')]
+            record.tribe_domain = str(domain)
+
+    @api.depends('church_id')
+    def _compute_prayer_cell_domain(self):
+        for record in self:
+            if record.church_id:
+                domain = [
+                    ('organization_type', '=', 'prayer_cell'),
+                    ('prayer_cell_church_id', '=', record.church_id.id)
+                ]
+            else:
+                domain = [('organization_type', '=', 'prayer_cell')]
+            record.prayer_cell_domain = str(domain)
+
+    @api.depends('church_id')
+    def _compute_group_domain(self):
+        for record in self:
+            if record.church_id:
+                domain = [
+                    ('organization_type', '=', 'group'),
+                    ('group_church_id', '=', record.church_id.id)
+                ]
+            else:
+                domain = [('organization_type', '=', 'group')]
+            record.group_domain = str(domain)
+
+    @api.depends('church_id')
+    def _compute_academy_domain(self):
+        for record in self:
+            if record.church_id:
+                domain = [
+                    ('organization_type', '=', 'academy'),
+                    ('academy_church_id', '=', record.church_id.id)
+                ]
+            else:
+                domain = [('organization_type', '=', 'academy')]
+            record.academy_domain = str(domain)
+
+    @api.depends('region_id')
+    def _compute_regional_capital_domain(self):
+        for record in self:
+            if record.region_id:
+                domain = [
+                    ('organization_type', '=', 'company'),
+                    ('region_id', '=', record.region_id.id)
+                ]
+            else:
+                domain = [('organization_type', '=', 'company')]
+            record.regional_capital_domain = str(domain)
+
+    # Méthodes pour réinitialiser les champs dépendants
+    @api.onchange('church_id')
+    def _onchange_church_id(self):
+        """Réinitialise les champs liés quand l'église change"""
+        if self.church_id:
+            # Réinitialise les champs si l'église change
+            self.tribe_id = False
+            self.prayer_cell_id = False
+            self.group_id = False
+            self.academy_id = False
+
+    @api.onchange('region_id')
+    def _onchange_region_id(self):
+        """Réinitialise le chef-lieu quand la région change"""
+        if self.region_id:
+            self.regional_capital_id = False
+
+    # Contraintes et validations
+    @api.constrains('organization_type', 'tribe_church_id')
+    def _check_tribe_church_consistency(self):
+        for record in self:
+            if record.organization_type == 'tribe' and record.tribe_church_id:
+                if record.tribe_church_id.organization_type != 'company':
+                    raise models.ValidationError(
+                        "L'église de la tribu doit être de type 'Église'."
+                    )
+
+    @api.constrains('organization_type', 'prayer_cell_tribe_id')
+    def _check_prayer_cell_tribe_consistency(self):
+        for record in self:
+            if record.organization_type == 'prayer_cell' and record.prayer_cell_tribe_id:
+                if record.prayer_cell_tribe_id.organization_type != 'tribe':
+                    raise models.ValidationError(
+                        "La tribu de la cellule de prière doit être de type 'Tribu'."
+                    )
+
+    @api.constrains('church_id', 'tribe_id')
+    def _check_tribe_church_relation(self):
+        for record in self:
+            if record.church_id and record.tribe_id:
+                if record.tribe_id.tribe_church_id != record.church_id:
+                    raise models.ValidationError(
+                        "La tribu sélectionnée n'appartient pas à l'église choisie."
+                    )
+
+    @api.constrains('church_id', 'prayer_cell_id')
+    def _check_prayer_cell_church_relation(self):
+        for record in self:
+            if record.church_id and record.prayer_cell_id:
+                if record.prayer_cell_id.prayer_cell_church_id != record.church_id:
+                    raise models.ValidationError(
+                        "La cellule de prière sélectionnée n'appartient pas à l'église choisie."
+                    )
+
+    @api.constrains('church_id', 'group_id')
+    def _check_group_church_relation(self):
+        for record in self:
+            if record.church_id and record.group_id:
+                if record.group_id.group_church_id != record.church_id:
+                    raise models.ValidationError(
+                        "Le groupe sélectionné n'appartient pas à l'église choisie."
+                    )
+
+    @api.constrains('church_id', 'academy_id')
+    def _check_academy_church_relation(self):
+        for record in self:
+            if record.church_id and record.academy_id:
+                if record.academy_id.academy_church_id != record.church_id:
+                    raise models.ValidationError(
+                        "La structure sélectionnée n'appartient pas à l'église choisie."
+                    )
+
+    @api.constrains('region_id', 'regional_capital_id')
+    def _check_regional_capital_relation(self):
+        for record in self:
+            if record.region_id and record.regional_capital_id:
+                if record.regional_capital_id.region_id != record.region_id:
+                    raise models.ValidationError(
+                        "Le chef-lieu sélectionné n'appartient pas à la région choisie."
+                    )
     # ========== NOUVELLES INFORMATIONS PERSONNELLES ==========
 
     # Sexe
