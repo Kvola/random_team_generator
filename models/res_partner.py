@@ -103,6 +103,11 @@ class ResPartner(models.Model):
         "res.partner",
         string="Tribu",
     )
+    @api.constrains('tribe_domain')
+    def _check_tribe_domain(self):
+        for record in self:
+            if not record.tribe_domain:
+                raise ValidationError("Veuillez enregistrer une église. La tribu ne peut pas être vide.")
 
     @api.depends_context("tribe_id")
     def _compute_prayer_cell_domain(self):
@@ -117,6 +122,12 @@ class ResPartner(models.Model):
         "res.partner",
         string="Cellule de prière",
     )
+    @api.constrains('prayer_cell_domain')
+    def _check_prayer_cell_domain(self):
+        for record in self:
+            if not record.prayer_cell_domain:
+                raise ValidationError("Veuillez enregistrer une tribu. La cellule de prière ne peut pas être vide.")
+
     @api.depends_context("church_id")
     def _compute_group_domain(self):
         for rec in self:
@@ -130,6 +141,11 @@ class ResPartner(models.Model):
         "res.partner",
         string="Groupe",
     )
+    @api.constrains('group_domain')
+    def _check_group_domain(self):
+        for record in self:
+            if not record.group_domain:
+                raise ValidationError("Veuillez enregistrer une église. Le groupe ne peut pas être vide.")
 
     @api.depends_context("church_id")
     def _compute_academy_domain(self):
@@ -144,6 +160,11 @@ class ResPartner(models.Model):
         "res.partner",
         string="Autre Structure",
     )
+    @api.constrains('academy_domain')
+    def _check_academy_domain(self):
+        for record in self:
+            if not record.academy_domain:
+                raise ValidationError("Veuillez enregistrer une église. L'académie ne peut pas être vide.")
 
     region_id = fields.Many2one(
         "res.partner", string="Région", domain="[('organization_type', '=', 'region')]"
@@ -162,6 +183,12 @@ class ResPartner(models.Model):
         "res.partner",
         string="Chef-lieu de région",
     )
+    @api.constrains('regional_capital_domain')
+    def _check_regional_capital_domain(self):
+        for record in self:
+            if not record.regional_capital_domain:
+                raise ValidationError("Veuillez enregistrer une région. Le chef-lieu de région ne peut pas être vide.")
+                
     regional_pastor_id = fields.Many2one(
         "res.partner",
         string="Pasteur régional",
