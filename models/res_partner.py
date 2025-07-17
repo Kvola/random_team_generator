@@ -95,7 +95,7 @@ class ResPartner(models.Model):
         for rec in self:
             rec.tribe_domain = [
                 ("organization_type", "=", "tribe"),
-                ("tribe_church_id", "=", rec.church_id._origin.id),
+                ("tribe_church_id", "=", rec.church_id.id),
             ] if rec.church_id else []
 
     tribe_domain = fields.Char(compute="_compute_tribe_domain")
@@ -109,7 +109,7 @@ class ResPartner(models.Model):
         for rec in self:
             rec.prayer_cell_domain = [
                 ("organization_type", "=", "prayer_cell"),
-                ("prayer_cell_tribe_id", "=", rec.tribe_id._origin.id),
+                ("prayer_cell_tribe_id", "=", rec.tribe_id.id),
             ] if rec.tribe_id else  []
 
     prayer_cell_domain = fields.Char(compute="_compute_prayer_cell_domain")
@@ -122,7 +122,7 @@ class ResPartner(models.Model):
         for rec in self:
             rec.group_domain = [
                 ("organization_type", "=", "group"),
-                ("group_church_id", "=", rec.church_id._origin.id),
+                ("group_church_id", "=", rec.church_id.id),
             ] if rec.church_id else  []
 
     group_domain = fields.Char(compute="_compute_group_domain")
@@ -136,7 +136,7 @@ class ResPartner(models.Model):
         for rec in self:
             rec.academy_domain = [
                 ("organization_type", "=", "academy"),
-                ("academy_church_id", "=", rec.church_id._origin.id),
+                ("academy_church_id", "=", rec.church_id.id),
             ] if rec.church_id else []
 
     academy_domain = fields.Char(compute="_compute_academy_domain")
@@ -155,7 +155,7 @@ class ResPartner(models.Model):
         for rec in self:
             rec.regional_capital_domain = [
                 ("organization_type", "=", "company"),
-                ("region_id", "=", rec.region_id._origin.id),
+                ("region_id", "=", rec.region_id.id),
             ] if rec.region_id else []
     regional_capital_domain = fields.Char(compute="_compute_regional_capital_domain")
     regional_capital_id = fields.Many2one(
