@@ -96,7 +96,9 @@ class ResPartner(models.Model):
             rec.tribe_domain = [
                 ("organization_type", "=", "tribe"),
                 ("tribe_church_id", "=", rec.church_id.id),
-            ] if rec.church_id else []
+            ] if rec.church_id else [
+                ("organization_type", "=", "tribe")
+            ]
 
     tribe_domain = fields.Char(compute="_compute_tribe_domain")
     tribe_id = fields.Many2one(
@@ -110,7 +112,9 @@ class ResPartner(models.Model):
             rec.prayer_cell_domain = [
                 ("organization_type", "=", "prayer_cell"),
                 ("prayer_cell_tribe_id", "=", rec.tribe_id.id),
-            ] if rec.tribe_id else []
+            ] if rec.tribe_id else [
+                ("organization_type", "=", "prayer_cell")
+            ]
 
     prayer_cell_domain = fields.Char(compute="_compute_prayer_cell_domain")
     prayer_cell_id = fields.Many2one(
@@ -123,7 +127,9 @@ class ResPartner(models.Model):
             rec.group_domain = [
                 ("organization_type", "=", "group"),
                 ("group_church_id", "=", rec.church_id.id),
-            ] if rec.church_id else []
+            ] if rec.church_id else [
+                ("organization_type", "=", "group")
+            ]
 
     group_domain = fields.Char(compute="_compute_group_domain")
     group_id = fields.Many2one(
@@ -137,7 +143,9 @@ class ResPartner(models.Model):
             rec.academy_domain = [
                 ("organization_type", "=", "academy"),
                 ("academy_church_id", "=", rec.church_id.id),
-            ] if rec.church_id else []
+            ] if rec.church_id else [
+                ("organization_type", "=", "academy")
+            ]
 
     academy_domain = fields.Char(compute="_compute_academy_domain")
     academy_id = fields.Many2one(
@@ -156,7 +164,9 @@ class ResPartner(models.Model):
             rec.regional_capital_domain = [
                 ("organization_type", "=", "company"),
                 ("region_id", "=", rec.region_id.id),
-            ] if rec.region_id else []
+            ] if rec.region_id else [
+                ("organization_type", "=", "company")
+            ]
     regional_capital_domain = fields.Char(compute="_compute_regional_capital_domain")
     regional_capital_id = fields.Many2one(
         "res.partner",
