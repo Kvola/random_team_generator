@@ -95,7 +95,7 @@ class ResPartner(models.Model):
         string="Tribu",
         domain=lambda self: [
             ("organization_type", "=", "tribe"),
-            ("tribe_church_id", "=", self.church_id.id),
+            ("tribe_church_id", "=", self.church_id.id if self.church_id else False),
         ],
     )
     prayer_cell_id = fields.Many2one(
@@ -103,7 +103,7 @@ class ResPartner(models.Model):
         string="Cellule de prière",
         domain=lambda self: [
             ("organization_type", "=", "prayer_cell"),
-            ("prayer_cell_church_id", "=", self.church_id.id),
+            ("prayer_cell_church_id", "=", self.church_id.id if self.church_id else False),
         ],
     )
     group_id = fields.Many2one(
@@ -111,7 +111,7 @@ class ResPartner(models.Model):
         string="Groupe",
         domain=lambda self: [
             ("organization_type", "=", "group"),
-            ("group_church_id", "=", self.church_id.id),
+            ("group_church_id", "=", self.church_id.id if self.church_id else False),
         ],
     )
     academy_id = fields.Many2one(
@@ -119,7 +119,7 @@ class ResPartner(models.Model):
         string="Autre Structure",
         domain=lambda self: [
             ("organization_type", "=", "academy"),
-            ("academy_church_id", "=", self.church_id.id),
+            ("academy_church_id", "=", self.church_id.id if self.church_id else False),
         ],
     )
 
@@ -131,7 +131,7 @@ class ResPartner(models.Model):
         string="Chef-lieu de région",
         domain=lambda self: [
             ("organization_type", "=", "company"),
-            ("region_id", "=", self.region_id.id),
+            ("region_id", "=", self.region_id.id if self.region_id else False),
         ],
     )
     regional_pastor_id = fields.Many2one(
