@@ -39,7 +39,6 @@ class ResPartner(models.Model):
             ("region", "Région"),
         ],
         string="Type d'organisation",
-        default="company",
     )
 
     # Relations spécialisées
@@ -99,7 +98,7 @@ class ResPartner(models.Model):
                     ("tribe_church_id", "=", rec.church_id.id),
                 ]
             else:
-                rec.tribe_domain = []  # ✅ Jamais False
+                rec.tribe_domain = [] 
 
     tribe_domain = fields.Char(compute="_compute_tribe_domain")
     tribe_id = fields.Many2one(
@@ -174,7 +173,7 @@ class ResPartner(models.Model):
                 ]
             else:
                 rec.regional_capital_domain = []
-                
+
     regional_capital_domain = fields.Char(compute="_compute_regional_capital_domain")
     regional_capital_id = fields.Many2one(
         "res.partner",
