@@ -466,6 +466,11 @@ class ResPartner(models.Model):
         string="Responsables adjoints de la cellule",
         domain="[('is_leader','=',True), ('prayer_cell_id','=',id)]",
     )
+    prayer_cell_follower_id = fields.Many2one(
+        "res.partner",
+        string="Responsable de la cellule",
+        domain="[('is_elder','=',True)]",
+    )
 
     academy_leader_id = fields.Many2one(
         "res.partner",

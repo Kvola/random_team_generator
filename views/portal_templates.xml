@@ -111,6 +111,7 @@
                                                 <th class="text-center">Responsables</th>
                                                 <th class="text-center">Nombre de membres</th>
                                                 <th class="text-center">Membres</th>
+                                                <th class="text-center">Responsable de suivi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -247,6 +248,38 @@
                                                         <t t-else="">
                                                             <span class="text-muted fst-italic">Aucun
                                                                 membre</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <!-- Responsable de suivi -->
+                                                        <t t-if="cell.prayer_cell_follower_id">
+                                                            <div class="mb-2">
+                                                                <div
+                                                                    class="d-flex align-items-center">
+                                                                    <i
+                                                                        class="fa fa-user-tie me-2 text-primary"></i>
+                                                                    <div>
+                                                                        <div class="fw-bold">
+                                                                            <span
+                                                                                t-esc="cell.prayer_cell_follower_id.name" />
+                                                                        </div>
+                                                                        <t
+                                                                            t-if="cell.prayer_cell_follower_id.phone">
+                                                                            <div
+                                                                                class="text-muted small">
+                                                                                <i
+                                                                                    class="fa fa-phone me-1"></i>
+                                                                                <span
+                                                                                    t-esc="cell.prayer_cell_follower_id.phone" />
+                                                                            </div>
+                                                                        </t>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <div class="text-muted fst-italic mb-2">Responsable de suivi
+                                                                non assigné</div>
                                                         </t>
                                                     </td>
                                                 </tr>

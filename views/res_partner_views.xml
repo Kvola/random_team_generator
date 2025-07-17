@@ -146,6 +146,7 @@
                         <group>
                             <field name="prayer_cell_leader_id"/>
                             <field name="prayer_cell_assistant_leader_ids" widget="many2many_tags"/>
+                            <field name="prayer_cell_follower_id"/>
                         </group>
                     </group>                    
                 </page>
