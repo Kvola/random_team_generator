@@ -468,7 +468,7 @@ class ResPartner(models.Model):
     )
     prayer_cell_follower_id = fields.Many2one(
         "res.partner",
-        string="Responsable de la cellule",
+        string="Responsable de suivi de la cellule",
         domain="[('is_elder','=',True)]",
     )
 
