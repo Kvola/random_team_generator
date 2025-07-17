@@ -4,6 +4,7 @@ from datetime import date
 import logging
 from odoo.exceptions import ValidationError
 import math
+from odoo.addons.portal.controllers.portal import pager as portal_pager
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
@@ -36,17 +37,83 @@ class ResPartnerPortal(http.Controller):
 
     @http.route('/cellules-priere', type='http', auth="public", website=True)
     def list_prayer_cells(self, **post):
-        prayer_cells = request.env['res.partner'].sudo().search([
+        # Récupération des paramètres de pagination
+        page = int(post.get('page', 1))
+        limit = int(post.get('limit', 10))  # 10 par défaut comme dans la version originale
+        
+        # Calcul de l'offset
+        offset = (page - 1) * limit
+        
+        # Domaine de recherche
+        domain = [
             ('organization_type', '=', 'prayer_cell'),
             ('active', '=', True)
-        ], order='name')
+        ]
+        
+        # Compte total des cellules de prière
+        total_count = request.env['res.partner'].sudo().search_count(domain)
+        
+        # Récupération des cellules de prière pour la page actuelle
+        prayer_cells = request.env['res.partner'].sudo().search(
+            domain,
+            offset=offset,
+            limit=limit,
+            order='name'
+        )
+        
+        # Calcul du nombre total de pages
+        page_count = math.ceil(total_count / limit) if total_count > 0 else 1
+        
+        # Construction des URLs pour la pagination
+        base_url = '/cellules-priere'
+        
+        def build_url(page_num, limit_val=limit):
+            return f"{base_url}?page={page_num}&limit={limit_val}"
+        
+        # URLs de navigation
+        url_first = build_url(1)
+        url_last = build_url(page_count)
+        url_previous = build_url(page - 1) if page > 1 else None
+        url_next = build_url(page + 1) if page < page_count else None
+        
+        # Génération de la plage de pages à afficher (5 pages max)
+        start_page = max(1, page - 2)
+        end_page = min(page_count, page + 2)
+        
+        # Ajustement si on est proche du début ou de la fin
+        if end_page - start_page < 4:
+            if start_page == 1:
+                end_page = min(page_count, start_page + 4)
+            else:
+                start_page = max(1, end_page - 4)
+        
+        page_range = list(range(start_page, end_page + 1))
+        
+        # Création de l'objet pager
+        pager = {
+            'total': total_count,
+            'limit': limit,
+            'offset': offset,
+            'page': page,
+            'page_count': page_count,
+            'url_first': url_first,
+            'url_last': url_last,
+            'url_previous': url_previous,
+            'url_next': url_next,
+            'url_page': f"{base_url}?page=%s&limit={limit}",
+            'page_range': page_range,
+        }
+        
+        # Calcul des statistiques globales (pour toutes les cellules de prière, pas seulement la page actuelle)
+        all_prayer_cells = request.env['res.partner'].sudo().search(domain)
         
         # Calcul du nombre total de membres
-        total_members = sum(len(cell.prayer_cell_members) for cell in prayer_cells)
+        total_members = sum(len(cell.prayer_cell_members) for cell in all_prayer_cells)
         
         return request.render("random_team_generator.prayer_cell_list", {
             'prayer_cells': prayer_cells,
-            'total_members': total_members
+            'total_members': total_members,
+            'pager': pager
         })
 
     @http.route('/eglises/pdf', type='http', auth="public", website=True)
