@@ -14,6 +14,9 @@
             <xpath expr="//field[@name='function']" position="attributes">
                 <attribute name="string">Profession</attribute>
             </xpath>
+            <xpath expr="//field[@name='mobile']" position="attributes">
+                <attribute name="string">Whatsapp</attribute>
+            </xpath>
             <!-- Ajout du champ type d'organisation -->
             <field name="is_company" position="after">
                 <field name="organization_type" invisible="not is_company"/>

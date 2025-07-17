@@ -283,6 +283,7 @@ class ResPartnerPortal(http.Controller):
                     'name': post.get('name'),
                     'email': post.get('email') if post.get('email') else False,
                     'phone': post.get('phone') if post.get('phone') else False,
+                    'mobile': post.get('mobile') if post.get('mobile') else False,
                     'gender': post.get('gender'),
                     'birthdate': birthdate_value,
                     'marital_status': post.get('marital_status'),

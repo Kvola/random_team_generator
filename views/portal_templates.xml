@@ -908,6 +908,11 @@
                                             <input type="tel" name="phone" class="form-control"
                                                 t-att-value="values.get('phone', '')" />
                                         </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Whatsapp</label>
+                                            <input type="tel" name="mobile" class="form-control"
+                                                t-att-value="values.get('mobile', '')" />
+                                        </div>
                                         <div class="col-md-6 mb-3 required-field">
                                             <label class="form-label">Sexe</label>
                                             <select name="gender"
@@ -1279,10 +1284,10 @@
                                     Votre inscription a bien été enregistrée. Un responsable va la
                                     valider prochainement.
                                 </p>
-                                <p>
+                                <!-- <p>
                                     Vous recevrez un email de confirmation une fois votre compte
                                     activé.
-                                </p>
+                                </p> -->
                                 <a href="/" class="btn btn-primary">
                                     Retour à l'accueil
                                 </a>
