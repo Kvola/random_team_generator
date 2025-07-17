@@ -1,0 +1,42 @@
+<odoo>
+    <data>
+        <record id="view_prayer_cell_tree" model="ir.ui.view">
+            <field name="name">random.prayer.cell.tree</field>
+            <field name="model">random.prayer.cell</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="tribe_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_prayer_cell_form" model="ir.ui.view">
+            <field name="name">random.prayer.cell.form</field>
+            <field name="model">random.prayer.cell</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                            <field name="tribe_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="action_prayer_cell" model="ir.actions.act_window">
+            <field name="name">Cellules de Prière</field>
+            <field name="res_model">random.prayer.cell</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_prayer_cell_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Créez et gérez vos cellules de prière ici.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

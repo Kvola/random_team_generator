@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Types de tribus -->
+        <record id="benjamin_tribe" model="random.tribe">
+            <field name="name">Benjamin</field>
+            <field name="description">Tribu de Benjamin</field>
+        </record>
+        <record id="judah_tribe" model="random.tribe">
+            <field name="name">Juda</field>
+            <field name="description">Tribu de Juda</field>
+        </record>
+        <record id="levi_tribe" model="random.tribe">
+            <field name="name">Lévi</field>
+            <field name="description">Tribu de Lévi</field>
+        </record>
+        <record id="dan_tribe" model="random.tribe">
+            <field name="name">Dan</field>
+            <field name="description">Tribu de Dan</field>
+        </record>
+        <record id="naphtali_tribe" model="random.tribe">
+            <field name="name">Nephtali</field>
+            <field name="description">Tribu de Nephtali</field>
+        </record>
+        <record id="gad_tribe" model="random.tribe">
+            <field name="name">Gad</field>
+            <field name="description">Tribu de Gad</field>
+        </record>
+        <record id="asher_tribe" model="random.tribe">
+            <field name="name">Asher</field>
+            <field name="description">Tribu de Asher</field>
+        </record>
+        <record id="issachar_tribe" model="random.tribe">
+            <field name="name">Issacar</field>
+            <field name="description">Tribu de Issacar</field>
+        </record>
+        <record id="zebulun_tribe" model="random.tribe">
+            <field name="name">Zabulon</field>
+            <field name="description">Tribu de Zabulon</field>
+        </record>
+        <record id="reuben_tribe" model="random.tribe">
+            <field name="name">Ruben</field>
+            <field name="description">Tribu de Ruben</field>
+        </record>
+        <record id="ephraim_tribe" model="random.tribe">
+            <field name="name">Ephraim</field>
+            <field name="description">Tribu de Ephraim</field>
+        </record>
+        <record id="simeon_tribe" model="random.tribe">
+            <field name="name">Simeon</field>
+            <field name="description">Tribu de Simeon</field>
+        </record>
+        <record id="manasseh_tribe" model="random.tribe">
+            <field name="name">Manassé</field>
+            <field name="description">Tribu de Manassé</field>
+        </record>
+    </data>
+</odoo>

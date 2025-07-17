@@ -2,6 +2,20 @@ from odoo import models, fields, api
 from datetime import datetime, timedelta, date
 import random
 
+class RandomTribe(models.Model):
+    _name = 'random.tribe'
+    _description = 'Tribu'
+
+    name = fields.Char(string='Nom de la tribu', required=True)
+    description = fields.Text(string='Description')
+class RandomPrayerCell(models.Model):
+    _name = 'random.prayer.cell'
+    _description = 'Cellule de prière'
+
+    name = fields.Char(string='Nom de la cellule de prière', required=True)
+    description = fields.Text(string='Description')
+    tribe_id = fields.Many2one('random.tribe', string='Tribu associée',
+                               help="Tribu à laquelle cette cellule de prière est associée")
 # Extension du modèle res.partner pour la gestion des équipes et informations personnelles
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -17,19 +31,48 @@ class ResPartner(models.Model):
     ], string='Type d\'organisation', default='company')
     
     # Relations spécialisées
-    prayer_cell_id = fields.Many2one('res.partner', string='Cellule de prière', 
-                                   domain=[('organization_type', '=', 'prayer_cell')])
-    group_id = fields.Many2one('res.partner', string='Groupe', 
-                              domain=[('organization_type', '=', 'group')])
-    academy_id = fields.Many2one('res.partner', string='Autre Structure', 
-                                domain=[('organization_type', '=', 'academy')])
-    tribe_id = fields.Many2one('res.partner', string='Tribu',
-                             domain=[('organization_type', '=', 'tribe')])
+    # église de la tribu
+    tribe_church_id = fields.Many2one('res.partner', string='Église de la tribu',
+                                 domain=[('organization_type', '=', 'company')])
+    # tribu de la cellule de prière
+    prayer_cell_tribe_id = fields.Many2one('res.partner', string='Tribu de la cellule',
+                        domain=[('organization_type', '=', 'tribe')])
+    # église de la cellule de prière
+    prayer_cell_church_id = fields.Many2one('res.partner', string='Église de la cellule', 
+                            related='prayer_cell_tribe_id.tribe_church_id', store=True, readonly=True)
+    # église du groupe d'âge
+    group_church_id = fields.Many2one('res.partner', string='Église du groupe',
+                                 domain=[('organization_type', '=', 'company')])
+    # église de la structure
+    academy_church_id = fields.Many2one('res.partner', string='Église de la structure',
+                                 domain=[('organization_type', '=', 'company')])
+
+    prayer_cell_type_id = fields.Many2one('random.prayer.cell', string='Type de cellule de prière',
+                                       domain="[('id', '!=', False)]",
+                                       help="Type de cellule de prière pour cette organisation")
+    tribe_type_id = fields.Many2one('random.tribe', string='Type de tribu',
+                                 domain="[('id', '!=', False)]",
+                                 help="Type de tribu pour cette organisation")
+
+    # église du fidèle
     church_id = fields.Many2one('res.partner', string='Église',
                                  domain=[('organization_type', '=', 'company')])
+    # tribu du fidèle
+    tribe_id = fields.Many2one('res.partner', string='Tribu',
+                             domain=[('organization_type', '=', 'tribe'),('tribe_church_id', '=', church_id)])
+    # cellule de prière du fidèle
+    prayer_cell_id = fields.Many2one('res.partner', string='Cellule de prière', 
+                    domain=[('organization_type', '=', 'prayer_cell'), ('prayer_cell_church_id', '=', church_id)])
+    # groupe d'âge du fidèle
+    group_id = fields.Many2one('res.partner', string='Groupe', 
+                              domain=[('organization_type', '=', 'group'), ('group_church_id', '=', church_id)])
+    # autre structure du fidèle
+    academy_id = fields.Many2one('res.partner', string='Autre Structure', 
+                                domain=[('organization_type', '=', 'academy'), ('academy_church_id', '=', church_id)])
+
     region_id = fields.Many2one('res.partner', string='Région',
                                  domain=[('organization_type', '=', 'region')])
-    regional_capital_id = fields.Many2one('res.partner', string='Capitale régionale',
+    regional_capital_id = fields.Many2one('res.partner', string='Chef-lieu de région',
                                         domain="[('organization_type', '=', 'company'), ('region_id', '=', id)]")
     regional_pastor_id = fields.Many2one('res.partner', string='Pasteur régional', related='regional_capital_id.main_pastor_id', store=True)
 
@@ -102,7 +145,7 @@ class ResPartner(models.Model):
     tribe_members = fields.One2many('res.partner', 'tribe_id',
                                    string='Membres de la tribu')
     company_contacts = fields.One2many('res.partner', 'church_id', 
-                                      string='Contacts de l\'entreprise')
+                                      string='Membres de l\'église')
 
     # Champs calculés pour afficher les équipes de chaque type
     company_team_ids = fields.Many2many('random.team', compute='_compute_team_memberships', 

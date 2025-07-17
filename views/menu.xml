@@ -8,4 +8,6 @@
     <!-- Sous menus configuration -->
     <menuitem id="menu_setting" name="Paramètres" parent="menu_team_settings" action="action_team_settings" sequence="10"/>
     <menuitem id="menu_random_task" name="Tâches" parent="menu_team_settings" action="action_random_task" sequence="20"/>
+    <menuitem id="menu_random_tribe" name="Tribus" parent="menu_team_settings" action="action_tribe" sequence="30"/>
+    <menuitem id="menu_prayer_cell" name="Cellules de Prière" parent="menu_team_settings" action="action_prayer_cell" sequence="40"/>
 </odoo>

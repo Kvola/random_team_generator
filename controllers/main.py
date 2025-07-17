@@ -6,6 +6,48 @@ from odoo.exceptions import ValidationError
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
+    @http.route('/cellules-priere/pdf', type='http', auth="public", website=True)
+    def pdf_prayer_cells(self, **post):
+        prayer_cells = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'prayer_cell'),
+            ('active', '=', True)
+        ], order='name')
+        
+        # Calcul du nombre total de membres
+        total_members = sum(len(cell.prayer_cell_members) for cell in prayer_cells)
+        
+        pdf = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            'random_team_generator.prayer_cell_list_pdf', 
+            [0],
+            data={
+                'prayer_cells': prayer_cells,
+                'total_members': total_members
+            }
+        )
+        
+        pdfhttpheaders = [
+            ('Content-Type', 'application/pdf'),
+            ('Content-Length', len(pdf[0])),
+            ('Content-Disposition', 'attachment; filename=liste_cellules_priere.pdf')
+        ]
+        
+        return request.make_response(pdf[0], headers=pdfhttpheaders)
+
+    @http.route('/cellules-priere', type='http', auth="public", website=True)
+    def list_prayer_cells(self, **post):
+        prayer_cells = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'prayer_cell'),
+            ('active', '=', True)
+        ], order='name')
+        
+        # Calcul du nombre total de membres
+        total_members = sum(len(cell.prayer_cell_members) for cell in prayer_cells)
+        
+        return request.render("random_team_generator.prayer_cell_list", {
+            'prayer_cells': prayer_cells,
+            'total_members': total_members
+        })
+
     @http.route('/eglises/pdf', type='http', auth="public", website=True)
     def pdf_churches(self, **post):
         churches = request.env['res.partner'].sudo().search([

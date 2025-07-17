@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Format de papier paysage pour le rapport -->
+    <record id="paperformat_prayer_cell_list_landscape" model="report.paperformat">
+        <field name="name">Prayer Cell List Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <template id="prayer_cell_list_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <style>
+                            .header-title {
+                                font-size: 24px;
+                                font-weight: bold;
+                                color: #2c3e50;
+                                margin-bottom: 10px;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            }
+                            .header-subtitle {
+                                font-size: 12px;
+                                color: #7f8c8d;
+                                margin-bottom: 20px;
+                            }
+                            .cell-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 20px;
+                                font-size: 14px;
+                            }
+                            .cell-table th {
+                                background: #8e44ad !important;  /* Violet pour les cellules de prière */
+                                color: white;
+                                font-weight: bold;
+                                padding: 12px 8px;
+                                text-align: center;
+                                border: 1px solid #6c3483;
+                                font-size: 10px;
+                                text-transform: uppercase;
+                            }
+                            .cell-table td {
+                                padding: 10px 8px;
+                                border: 1px solid #d2b4de;
+                                vertical-align: top;
+                                line-height: 1.4;
+                            }
+                            .cell-table tbody tr:nth-child(even) {
+                                background-color: #f5eef8;
+                            }
+                            .cell-table tbody tr:hover {
+                                background-color: #e8daef;
+                            }
+                            .cell-name {
+                                font-weight: bold;
+                                color: #6c3483;
+                                font-size: 12px;
+                            }
+                            .church-name {
+                                color: #2874a6;
+                                font-weight: 500;
+                            }
+                            .tribe-name {
+                                color: #1e8449;
+                                font-weight: 500;
+                            }
+                            .member-info {
+                                margin-bottom: 5px;
+                            }
+                            .member-name {
+                                font-weight: 500;
+                                color: #2c3e50;
+                            }
+                            .member-phone {
+                                color: #7f8c8d;
+                                font-size: 10px;
+                                font-style: italic;
+                            }
+                            .leader-info {
+                                margin-bottom: 3px;
+                                padding: 2px 0;
+                            }
+                            .empty-cell {
+                                text-align: center;
+                                color: #95a5a6;
+                                font-style: italic;
+                            }
+                            .summary-info {
+                                margin-top: 20px;
+                                padding: 10px;
+                                background-color: #f4ecf7;
+                                border-radius: 5px;
+                                font-size: 10px;
+                                color: #2c3e50;
+                            }
+                            .fa {
+                                margin-right: 3px;
+                            }
+                        </style>
+
+                        <div class="header" style="text-align: center; margin-bottom: 20px;">
+                            <h1 class="header-title">Liste des Cellules de Prière</h1>
+                            <p class="header-subtitle">
+                                Date d'édition : <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                                | Total : <span t-esc="len(prayer_cells)" /> cellule(s) - <span t-esc="total_members" /> membre(s)
+                            </p>
+                        </div>
+
+                        <table class="cell-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">Cellule</th>
+                                    <th style="width: 20%;">Église</th>
+                                    <th style="width: 15%;">Tribu</th>
+                                    <th style="width: 30%;">Membres</th>
+                                    <th style="width: 15%;">Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="prayer_cells" t-as="cell">
+                                    <tr>
+                                        <td>
+                                            <div class="cell-name">
+                                                <i class="fa fa-heart" aria-hidden="true"></i>
+                                                <span t-esc="cell.name" />
+                                            </div>
+                                        </td>
+                                        
+                                        <td>
+                                            <div class="church-name">
+                                                <t t-if="cell.church_id">
+                                                    <i class="fa fa-church" aria-hidden="true"></i>
+                                                    <span t-esc="cell.church_id.name" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="empty-cell">Non définie</span>
+                                                </t>
+                                            </div>
+                                        </td>
+                                        
+                                        <td>
+                                            <div class="tribe-name">
+                                                <t t-if="cell.tribe_id">
+                                                    <i class="fa fa-sitemap" aria-hidden="true"></i>
+                                                    <span t-esc="cell.tribe_id.name" />
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="empty-cell">Non définie</span>
+                                                </t>
+                                            </div>
+                                        </td>
+                                        
+                                        <td>
+                                            <t t-if="cell.prayer_cell_members">
+                                                <t t-foreach="cell.prayer_cell_members" t-as="member">
+                                                    <div class="member-info">
+                                                        <div class="member-name">
+                                                            <i class="fa fa-user" aria-hidden="true"></i>
+                                                            <span t-esc="member.name" />
+                                                        </div>
+                                                        <t t-if="member.phone">
+                                                            <div class="member-phone">
+                                                                <i class="fa fa-phone" aria-hidden="true"></i>
+                                                                <span t-esc="member.phone" />
+                                                            </div>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="empty-cell">Aucun membre</span>
+                                            </t>
+                                        </td>
+                                        
+                                        <td>
+                                            <t t-if="cell.prayer_cell_leader_id">
+                                                <div class="leader-info">
+                                                    <div class="member-name">
+                                                        <i class="fa fa-user-tie" aria-hidden="true"></i>
+                                                        <span t-esc="cell.prayer_cell_leader_id.name" />
+                                                    </div>
+                                                    <t t-if="cell.prayer_cell_leader_id.phone">
+                                                        <div class="member-phone">
+                                                            <i class="fa fa-phone" aria-hidden="true"></i>
+                                                            <span t-esc="cell.prayer_cell_leader_id.phone" />
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="empty-cell">Non assigné</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Résumé en bas de page -->
+                        <div class="summary-info">
+                            <strong>Résumé :</strong> 
+                            <span t-esc="len(prayer_cells)" /> cellule(s) de prière | 
+                            <span t-esc="total_members" /> membre(s) | 
+                            Rapport généré le <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_prayer_cell_list" model="ir.actions.report">
+        <field name="name">Liste des cellules de prière</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">random_team_generator.prayer_cell_list_pdf</field>
+        <field name="report_file">random_team_generator.prayer_cell_list_pdf</field>
+        <field name="print_report_name">'liste_cellules_priere_' + datetime.datetime.now().strftime('%Y%m%d') + '.pdf'</field>
+        <field name="binding_model_id" ref="model_res_partner" />
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="random_team_generator.paperformat_prayer_cell_list_landscape" />
+    </record>
+</odoo>

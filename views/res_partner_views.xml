@@ -109,7 +109,7 @@
                 </page>
 
                 <!-- Onglet spécifique pour les régions -->
-                <page string="Informations Région" name="region_info" invisible="organization_type != 'region'">
+                <page string="Informations Région" name="region_info" invisible="organization_type != 'region' or not is_company">
                     <group>
                         <field name="regional_capital_id"/>
                         <field name="regional_pastor_id"/>
@@ -123,6 +123,48 @@
                         <field name="parent_church_id"/>
                         <field name="main_pastor_id"/>
                         <field name="assistant_pastor_ids" widget="many2many_tags"/>
+                    </group>
+                </page>
+
+                <page string="Informations Tribu" name="tribe_info" invisible="organization_type != 'tribe' or not is_company">
+                    <group>
+                        <field name="tribe_type_id"/>
+                        <field name="tribe_church_id"/>
+                    </group>
+                </page>
+                <page string="Informations Cellule de prière" name="prayer_cell_info" invisible="organization_type != 'prayer_cell' or not is_company">
+                    <group>
+                        <group>
+                            <field name="prayer_cell_type_id"/>
+                            <field name="prayer_cell_tribe_id"/>
+                            <field name="prayer_cell_church_id"/>
+                        </group>
+                        <group>
+                            <field name="prayer_cell_leader_id"/>
+                            <field name="prayer_cell_assistant_leader_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>                    
+                </page>
+                <page string="Informations Groupe" name="group_info" invisible="organization_type != 'group' or not is_company">
+                    <group>
+                        <group>
+                            <field name="group_church_id"/>
+                        </group>
+                        <group>
+                            <field name="group_leader_id"/>
+                            <field name="group_assistant_leader_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Informations Académie" name="academy_info" invisible="organization_type != 'academy' or not is_company">
+                    <group>
+                        <group>
+                            <field name="academy_church_id"/>
+                        </group>
+                        <group>
+                            <field name="academy_leader_id"/>
+                            <field name="academy_assistant_leader_ids" widget="many2many_tags"/>
+                        </group>
                     </group>
                 </page>
 
@@ -594,8 +636,8 @@
                     </field>
                 </page>
 
-                <!-- Onglet Membres de l'académie -->
-                <page string="Membres de l'académie" name="academy_members" 
+                <!-- Onglet Membres de la structure -->
+                <page string="Membres de la structure" name="academy_members" 
                     invisible="organization_type != 'academy' or not is_company">
                     <field name="academy_members" mode="kanban">
                         <kanban>
@@ -658,8 +700,8 @@
                     </field>
                 </page>
 
-                <!-- Onglet Contacts d'entreprise -->
-                <page string="Contacts d'entreprise" name="company_contacts" 
+                <!-- Onglet Membres de l'église -->
+                <page string="Membres de l'église" name="church_members" 
                     invisible="not is_company or organization_type != 'company'">
                     <field name="company_contacts" mode="kanban">
                         <kanban>
@@ -722,28 +764,6 @@
                     </field>
                 </page>
             </page>
-
-            <!-- Ajout des responsables dans les onglets correspondants -->
-            <xpath expr="//page[@name='group_members']" position="inside">
-                <group string="Responsables">
-                    <field name="group_leader_id"/>
-                    <field name="group_assistant_leader_ids" widget="many2many_tags"/>
-                </group>
-            </xpath>
-
-            <xpath expr="//page[@name='prayer_cell_members']" position="inside">
-                <group string="Responsables">
-                    <field name="prayer_cell_leader_id"/>
-                    <field name="prayer_cell_assistant_leader_ids" widget="many2many_tags"/>
-                </group>
-            </xpath>
-
-            <xpath expr="//page[@name='academy_members']" position="inside">
-                <group string="Responsables">
-                    <field name="academy_leader_id"/>
-                    <field name="academy_assistant_leader_ids" widget="many2many_tags"/>
-                </group>
-            </xpath>
         </field>
     </record>
     <record id="view_partner_inscription_kanban" model="ir.ui.view">

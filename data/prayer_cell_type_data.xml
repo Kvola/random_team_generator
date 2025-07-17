@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Livres de démonstration -->
+        <record id="benjamin_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Benjamin 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Benjamin</field>
+            <field name="tribe_id" ref="benjamin_tribe"/>
+        </record>
+        <record id="benjamin_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Benjamin 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Benjamin</field>
+            <field name="tribe_id" ref="benjamin_tribe"/>
+        </record>
+        <record id="judah_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Juda 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Juda</field>
+            <field name="tribe_id" ref="judah_tribe"/>
+        </record>
+        <record id="judah_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Juda 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Juda</field>
+            <field name="tribe_id" ref="judah_tribe"/>
+        </record>
+        <record id="levi_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Lévi 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Lévi</field>
+            <field name="tribe_id" ref="levi_tribe"/>
+        </record>
+        <record id="levi_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Lévi 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Lévi</field>
+            <field name="tribe_id" ref="levi_tribe"/>
+        </record>
+        <record id="dan_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Dan 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Dan</field>
+            <field name="tribe_id" ref="dan_tribe"/>
+        </record>
+        <record id="dan_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Dan 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Dan</field>
+            <field name="tribe_id" ref="dan_tribe"/>
+        </record>
+        <record id="naphtali_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Nephtali 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Nephtali</field>
+            <field name="tribe_id" ref="naphtali_tribe"/>
+        </record>
+        <record id="naphtali_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Nephtali 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Nephtali</field>
+            <field name="tribe_id" ref="naphtali_tribe"/>
+        </record>
+        <record id="gad_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Gad 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Gad</field>
+            <field name="tribe_id" ref="gad_tribe"/>
+        </record>
+        <record id="gad_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Gad 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Gad</field>
+            <field name="tribe_id" ref="gad_tribe"/>
+        </record>
+        <record id="asher_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Asher 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Asher</field>
+            <field name="tribe_id" ref="asher_tribe"/>
+        </record>
+        <record id="asher_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Asher 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Asher</field>
+            <field name="tribe_id" ref="asher_tribe"/>
+        </record>
+        <record id="issachar_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Issacar 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Issacar</field>
+            <field name="tribe_id" ref="issachar_tribe"/>
+        </record>
+        <record id="issachar_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Issacar 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Issacar</field>
+            <field name="tribe_id" ref="issachar_tribe"/>
+        </record>
+        <record id="zebulun_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Zabulon 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Zabulon</field>
+            <field name="tribe_id" ref="zebulun_tribe"/>
+        </record>
+        <record id="zebulun_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Zabulon 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Zabulon</field>
+            <field name="tribe_id" ref="zebulun_tribe"/>
+        </record>
+        <record id="reuben_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Ruben 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Ruben</field>
+            <field name="tribe_id" ref="reuben_tribe"/>
+        </record>
+        <record id="reuben_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Ruben 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Ruben</field>
+            <field name="tribe_id" ref="reuben_tribe"/>
+        </record>
+        <record id="ephraim_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Ephraim 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Ephraim</field>
+            <field name="tribe_id" ref="ephraim_tribe"/>
+        </record>
+        <record id="ephraim_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Ephraim 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Ephraim</field>
+            <field name="tribe_id" ref="ephraim_tribe"/>
+        </record>
+        <record id="simeon_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Simeon 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Simeon</field>
+            <field name="tribe_id" ref="simeon_tribe"/>
+        </record>
+        <record id="simeon_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Simeon 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Simeon</field>
+            <field name="tribe_id" ref="simeon_tribe"/>
+        </record>
+        <record id="manasseh_one_prayer_cell" model="random.prayer.cell">
+            <field name="name">Manassé 1</field>
+            <field name="description">Cellule de prière 1 de la tribu Manassé</field>
+            <field name="tribe_id" ref="manasseh_tribe"/>
+        </record>
+        <record id="manasseh_two_prayer_cell" model="random.prayer.cell">
+            <field name="name">Manassé 2</field>
+            <field name="description">Cellule de prière 2 de la tribu Manassé</field>
+            <field name="tribe_id" ref="manasseh_tribe"/>
+        </record>
+    </data>
+</odoo>
