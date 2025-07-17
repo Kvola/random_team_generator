@@ -3,6 +3,7 @@ from odoo.http import request
 from datetime import date
 import logging
 from odoo.exceptions import ValidationError
+import math
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
@@ -71,13 +72,87 @@ class ResPartnerPortal(http.Controller):
 
     @http.route('/eglises', type='http', auth="public", website=True)
     def list_churches(self, **post):
-        churches = request.env['res.partner'].sudo().search([
+        # Récupération des paramètres de pagination
+        page = int(post.get('page', 1))
+        limit = int(post.get('limit', 20))  # 20 par défaut
+        
+        # Calcul de l'offset
+        offset = (page - 1) * limit
+        
+        # Domaine de recherche
+        domain = [
             ('is_church', '=', True),
             ('active', '=', True)
-        ], order='name')
+        ]
+        
+        # Compte total des églises
+        total_count = request.env['res.partner'].sudo().search_count(domain)
+        
+        # Récupération des églises pour la page actuelle
+        churches = request.env['res.partner'].sudo().search(
+            domain,
+            offset=offset,
+            limit=limit,
+            order='name'
+        )
+        
+        # Calcul du nombre total de pages
+        page_count = math.ceil(total_count / limit) if total_count > 0 else 1
+        
+        # Construction des URLs pour la pagination
+        base_url = '/eglises'
+        
+        def build_url(page_num, limit_val=limit):
+            return f"{base_url}?page={page_num}&limit={limit_val}"
+        
+        # URLs de navigation
+        url_first = build_url(1)
+        url_last = build_url(page_count)
+        url_previous = build_url(page - 1) if page > 1 else None
+        url_next = build_url(page + 1) if page < page_count else None
+        
+        # Génération de la plage de pages à afficher (5 pages max)
+        start_page = max(1, page - 2)
+        end_page = min(page_count, page + 2)
+        
+        # Ajustement si on est proche du début ou de la fin
+        if end_page - start_page < 4:
+            if start_page == 1:
+                end_page = min(page_count, start_page + 4)
+            else:
+                start_page = max(1, end_page - 4)
+        
+        page_range = list(range(start_page, end_page + 1))
+        
+        # Création de l'objet pager
+        pager = {
+            'total': total_count,
+            'limit': limit,
+            'offset': offset,
+            'page': page,
+            'page_count': page_count,
+            'url_first': url_first,
+            'url_last': url_last,
+            'url_previous': url_previous,
+            'url_next': url_next,
+            'url_page': f"{base_url}?page=%s&limit={limit}",
+            'page_range': page_range,
+        }
+        
+        # Calcul des statistiques globales (pour toutes les églises, pas seulement la page actuelle)
+        all_churches = request.env['res.partner'].sudo().search(domain)
+        
+        # Statistiques globales
+        total_regions = len(set(church.region_id.name for church in all_churches if church.region_id.name))
+        total_main_pastors = len([church for church in all_churches if church.main_pastor_id.name])
+        total_assistant_pastors = sum(len(church.assistant_pastor_ids) for church in all_churches)
         
         return request.render("random_team_generator.church_list", {
-            'churches': churches
+            'churches': churches,
+            'pager': pager,
+            'total_regions': total_regions,
+            'total_main_pastors': total_main_pastors,
+            'total_assistant_pastors': total_assistant_pastors,
         })
 
     @http.route('/inscription', type='http', auth="public", website=True, csrf=False)

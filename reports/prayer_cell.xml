@@ -139,9 +139,9 @@
                                         
                                         <td>
                                             <div class="church-name">
-                                                <t t-if="cell.church_id">
+                                                <t t-if="cell.prayer_cell_church_id">
                                                     <i class="fa fa-church" aria-hidden="true"></i>
-                                                    <span t-esc="cell.church_id.name" />
+                                                    <span t-esc="cell.prayer_cell_church_id.name" />
                                                 </t>
                                                 <t t-else="">
                                                     <span class="empty-cell">Non définie</span>
@@ -151,9 +151,9 @@
                                         
                                         <td>
                                             <div class="tribe-name">
-                                                <t t-if="cell.tribe_id">
+                                                <t t-if="cell.prayer_cell_tribe_id">
                                                     <i class="fa fa-sitemap" aria-hidden="true"></i>
-                                                    <span t-esc="cell.tribe_id.name" />
+                                                    <span t-esc="cell.prayer_cell_tribe_id.name" />
                                                 </t>
                                                 <t t-else="">
                                                     <span class="empty-cell">Non définie</span>

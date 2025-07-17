@@ -17,187 +17,6 @@
         <field name="parent_id" ref="website.main_menu" />
         <field name="sequence">70</field>
     </record>
-    <!-- Template pour le PDF des cellules de prière -->
-    <template id="prayer_cell_list_pdf">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <style>
-                    .pdf-header {
-                        text-align: center;
-                        margin-bottom: 30px;
-                        border-bottom: 2px solid #3498db;
-                        padding-bottom: 15px;
-                    }
-                    .pdf-title {
-                        font-size: 28px;
-                        font-weight: bold;
-                        color: #ffffff !important;
-                        background-color: #00477a !important;
-                        margin-bottom: 8px;
-                        text-transform: uppercase;
-                        letter-spacing: 2px;
-                    }
-                    .pdf-subtitle {
-                        font-size: 12px;
-                        color: #7f8c8d;
-                        margin-bottom: 5px;
-                    }
-                    .pdf-stats {
-                        font-size: 11px;
-                        color: #34495e;
-                        font-weight: 500;
-                    }
-                    .pdf-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 20px;
-                        font-size: 10px;
-                    }
-                    .pdf-table th {
-                        color: #ffffff !important;
-                        background: #00477a !important;
-                        font-weight: bold;
-                        padding: 10px 6px;
-                        text-align: center;
-                        border: 1px solid #2980b9;
-                        font-size: 9px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                    }
-                    .pdf-table td {
-                        padding: 8px 6px;
-                        border: 1px solid #bdc3c7;
-                        vertical-align: top;
-                        line-height: 1.3;
-                    }
-                    .pdf-table tbody tr:nth-child(even) {
-                        background-color: #f8f9fa;
-                    }
-                    .pdf-cell-name {
-                        font-weight: bold;
-                        color: #2c3e50;
-                        font-size: 11px;
-                    }
-                    .pdf-church-name {
-                        color: #34495e;
-                        font-weight: 500;
-                    }
-                    .pdf-tribe-name {
-                        color: #7f8c8d;
-                        font-style: italic;
-                    }
-                    .pdf-member-name {
-                        font-weight: 500;
-                        color: #2c3e50;
-                    }
-                    .pdf-member-phone {
-                        color: #3498db;
-                        font-size: 9px;
-                    }
-                    .pdf-empty {
-                        text-align: center;
-                        color: #95a5a6;
-                        font-style: italic;
-                    }
-                    .pdf-footer {
-                        margin-top: 20px;
-                        padding: 8px 12px;
-                        background-color: #ecf0f1;
-                        border-radius: 4px;
-                        font-size: 9px;
-                        color: #2c3e50;
-                        text-align: center;
-                    }
-                </style>
-
-                <div class="pdf-header">
-                    <h1 class="pdf-title">Liste des Cellules de Prière</h1>
-                    <p class="pdf-subtitle">
-                        Date d'édition : <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
-                    </p>
-                    <p class="pdf-stats">
-                        Total : <span t-esc="len(prayer_cells)" /> cellule(s) - <span t-esc="total_members" /> membre(s)
-                    </p>
-                </div>
-
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">Cellule de prière</th>
-                            <th style="width: 20%;">Église</th>
-                            <th style="width: 15%;">Tribu</th>
-                            <th style="width: 30%;">Membres</th>
-                            <th style="width: 15%;">Responsable</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="prayer_cells" t-as="cell">
-                            <tr>
-                                <td>
-                                    <div class="pdf-cell-name" t-esc="cell.name" />
-                                </td>
-                                
-                                <td>
-                                    <t t-if="cell.prayer_cell_church_id.name">
-                                        <div class="pdf-church-name" t-esc="cell.prayer_cell_church_id.name" />
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Non définie</span>
-                                    </t>
-                                </td>
-                                
-                                <td>
-                                    <t t-if="cell.prayer_cell_tribe_id.name">
-                                        <div class="pdf-tribe-name" t-esc="cell.prayer_cell_tribe_id.name" />
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Non définie</span>
-                                    </t>
-                                </td>
-                                
-                                <td>
-                                    <t t-if="cell.prayer_cell_members">
-                                        <t t-foreach="cell.prayer_cell_members" t-as="member">
-                                            <div class="pdf-member-name" t-esc="member.name" />
-                                            <t t-if="member.phone">
-                                                <div class="pdf-member-phone">
-                                                    📞 <span t-esc="member.phone" />
-                                                </div>
-                                            </t>
-                                        </t>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Aucun membre</span>
-                                    </t>
-                                </td>
-                                
-                                <td>
-                                    <t t-if="cell.prayer_cell_leader_id.name">
-                                        <span class="pdf-member-name" t-esc="cell.prayer_cell_leader_id.name" />
-                                        <t t-if="cell.prayer_cell_leader_id.phone">
-                                            <div class="pdf-member-phone">
-                                                📞 <span t-esc="cell.prayer_cell_leader_id.phone" />
-                                            </div>
-                                        </t>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Non assigné</span>
-                                    </t>
-                                </td>
-                            </tr>
-                        </t>
-                    </tbody>
-                </table>
-
-                <div class="pdf-footer">
-                    <strong>Résumé :</strong> 
-                    <span t-esc="len(prayer_cells)" /> cellule(s) | 
-                    <span t-esc="total_members" /> membre(s) | 
-                    Généré le <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
-                </div>
-            </t>
-        </t>
-    </template>
 
     <!-- Template pour la vue web des cellules de prière -->
     <template id="prayer_cell_list" name="Liste des cellules de prière">
@@ -210,81 +29,117 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-8">
                                         <h3 class="mb-0">
-                                            <i class="fa fa-heart me-1"></i>
-                                            Liste des Cellules de Prière
+                                            <i class="fa fa-heart me-1"></i> Liste des Cellules de Prière
                                         </h3>
                                         <small class="text-light">
-                                            <i class="fa fa-calendar me-1"></i>
-                                            Dernière mise à jour : <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                                            <i class="fa fa-calendar me-1"></i> Dernière mise à jour :
+                                            <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
                                         </small>
                                     </div>
                                     <div class="col-md-4 text-end">
                                         <span class="badge bg-light text-primary fs-6">
                                             <i class="fa fa-users me-1"></i>
-                                            <span t-esc="len(prayer_cells)" /> cellule(s) - <span t-esc="total_members" /> membre(s)
+                                            <span id="totalCells" t-esc="len(prayer_cells)" /> cellule(s) -
+                                            <span id="totalMembers" t-esc="total_members" /> membre(s)
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="card-body">
+                                <!-- Barre de recherche et contrôles -->
                                 <div class="row mb-3">
-                                    <div class="col-md-6">
+                                    <div class="col-md-8">
                                         <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="fa fa-search"></i>
                                             </span>
-                                            <input type="text" class="form-control" id="searchInput" 
-                                                placeholder="Rechercher une cellule, église ou membre..." />
+                                            <input type="text" class="form-control" id="searchInput"
+                                                placeholder="Rechercher une cellule, église, tribu ou membre..." />
+                                            <button class="btn btn-outline-secondary" id="clearSearch">
+                                                <i class="fa fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 text-end">
-                                        <a href="/cellules-priere/pdf" class="btn btn-outline-primary">
-                                            <i class="fa fa-file-pdf me-1"></i> Exporter PDF
-                                        </a>
-                                        <button class="btn btn-outline-secondary" onclick="window.print()">
-                                            <i class="fa fa-print me-1"></i> Imprimer
-                                        </button>
+                                    <div class="col-md-4 text-end">
+                                        <div class="btn-group" role="group">
+                                            <a href="/cellules-priere/pdf" class="btn btn-outline-primary">
+                                                <i class="fa fa-file-pdf me-1"></i> PDF
+                                            </a>
+                                            <button class="btn btn-outline-secondary" onclick="window.print()">
+                                                <i class="fa fa-print me-1"></i> Imprimer
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- Contrôles de pagination supérieurs -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <label class="me-2">Afficher</label>
+                                            <select id="rowsPerPage" class="form-select form-select-sm" style="width: auto;">
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="all">Tout</option>
+                                            </select>
+                                            <span class="ms-2">cellules</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <nav aria-label="Pagination supérieure">
+                                            <ul class="pagination pagination-sm mb-0" id="paginationTop">
+                                                <!-- Généré par JavaScript -->
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+
+                                <!-- Tableau principal -->
                                 <div class="table-responsive">
                                     <table class="table table-hover table-striped" id="cellsTable">
                                         <thead class="table-dark">
                                             <tr>
-                                                <th class="text-center">
-                                                    <i class="fa fa-heart me-1"></i>
-                                                    Cellule
+                                                <th class="text-center sortable" data-sort="name">
+                                                    <i class="fa fa-heart me-1"></i> Cellule
+                                                    <i class="fa fa-sort sort-icon"></i>
                                                 </th>
-                                                <th class="text-center">
-                                                    <i class="fa fa-church me-1"></i>
-                                                    Église
+                                                <th class="text-center sortable" data-sort="church">
+                                                    <i class="fa fa-church me-1"></i> Église
+                                                    <i class="fa fa-sort sort-icon"></i>
                                                 </th>
-                                                <th class="text-center">
-                                                    <i class="fa fa-sitemap me-1"></i>
-                                                    Tribu
+                                                <th class="text-center sortable" data-sort="tribe">
+                                                    <i class="fa fa-sitemap me-1"></i> Tribu
+                                                    <i class="fa fa-sort sort-icon"></i>
                                                 </th>
-                                                <th class="text-center">
-                                                    <i class="fa fa-users me-1"></i>
-                                                    Membres
+                                                <th class="text-center sortable" data-sort="members">
+                                                    <i class="fa fa-users me-1"></i> Membres
+                                                    <i class="fa fa-sort sort-icon"></i>
                                                 </th>
-                                                <th class="text-center">
-                                                    <i class="fa fa-user-tie me-1"></i>
-                                                    Responsable
+                                                <th class="text-center sortable" data-sort="leader">
+                                                    <i class="fa fa-user-tie me-1"></i> Responsable
+                                                    <i class="fa fa-sort sort-icon"></i>
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="tableBody">
                                             <t t-foreach="prayer_cells" t-as="cell">
-                                                <tr>
+                                                <tr class="data-row" 
+                                                    t-att-data-name="cell.name"
+                                                    t-att-data-church="cell.prayer_cell_church_id.name or ''"
+                                                    t-att-data-tribe="cell.prayer_cell_tribe_id.name or ''"
+                                                    t-att-data-member-count="len(cell.prayer_cell_members)"
+                                                    t-att-data-leader="cell.prayer_cell_leader_id.name or ''">
                                                     <td>
                                                         <div class="fw-bold text-primary">
                                                             <i class="fa fa-home me-2 text-muted"></i>
                                                             <span t-esc="cell.name" />
                                                         </div>
                                                     </td>
-                                                    
-                                                    <td>
+
+                                                    <td class="text-center">
                                                         <t t-if="cell.prayer_cell_church_id.name">
                                                             <span class="badge bg-info text-dark">
                                                                 <i class="fa fa-map-pin me-1"></i>
@@ -298,8 +153,8 @@
                                                             </span>
                                                         </t>
                                                     </td>
-                                                    
-                                                    <td>
+
+                                                    <td class="text-center">
                                                         <t t-if="cell.prayer_cell_tribe_id.name">
                                                             <span class="badge bg-secondary">
                                                                 <i class="fa fa-map-pin me-1"></i>
@@ -313,9 +168,15 @@
                                                             </span>
                                                         </t>
                                                     </td>
-                                                    
+
                                                     <td>
                                                         <t t-if="cell.prayer_cell_members">
+                                                            <div class="member-count-badge mb-2">
+                                                                <span class="badge bg-primary">
+                                                                    <i class="fa fa-users me-1"></i>
+                                                                    <span t-esc="len(cell.prayer_cell_members)" /> membre(s)
+                                                                </span>
+                                                            </div>
                                                             <t t-foreach="cell.prayer_cell_members" t-as="member">
                                                                 <div class="member-info mb-2">
                                                                     <div class="fw-semibold text-dark">
@@ -325,7 +186,10 @@
                                                                     <t t-if="member.phone">
                                                                         <div class="small text-primary">
                                                                             <i class="fa fa-phone me-1"></i>
-                                                                            <span t-esc="member.phone" />
+                                                                            <a t-att-href="'tel:' + member.phone" 
+                                                                            class="text-decoration-none">
+                                                                                <span t-esc="member.phone" />
+                                                                            </a>
                                                                         </div>
                                                                     </t>
                                                                 </div>
@@ -338,7 +202,7 @@
                                                             </span>
                                                         </t>
                                                     </td>
-                                                    
+
                                                     <td>
                                                         <t t-if="cell.prayer_cell_leader_id.name">
                                                             <div class="leader-info">
@@ -349,7 +213,10 @@
                                                                 <t t-if="cell.prayer_cell_leader_id.phone">
                                                                     <div class="small text-primary">
                                                                         <i class="fa fa-phone me-1"></i>
-                                                                        <span t-esc="cell.prayer_cell_leader_id.phone" />
+                                                                        <a t-att-href="'tel:' + cell.prayer_cell_leader_id.phone" 
+                                                                        class="text-decoration-none">
+                                                                            <span t-esc="cell.prayer_cell_leader_id.phone" />
+                                                                        </a>
                                                                     </div>
                                                                 </t>
                                                             </div>
@@ -366,222 +233,366 @@
                                         </tbody>
                                     </table>
                                 </div>
+
+                                <!-- Message d'absence de résultats -->
+                                <div id="noResults" class="text-center py-5" style="display: none;">
+                                    <div class="text-muted">
+                                        <i class="fa fa-search fa-3x mb-3"></i>
+                                        <h5>Aucun résultat trouvé</h5>
+                                        <p>Essayez de modifier vos critères de recherche</p>
+                                    </div>
+                                </div>
+
+                                <!-- Informations de pagination inférieures -->
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="dataTables_info text-muted" id="pageInfo">
+                                            Affichage de 1 à <span t-esc="min(10, len(prayer_cells))" /> sur 
+                                            <span t-esc="len(prayer_cells)" /> cellules
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <nav aria-label="Pagination inférieure">
+                                            <ul class="pagination mb-0" id="paginationBottom">
+                                                <!-- Généré par JavaScript -->
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Script pour la recherche -->
+            <!-- CSS personnalisé -->
+            <style>
+                .sortable {
+                    cursor: pointer;
+                    user-select: none;
+                    position: relative;
+                }
+                
+                .sortable:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
+                
+                .sort-icon {
+                    opacity: 0.5;
+                    font-size: 0.8em;
+                    margin-left: 5px;
+                }
+                
+                .sortable.asc .sort-icon::before {
+                    content: "\f0de";
+                    opacity: 1;
+                }
+                
+                .sortable.desc .sort-icon::before {
+                    content: "\f0dd";
+                    opacity: 1;
+                }
+                
+                .member-info {
+                    border-left: 3px solid #007bff;
+                    padding-left: 10px;
+                    margin-bottom: 8px;
+                }
+                
+                .leader-info {
+                    border-left: 3px solid #28a745;
+                    padding-left: 10px;
+                }
+                
+                .member-count-badge {
+                    text-align: center;
+                }
+                
+                .pagination-sm .page-link {
+                    padding: 0.25rem 0.5rem;
+                    font-size: 0.875rem;
+                }
+                
+                .table-hover tbody tr:hover {
+                    background-color: rgba(0, 123, 255, 0.05);
+                }
+                
+                .data-row {
+                    transition: all 0.2s ease;
+                }
+                
+                .bg-gradient-primary {
+                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                    color: white;
+                }
+            </style>
+
+            <!-- Scripts pour la pagination, recherche et tri -->
             <script>
-                document.getElementById('searchInput').addEventListener('keyup', function() {
-                    const searchTerm = this.value.toLowerCase();
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Configuration initiale
+                    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+                    const tableBody = document.getElementById('tableBody');
+                    const rows = Array.from(tableBody.getElementsByClassName('data-row'));
+                    const paginationTop = document.getElementById('paginationTop');
+                    const paginationBottom = document.getElementById('paginationBottom');
+                    const pageInfo = document.getElementById('pageInfo');
+                    const searchInput = document.getElementById('searchInput');
+                    const clearSearch = document.getElementById('clearSearch');
+                    const noResults = document.getElementById('noResults');
                     const table = document.getElementById('cellsTable');
-                    const rows = table.getElementsByTagName('tr');
                     
-                    for (let i = 1; i &lt; rows.length; i++) {
-                        const row = rows[i];
-                        const text = row.textContent.toLowerCase();
-                        
-                        if (text.includes(searchTerm)) {
-                            row.style.display = '';
+                    let currentPage = 1;
+                    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+                    let filteredRows = rows;
+                    let sortColumn = null;
+                    let sortDirection = 'asc';
+
+                    // Fonction de tri
+                    function sortTable(column) {
+                        if (sortColumn === column) {
+                            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
                         } else {
-                            row.style.display = 'none';
+                            sortColumn = column;
+                            sortDirection = 'asc';
                         }
+
+                        // Mettre à jour les icônes de tri
+                        document.querySelectorAll('.sortable').forEach(th => {
+                            th.classList.remove('asc', 'desc');
+                        });
+                        document.querySelector(`[data-sort="${column}"]`).classList.add(sortDirection);
+
+                        // Trier les lignes filtrées
+                        filteredRows.sort((a, b) => {
+                            let aValue = '';
+                            let bValue = '';
+
+                            switch(column) {
+                                case 'name':
+                                    aValue = a.dataset.name || '';
+                                    bValue = b.dataset.name || '';
+                                    break;
+                                case 'church':
+                                    aValue = a.dataset.church || '';
+                                    bValue = b.dataset.church || '';
+                                    break;
+                                case 'tribe':
+                                    aValue = a.dataset.tribe || '';
+                                    bValue = b.dataset.tribe || '';
+                                    break;
+                                case 'members':
+                                    aValue = parseInt(a.dataset.memberCount) || 0;
+                                    bValue = parseInt(b.dataset.memberCount) || 0;
+                                    break;
+                                case 'leader':
+                                    aValue = a.dataset.leader || '';
+                                    bValue = b.dataset.leader || '';
+                                    break;
+                            }
+
+                            if (typeof aValue === 'number' &amp;&amp; typeof bValue === 'number') {
+                                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+                            } else {
+                                const comparison = aValue.localeCompare(bValue, 'fr', { sensitivity: 'base' });
+                                return sortDirection === 'asc' ? comparison : -comparison;
+                            }
+                        });
+
+                        currentPage = 1;
+                        updateDisplay();
                     }
+
+                    // Fonction pour mettre à jour l'affichage
+                    function updateDisplay() {
+                        // Filtrer par recherche
+                        const searchTerm = searchInput.value.toLowerCase().trim();
+                        filteredRows = rows.filter(row => {
+                            if (searchTerm === '') return true;
+                            return row.textContent.toLowerCase().includes(searchTerm);
+                        });
+
+                        // Mettre à jour les totaux
+                        document.getElementById('totalCells').textContent = filteredRows.length;
+                        const totalMembers = filteredRows.reduce((sum, row) => {
+                            return sum + (parseInt(row.dataset.memberCount) || 0);
+                        }, 0);
+                        document.getElementById('totalMembers').textContent = totalMembers;
+
+                        // Gestion de l'affichage "Tout"
+                        if (rowsPerPage === 'all') {
+                            currentPage = 1;
+                            displayRows(filteredRows);
+                            updatePageInfo(1, filteredRows.length, filteredRows.length);
+                            generatePaginationControls(1);
+                        } else {
+                            // Pagination normale
+                            const pageCount = Math.ceil(filteredRows.length / rowsPerPage);
+                            currentPage = Math.min(currentPage, pageCount) || 1;
+
+                            const start = (currentPage - 1) * rowsPerPage;
+                            const end = start + rowsPerPage;
+                            const pageRows = filteredRows.slice(start, end);
+
+                            displayRows(pageRows);
+                            updatePageInfo(start + 1, Math.min(end, filteredRows.length), filteredRows.length);
+                            generatePaginationControls(pageCount);
+                        }
+
+                        // Afficher/masquer le message d'absence de résultats
+                        noResults.style.display = filteredRows.length === 0 ? 'block' : 'none';
+                        table.style.display = filteredRows.length === 0 ? 'none' : 'table';
+                    }
+
+                    // Fonction pour afficher les lignes
+                    function displayRows(rowsToShow) {
+                        rows.forEach(row => row.style.display = 'none');
+                        rowsToShow.forEach(row => row.style.display = '');
+                    }
+
+                    // Fonction pour mettre à jour les informations de page
+                    function updatePageInfo(start, end, total) {
+                        const displayedStart = total > 0 ? start : 0;
+                        pageInfo.innerHTML = `Affichage de ${displayedStart} à ${end} sur ${total} cellules`;
+                    }
+
+                    // Fonction pour générer les contrôles de pagination
+                    function generatePaginationControls(pageCount) {
+                        if (pageCount &lt;= 1) {
+                            paginationTop.innerHTML = '';
+                            paginationBottom.innerHTML = '';
+                            return;
+                        }
+
+                        const paginationHTML = [];
+                        const maxVisiblePages = 5;
+
+                        // Bouton Précédent
+                        paginationHTML.push(`
+                            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" data-page="${currentPage - 1}">
+                                    <i class="fa fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        `);
+
+                        // Calcul des pages visibles
+                        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                        let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+
+                        if (endPage - startPage + 1 &lt; maxVisiblePages) {
+                            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                        }
+
+                        // Première page et ellipses
+                        if (startPage > 1) {
+                            paginationHTML.push(`
+                                <li class="page-item">
+                                    <a class="page-link" href="#" data-page="1">1</a>
+                                </li>
+                            `);
+                            if (startPage > 2) {
+                                paginationHTML.push(`
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                `);
+                            }
+                        }
+
+                        // Pages numérotées
+                        for (let i = startPage; i &lt;= endPage; i++) {
+                            paginationHTML.push(`
+                                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                                </li>
+                            `);
+                        }
+
+                        // Dernière page et ellipses
+                        if (endPage &lt; pageCount) {
+                            if (endPage &lt; pageCount - 1) {
+                                paginationHTML.push(`
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                `);
+                            }
+                            paginationHTML.push(`
+                                <li class="page-item">
+                                    <a class="page-link" href="#" data-page="${pageCount}">${pageCount}</a>
+                                </li>
+                            `);
+                        }
+
+                        // Bouton Suivant
+                        paginationHTML.push(`
+                            <li class="page-item ${currentPage === pageCount ? 'disabled' : ''}">
+                                <a class="page-link" href="#" data-page="${currentPage + 1}">
+                                    <i class="fa fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        `);
+
+                        // Appliquer aux deux paginations
+                        const htmlString = paginationHTML.join('');
+                        paginationTop.innerHTML = htmlString;
+                        paginationBottom.innerHTML = htmlString;
+
+                        // Ajouter les écouteurs d'événements
+                        document.querySelectorAll('.page-link').forEach(link => {
+                            link.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const page = parseInt(this.getAttribute('data-page'));
+                                if (!isNaN(page) &amp;&amp; page >= 1 &amp;&amp; page &amp;= pageCount) {
+                                    currentPage = page;
+                                    updateDisplay();
+                                    // Scroll vers le haut
+                                    document.querySelector('.card-header').scrollIntoView({ 
+                                        behavior: 'smooth' 
+                                    });
+                                }
+                            });
+                        });
+                    }
+
+                    // Écouteurs d'événements
+                    rowsPerPageSelect.addEventListener('change', function() {
+                        rowsPerPage = this.value === 'all' ? 'all' : parseInt(this.value);
+                        currentPage = 1;
+                        updateDisplay();
+                    });
+
+                    searchInput.addEventListener('input', function() {
+                        currentPage = 1;
+                        updateDisplay();
+                    });
+
+                    clearSearch.addEventListener('click', function() {
+                        searchInput.value = '';
+                        currentPage = 1;
+                        updateDisplay();
+                    });
+
+                    // Écouteurs pour le tri
+                    document.querySelectorAll('.sortable').forEach(th => {
+                        th.addEventListener('click', function() {
+                            sortTable(this.dataset.sort);
+                        });
+                    });
+
+                    // Raccourcis clavier
+                    document.addEventListener('keydown', function(e) {
+                        if (e.ctrlKey &amp;&amp; e.key === 'f') {
+                            e.preventDefault();
+                            searchInput.focus();
+                        }
+                    });
+
+                    // Initialisation
+                    updateDisplay();
                 });
             </script>
-        </t>
-    </template>
-    <!-- Template pour le PDF -->
-    <template id="church_list_pdf">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <style>
-                    .pdf-header {
-                        text-align: center;
-                        margin-bottom: 30px;
-                        border-bottom: 2px solid #3498db;
-                        padding-bottom: 15px;
-                    }
-                    .pdf-title {
-                        font-size: 28px;
-                        font-weight: bold;
-                        color: #ffffff !important;
-                        background-color: #00477a !important;
-                        margin-bottom: 8px;
-                        text-transform: uppercase;
-                        letter-spacing: 2px;
-                    }
-                    .pdf-subtitle {
-                        font-size: 12px;
-                        color: #7f8c8d;
-                        margin-bottom: 5px;
-                    }
-                    .pdf-stats {
-                        font-size: 11px;
-                        color: #34495e;
-                        font-weight: 500;
-                    }
-                    .pdf-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 20px;
-                        font-size: 10px;
-                    }
-                    .pdf-table th {
-                        color: #ffffff !important;
-                        background: #00477a !important;
-                        font-weight: bold;
-                        padding: 10px 6px;
-                        text-align: center;
-                        border: 1px solid #2980b9;
-                        font-size: 9px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                    }
-                    .pdf-table td {
-                        padding: 8px 6px;
-                        border: 1px solid #bdc3c7;
-                        vertical-align: top;
-                        line-height: 1.3;
-                    }
-                    .pdf-table tbody tr:nth-child(even) {
-                        background-color: #f8f9fa;
-                    }
-                    .pdf-church-name {
-                        font-weight: bold;
-                        color: #2c3e50;
-                        font-size: 11px;
-                    }
-                    .pdf-region {
-                        color: #34495e;
-                        font-weight: 500;
-                    }
-                    .pdf-pastor-name {
-                        font-weight: 500;
-                        color: #2c3e50;
-                        display: block;
-                        margin-bottom: 2px;
-                    }
-                    .pdf-pastor-phone {
-                        color: #7f8c8d;
-                        font-size: 8px;
-                        font-style: italic;
-                    }
-                    .pdf-assistant-pastor {
-                        display: block;
-                        margin-bottom: 3px;
-                        padding: 1px 0;
-                    }
-                    .pdf-empty {
-                        text-align: center;
-                        color: #95a5a6;
-                        font-style: italic;
-                    }
-                    .pdf-footer {
-                        margin-top: 20px;
-                        padding: 8px 12px;
-                        background-color: #ecf0f1;
-                        border-radius: 4px;
-                        font-size: 9px;
-                        color: #2c3e50;
-                        text-align: center;
-                    }
-                </style>
-
-                <div class="pdf-header">
-                    <h1 class="pdf-title">Liste des Églises</h1>
-                    <p class="pdf-subtitle">
-                        Date d'édition : <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
-                    </p>
-                    <p class="pdf-stats">
-                        Total : <span t-esc="len(churches)" /> église(s) répertoriée(s)
-                    </p>
-                </div>
-
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 25%;">Église</th>
-                            <th style="width: 15%;">Région</th>
-                            <th style="width: 20%;">Pasteur Régional</th>
-                            <th style="width: 20%;">Pasteur Principal</th>
-                            <th style="width: 20%;">Pasteurs Adjoints</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="churches" t-as="church">
-                            <tr>
-                                <td>
-                                    <div class="pdf-church-name" t-esc="church.name" />
-                                </td>
-                                
-                                <td>
-                                    <t t-if="church.region_id.name">
-                                        <div class="pdf-region" t-esc="church.region_id.name" />
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Non définie</span>
-                                    </t>
-                                </td>
-                                
-                                <td>
-                                    <t t-if="church.region_id.regional_pastor_id.name">
-                                        <span class="pdf-pastor-name" t-esc="church.region_id.regional_pastor_id.name" />
-                                        <t t-if="church.region_id.regional_pastor_id.phone">
-                                            <div class="pdf-pastor-phone">
-                                                📞 <span t-esc="church.region_id.regional_pastor_id.phone" />
-                                            </div>
-                                        </t>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Non assigné</span>
-                                    </t>
-                                </td>
-                                
-                                <td>
-                                    <t t-if="church.main_pastor_id.name">
-                                        <span class="pdf-pastor-name" t-esc="church.main_pastor_id.name" />
-                                        <t t-if="church.main_pastor_id.phone">
-                                            <div class="pdf-pastor-phone">
-                                                📞 <span t-esc="church.main_pastor_id.phone" />
-                                            </div>
-                                        </t>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Non assigné</span>
-                                    </t>
-                                </td>
-                                
-                                <td>
-                                    <t t-if="church.assistant_pastor_ids">
-                                        <t t-foreach="church.assistant_pastor_ids" t-as="pastor">
-                                            <div class="pdf-assistant-pastor">
-                                                <span class="pdf-pastor-name" t-esc="pastor.name" />
-                                                <t t-if="pastor.phone">
-                                                    <div class="pdf-pastor-phone">
-                                                        📞 <span t-esc="pastor.phone" />
-                                                    </div>
-                                                </t>
-                                            </div>
-                                        </t>
-                                    </t>
-                                    <t t-else="">
-                                        <span class="pdf-empty">Aucun</span>
-                                    </t>
-                                </td>
-                            </tr>
-                        </t>
-                    </tbody>
-                </table>
-
-                <div class="pdf-footer">
-                    <strong>Résumé :</strong> 
-                    <span t-esc="len(churches)" /> église(s) | 
-                    Généré le <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
-                </div>
-            </t>
         </t>
     </template>
 
@@ -596,23 +607,22 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-8">
                                         <h3 class="mb-0">
-                                            <i class="fa fa-church me-1"></i>
-                                            Liste des Églises
-                                        </h3>
+                                            <i class="fa fa-church me-1"></i> Liste des Églises </h3>
                                         <small class="text-light">
-                                            <i class="fa fa-calendar me-1"></i>
-                                            Dernière mise à jour : <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                                            <i class="fa fa-calendar me-1"></i> Dernière mise à jour
+                                            : <span
+                                                t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
                                         </small>
                                     </div>
                                     <div class="col-md-4 text-end">
                                         <span class="badge bg-light text-primary fs-6">
                                             <i class="fa fa-home me-1"></i>
-                                            <span t-esc="len(churches)" /> église(s)
-                                        </span>
+                                        <span
+                                                t-esc="pager['total']" /> église(s) </span>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="card-body">
                                 <div class="row mb-3">
                                     <div class="col-md-6">
@@ -620,44 +630,69 @@
                                             <span class="input-group-text">
                                                 <i class="fa fa-search"></i>
                                             </span>
-                                            <input type="text" class="form-control" id="searchInput" 
+                                            <input type="text" class="form-control" id="searchInput"
                                                 placeholder="Rechercher une église, région ou pasteur..." />
                                         </div>
                                     </div>
                                     <div class="col-md-6 text-end">
-                                        <a href="/eglises/pdf" class="btn btn-outline-primary">
-                                            <i class="fa fa-file-pdf me-1"></i> Exporter PDF
-                                        </a>
-                                        <button class="btn btn-outline-secondary" onclick="window.print()">
-                                            <i class="fa fa-print me-1"></i> Imprimer
-                                        </button>
+                                        <div class="btn-group">
+                                            <select class="form-select" id="itemsPerPage"
+                                                style="width: auto;">
+                                                <option value="10"
+                                                    t-att-selected="'selected' if pager['limit'] == 10 else None">10
+                                                    par page</option>
+                                                <option value="20"
+                                                    t-att-selected="'selected' if pager['limit'] == 20 else None">20
+                                                    par page</option>
+                                                <option value="50"
+                                                    t-att-selected="'selected' if pager['limit'] == 50 else None">50
+                                                    par page</option>
+                                                <option value="100"
+                                                    t-att-selected="'selected' if pager['limit'] == 100 else None">100
+                                                    par page</option>
+                                            </select>
+                                        </div>
+                                        <a href="/eglises/pdf" class="btn btn-outline-primary ms-2">
+                                            <i class="fa fa-file-pdf me-1"></i> Exporter PDF </a>
+                                        <button class="btn btn-outline-secondary"
+                                            onclick="window.print()">
+                                            <i class="fa fa-print me-1"></i> Imprimer </button>
+                                    </div>
+                                </div>
+
+                                <!-- Informations de pagination -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted"> Affichage de <span
+                                                t-esc="pager['offset'] + 1" /> à <span
+                                                t-esc="min(pager['offset'] + pager['limit'], pager['total'])" />
+                                            sur <span t-esc="pager['total']" /> églises </small>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <small class="text-muted"> Page <span t-esc="pager['page']" />
+                                            sur <span t-esc="pager['page_count']" />
+                                        </small>
                                     </div>
                                 </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-hover table-striped" id="churchesTable">
+                                    <table class="table table-hover table-striped"
+                                        id="churchesTable">
                                         <thead class="table-dark">
                                             <tr>
                                                 <th class="text-center">
-                                                    <i class="fa fa-church me-1"></i>
-                                                    Église
-                                                </th>
+                                                    <i class="fa fa-church me-1"></i> Église </th>
                                                 <th class="text-center">
-                                                    <i class="fa fa-map-marker me-1"></i>
-                                                    Région
-                                                </th>
+                                                    <i class="fa fa-map-marker me-1"></i> Région </th>
                                                 <th class="text-center">
-                                                    <i class="fa fa-user-tie me-1"></i>
-                                                    Pasteur Régional
-                                                </th>
+                                                    <i class="fa fa-user-tie me-1"></i> Pasteur
+                                                    Régional </th>
                                                 <th class="text-center">
-                                                    <i class="fa fa-user-plus me-1"></i>
-                                                    Pasteur Principal
-                                                </th>
+                                                    <i class="fa fa-user-plus me-1"></i> Pasteur
+                                                    Principal </th>
                                                 <th class="text-center">
-                                                    <i class="fa fa-users me-1"></i>
-                                                    Pasteurs Adjoints
-                                                </th>
+                                                    <i class="fa fa-users me-1"></i> Pasteurs
+                                                    Adjoints </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -669,7 +704,7 @@
                                                             <span t-esc="church.name" />
                                                         </div>
                                                     </td>
-                                                    
+
                                                     <td>
                                                         <t t-if="church.region_id.name">
                                                             <span class="badge bg-info text-dark">
@@ -679,23 +714,30 @@
                                                         </t>
                                                         <t t-else="">
                                                             <span class="text-muted fst-italic">
-                                                                <i class="fa fa-exclamation-triangle me-1"></i>
-                                                                Non définie
-                                                            </span>
+                                                                <i
+                                                                    class="fa fa-exclamation-triangle me-1"></i>
+                                                                Non définie </span>
                                                         </t>
                                                     </td>
-                                                    
+
                                                     <td>
-                                                        <t t-if="church.region_id.regional_pastor_id.name">
+                                                        <t
+                                                            t-if="church.region_id.regional_pastor_id.name">
                                                             <div class="pastor-info">
                                                                 <div class="fw-semibold text-dark">
-                                                                    <i class="fa fa-user me-1 text-primary"></i>
-                                                                    <span t-esc="church.region_id.regional_pastor_id.name" />
+                                                                    <i
+                                                                        class="fa fa-user me-1 text-primary"></i>
+                                                                    <span
+                                                                        t-esc="church.region_id.regional_pastor_id.name" />
                                                                 </div>
-                                                                <t t-if="church.region_id.regional_pastor_id.phone">
+                                                                <t
+                                                                    t-if="church.region_id.regional_pastor_id.phone">
                                                                     <div class="small text-muted">
                                                                         <i class="fa fa-phone me-1"></i>
-                                                                        <span t-esc="church.region_id.regional_pastor_id.phone" />
+                                                                        <a t-att-href="'tel:' + church.region_id.regional_pastor_id.phone" 
+                                                                            class="text-decoration-none">
+                                                                            <span t-esc="church.region_id.regional_pastor_id.phone" />
+                                                                        </a>
                                                                     </div>
                                                                 </t>
                                                             </div>
@@ -703,22 +745,27 @@
                                                         <t t-else="">
                                                             <span class="text-muted fst-italic">
                                                                 <i class="fa fa-user-times me-1"></i>
-                                                                Non assigné
-                                                            </span>
+                                                                Non assigné </span>
                                                         </t>
                                                     </td>
-                                                    
+
                                                     <td>
                                                         <t t-if="church.main_pastor_id.name">
                                                             <div class="pastor-info">
                                                                 <div class="fw-semibold text-dark">
-                                                                    <i class="fa fa-user me-1 text-success"></i>
-                                                                    <span t-esc="church.main_pastor_id.name" />
+                                                                    <i
+                                                                        class="fa fa-user me-1 text-success"></i>
+                                                                    <span
+                                                                        t-esc="church.main_pastor_id.name" />
                                                                 </div>
-                                                                <t t-if="church.main_pastor_id.phone">
+                                                                <t
+                                                                    t-if="church.main_pastor_id.phone">
                                                                     <div class="small text-muted">
                                                                         <i class="fa fa-phone me-1"></i>
-                                                                        <span t-esc="church.main_pastor_id.phone" />
+                                                                        <a t-att-href="'tel:' + church.main_pastor_id.phone" 
+                                                                            class="text-decoration-none">
+                                                                            <span t-esc="church.main_pastor_id.phone" />
+                                                                        </a>
                                                                     </div>
                                                                 </t>
                                                             </div>
@@ -726,23 +773,31 @@
                                                         <t t-else="">
                                                             <span class="text-muted fst-italic">
                                                                 <i class="fa fa-user-times me-1"></i>
-                                                                Non assigné
-                                                            </span>
+                                                                Non assigné </span>
                                                         </t>
                                                     </td>
-                                                    
+
                                                     <td>
                                                         <t t-if="church.assistant_pastor_ids">
-                                                            <t t-foreach="church.assistant_pastor_ids" t-as="pastor">
+                                                            <t
+                                                                t-foreach="church.assistant_pastor_ids"
+                                                                t-as="pastor">
                                                                 <div class="assistant-pastor mb-2">
-                                                                    <div class="fw-semibold text-dark">
-                                                                        <i class="fa fa-user me-1 text-warning"></i>
+                                                                    <div
+                                                                        class="fw-semibold text-dark">
+                                                                        <i
+                                                                            class="fa fa-user me-1 text-warning"></i>
                                                                         <span t-esc="pastor.name" />
                                                                     </div>
                                                                     <t t-if="pastor.phone">
-                                                                        <div class="small text-muted">
-                                                                            <i class="fa fa-phone me-1"></i>
-                                                                            <span t-esc="pastor.phone" />
+                                                                        <div
+                                                                            class="small text-muted">
+                                                                            <i
+                                                                                class="fa fa-phone me-1"></i>
+                                                                            <a t-att-href="'tel:' + pastor.phone" 
+                                                                            class="text-decoration-none"><span
+                                                                                t-esc="pastor.phone" />
+                                                                            </a>
                                                                         </div>
                                                                     </t>
                                                                 </div>
@@ -751,14 +806,69 @@
                                                         <t t-else="">
                                                             <span class="text-muted fst-italic">
                                                                 <i class="fa fa-users-slash me-1"></i>
-                                                                Aucun
-                                                            </span>
+                                                                Aucun </span>
                                                         </t>
                                                     </td>
                                                 </tr>
                                             </t>
                                         </tbody>
                                     </table>
+                                </div>
+
+                                <!-- Pagination -->
+                                <div class="row mt-4">
+                                    <div class="col-md-12">
+                                        <nav aria-label="Navigation des pages">
+                                            <ul class="pagination justify-content-center">
+                                                <!-- Première page -->
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if pager['page'] == 1 else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_first']">
+                                                        <i class="fa fa-angle-double-left"></i>
+                                                    </a>
+                                                </li>
+
+                                                <!-- Page précédente -->
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if not pager['url_previous'] else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_previous'] or '#'">
+                                                        <i class="fa fa-angle-left"></i>
+                                                    </a>
+                                                </li>
+
+                                                <!-- Pages numériques -->
+                                                <t t-foreach="pager['page_range']" t-as="page_num">
+                                                    <li
+                                                        t-att-class="'page-item' + (' active' if page_num == pager['page'] else '')">
+                                                        <a class="page-link"
+                                                            t-att-href="pager['url_page'] % page_num">
+                                                            <span t-esc="page_num" />
+                                                        </a>
+                                                    </li>
+                                                </t>
+
+                                                <!-- Page suivante -->
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if not pager['url_next'] else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_next'] or '#'">
+                                                        <i class="fa fa-angle-right"></i>
+                                                    </a>
+                                                </li>
+
+                                                <!-- Dernière page -->
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if pager['page'] == pager['page_count'] else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_last']">
+                                                        <i class="fa fa-angle-double-right"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
                                 </div>
 
                                 <!-- Statistiques en bas -->
@@ -770,28 +880,29 @@
                                                     <div class="col-md-3">
                                                         <h5 class="text-primary">
                                                             <i class="fa fa-church"></i>
-                                                            <span t-esc="len(churches)" />
+                                                            <span t-esc="pager['total']" />
                                                         </h5>
                                                         <small class="text-muted">Total Églises</small>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <h5 class="text-info">
                                                             <i class="fa fa-map-marker"></i>
-                                                            <span t-esc="len(set(church.region_id.name for church in churches if church.region_id.name))" />
+                                                            <span t-esc="total_regions" />
                                                         </h5>
                                                         <small class="text-muted">Régions</small>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <h5 class="text-success">
                                                             <i class="fa fa-user-plus"></i>
-                                                            <span t-esc="len([church for church in churches if church.main_pastor_id.name])" />
+                                                            <span t-esc="total_main_pastors" />
                                                         </h5>
-                                                        <small class="text-muted">Pasteurs Principaux</small>
+                                                        <small class="text-muted">Pasteurs
+                                                            Principaux</small>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <h5 class="text-warning">
                                                             <i class="fa fa-users"></i>
-                                                            <span t-esc="sum(len(church.assistant_pastor_ids) for church in churches)" />
+                                                            <span t-esc="total_assistant_pastors" />
                                                         </h5>
                                                         <small class="text-muted">Pasteurs Adjoints</small>
                                                     </div>
@@ -804,27 +915,37 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Script pour la recherche -->
-            <script>
-                document.getElementById('searchInput').addEventListener('keyup', function() {
+                <!-- Script pour la recherche et pagination -->
+                <script>
+                    // Recherche
+                    document.getElementById('searchInput').addEventListener('keyup', function() {
                     const searchTerm = this.value.toLowerCase();
                     const table = document.getElementById('churchesTable');
                     const rows = table.getElementsByTagName('tr');
-                    
+
                     for (let i = 1; i &lt; rows.length; i++) {
-                        const row = rows[i];
-                        const text = row.textContent.toLowerCase();
-                        
-                        if (text.includes(searchTerm)) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
+                    const row = rows[i];
+                    const text = row.textContent.toLowerCase();
+
+                    if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                    } else {
+                    row.style.display = 'none';
                     }
-                });
-            </script>
+                    }
+                    });
+
+                    // Changement du nombre d'éléments par page
+                    document.getElementById('itemsPerPage').addEventListener('change', function() {
+                    const limit = this.value;
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('limit', limit);
+                    currentUrl.searchParams.set('page', 1); // Retour à la première page
+                    window.location.href = currentUrl.toString();
+                    });
+                </script>
+            </div>
         </t>
     </template>
     <!-- Formulaire d'inscription complet -->
