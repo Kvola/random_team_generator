@@ -196,8 +196,8 @@
                 </page>
 
                 <!-- Onglet pour les rôles dans l'église (pour les membres) -->
-                <page string="Structures et Rôles" name="church_roles"
-                    invisible="is_company or not is_in_a_church">
+                <page string="Structures" name="church_structures"
+                    invisible="is_company">
                     <group>
                         <group>
                             <field name="church_id" invisible="is_company" placeholder="Église" />
