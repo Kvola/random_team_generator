@@ -179,40 +179,84 @@ class ResPartner(models.Model):
 
     # ========== NOUVEAUX CHAMPS POUR LES GROUPES SPÉCIALISÉS ==========
 
-    # Groupes de chant (Many2many car un membre peut appartenir à plusieurs groupes)
+    # Groupes de communication (Many2many car un membre peut appartenir à plusieurs groupes)
+    @api.depends_context("church_id")
+    def _compute_communication_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.communication_domain = [
+                    ('organization_type', '=', 'communication'),
+                    ("communication_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.communication_domain = []
+    communication_domain = fields.Char(compute="_compute_communication_domain")
     communication_ids = fields.Many2many(
         "res.partner",
         "partner_communication_rel",
         "partner_id",
         "communication_id",
         string="Groupes de communication",
-        domain="[('organization_type', '=', 'communication'), ('church_id', '=', church_id)]",
+        #domain="[('organization_type', '=', 'communication'), ('church_id', '=', church_id)]",
         help="Groupes de communication auxquels ce membre appartient",
     )
 
-    # Groupes de danse (Many2many)
+    # Groupes de artistiques (Many2many)
+    @api.depends_context("church_id")
+    def _compute_artistic_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.artistic_domain = [
+                    ('organization_type', '=', 'artistic_group'),
+                    ("artistic_group_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.artistic_domain = []
+    artistic_domain = fields.Char(compute="_compute_artistic_domain")
     artistic_group_ids = fields.Many2many(
         "res.partner",
         "partner_artistic_group_rel",
         "partner_id",
         "artistic_group_id",
         string="Groupes artistiques",
-        domain="[('organization_type', '=', 'artistic_group'), ('church_id', '=', church_id)]",
+        #domain="[('organization_type', '=', 'artistic_group'), ('church_id', '=', church_id)]",
         help="Groupes artistiques auxquels ce membre appartient",
     )
 
     # ONG (Many2many)
+    @api.depends_context("church_id")
+    def _compute_ngo_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.ngo_domain = [
+                    ('organization_type', '=', 'ngo'),
+                    ("ngo_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.ngo_domain = []
+    ngo_domain = fields.Char(compute="_compute_ngo_domain")
     ngo_ids = fields.Many2many(
         "res.partner",
         "partner_ngo_rel",
         "partner_id",
         "ngo_id",
         string="ONG",
-        domain="[('organization_type', '=', 'ngo'), ('church_id', '=', church_id)]",
+        #domain="[('organization_type', '=', 'ngo'), ('church_id', '=', church_id)]",
         help="ONG auxquelles ce membre appartient",
     )
 
     # Écoles (Many2many)
+    @api.depends_context("church_id")
+    def _compute_school_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.school_domain = [
+                    ('organization_type', '=', 'school'),
+                    ("school_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.school_domain = []
+    school_domain = fields.Char(compute="_compute_school_domain")
     school_ids = fields.Many2many(
         "res.partner",
         "partner_school_rel",
@@ -224,6 +268,17 @@ class ResPartner(models.Model):
     )
 
     # Autres groupes (Many2many)
+    @api.depends_context("church_id")
+    def _compute_other_group_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.other_group_domain = [
+                    ('organization_type', '=', 'other_group'),
+                    ("other_group_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.other_group_domain = []
+    other_group_domain = fields.Char(compute="_compute_other_group_domain")
     other_group_ids = fields.Many2many(
         "res.partner",
         "partner_other_group_rel",
@@ -235,6 +290,17 @@ class ResPartner(models.Model):
     )
 
     # Groupes sportifs (Many2many)
+    @api.depends_context("church_id")
+    def _compute_sports_group_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.sports_group_domain = [
+                    ('organization_type', '=', 'sports_group'),
+                    ("sports_group_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.sports_group_domain = []
+    sports_group_domain = fields.Char(compute="_compute_sports_group_domain")
     sports_group_ids = fields.Many2many(
         "res.partner",
         "partner_sports_group_rel",
@@ -246,13 +312,24 @@ class ResPartner(models.Model):
     )
 
     # Groupes éducatifs (Many2many)
+    @api.depends_context("church_id")
+    def _compute_educational_group_domain(self):
+        for rec in self:
+            if rec.church_id:
+                rec.educational_group_domain = [
+                    ('organization_type', '=', 'educational_group'),
+                    ("educational_group_church_id", "=", rec.church_id.id),
+                ]
+            else:
+                rec.educational_group_domain = []
+    educational_group_domain = fields.Char(compute="_compute_educational_group_domain")
     educational_group_ids = fields.Many2many(
         "res.partner",
         "partner_educational_group_rel",
         "partner_id",
         "educational_group_id",
         string="Groupes éducatifs",
-        domain="[('organization_type', '=', 'educational_group'), ('church_id', '=', church_id)]",
+        #domain="[('organization_type', '=', 'educational_group'), ('church_id', '=', church_id)]",
         help="Groupes éducatifs auxquels ce membre appartient",
     )
 

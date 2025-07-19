@@ -213,26 +213,38 @@
                                 placeholder="Groupe" />
                         </group>
                         <group>
-                            <!-- New specialized group fields -->
+                            <field name="communication_domain" invisible="1" />
                             <field name="communication_ids" invisible="is_company"
                                 widget="many2many_tags"
-                                placeholder="Communication" />
+                                placeholder="Communication" domain="communication_domain" />
+
+                            <field name="artistic_domain" invisible="1" />
                             <field name="artistic_group_ids" invisible="is_company"
                                 widget="many2many_tags"
-                                placeholder="Artistique" />
+                                placeholder="Artistique" domain="artistic_domain" />
+
+                            <field name="ngo_domain" invisible="1" />
                             <field name="ngo_ids" invisible="is_company" widget="many2many_tags"
-                                placeholder="ONG" />
+                                placeholder="ONG" domain="ngo_domain" />
+
+                            <field name="school_domain" invisible="1" />
                             <field name="school_ids" invisible="is_company" widget="many2many_tags"
-                                placeholder="Écoles" />
+                                placeholder="Écoles" domain="school_domain" />
+
+                            <field name="sports_group_domain" invisible="1" />
                             <field name="sports_group_ids" invisible="is_company"
                                 widget="many2many_tags"
-                                placeholder="Sportifs" />
+                                placeholder="Sportifs" domain="sports_group_domain" />
+
+                            <field name="educational_group_domain" invisible="1" />
                             <field name="educational_group_ids" invisible="is_company"
                                 widget="many2many_tags"
-                                placeholder="Éducatifs" />
+                                placeholder="Éducatifs" domain="educational_group_domain" />
+                                
+                            <field name="other_group_domain" invisible="1" />
                             <field name="other_group_ids" invisible="is_company"
                                 widget="many2many_tags"
-                                placeholder="Autres Structures" />
+                                placeholder="Autres Structures" domain="other_group_domain" />
                         </group>
                     </group>
                 </page>
