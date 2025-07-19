@@ -2,14 +2,12 @@ from odoo import models, fields, api
 from datetime import datetime, timedelta, date
 import random
 
-
 class RandomTribe(models.Model):
     _name = "random.tribe"
     _description = "Tribu"
 
     name = fields.Char(string="Nom de la tribu", required=True)
     description = fields.Text(string="Description")
-
 
 class RandomPrayerCell(models.Model):
     _name = "random.prayer.cell"
@@ -23,7 +21,6 @@ class RandomPrayerCell(models.Model):
         help="Tribu à laquelle cette cellule de prière est associée",
     )
 
-
 # Extension du modèle res.partner pour la gestion des équipes et informations personnelles
 class ResPartner(models.Model):
     _inherit = "res.partner"
@@ -35,8 +32,14 @@ class ResPartner(models.Model):
             ("tribe", "Tribu"),
             ("prayer_cell", "Cellule de prière"),
             ("group", "Groupe"),
-            ("academy", "Autre Structure"),
             ("region", "Région"),
+            ("communication", "Communication"),
+            ("artistic_group", "Groupe Artistique"),
+            ("ngo", "ONG"),
+            ("school", "École"),
+            ("sports_group", "Groupe Sportif"),
+            ("educational_group", "Groupe Éducatif"),
+            ("other_group", "Autres Structures"),
         ],
         string="Type d'organisation",
     )
@@ -64,9 +67,41 @@ class ResPartner(models.Model):
         string="Église du groupe",
         domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
     )
-    academy_church_id = fields.Many2one(
+
+    # Relations pour les nouveaux groupes
+    communication_church_id = fields.Many2one(
         "res.partner",
-        string="Église de la structure",
+        string="Église du groupe de communication",
+        domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
+    )
+    artistic_group_church_id = fields.Many2one(
+        "res.partner",
+        string="Église du groupe artistique",
+        domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
+    )
+    ngo_church_id = fields.Many2one(
+        "res.partner",
+        string="Église de l'ONG",
+        domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
+    )
+    school_church_id = fields.Many2one(
+        "res.partner",
+        string="Église de l'école",
+        domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
+    )
+    other_group_church_id = fields.Many2one(
+        "res.partner",
+        string="Église du groupe spécialisé",
+        domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
+    )
+    sports_group_church_id = fields.Many2one(
+        "res.partner",
+        string="Église du groupe sportif",
+        domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
+    )
+    educational_group_church_id = fields.Many2one(
+        "res.partner",
+        string="Église du groupe éducatif",
         domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
     )
 
@@ -89,6 +124,7 @@ class ResPartner(models.Model):
         string="Église",
         domain="[('organization_type', '=', 'company'), ('is_church', '=', True)]",
     )
+
     @api.depends_context("church_id")
     def _compute_tribe_domain(self):
         for rec in self:
@@ -98,7 +134,7 @@ class ResPartner(models.Model):
                     ("tribe_church_id", "=", rec.church_id.id),
                 ]
             else:
-                rec.tribe_domain = [] 
+                rec.tribe_domain = []
 
     tribe_domain = fields.Char(compute="_compute_tribe_domain")
     tribe_id = fields.Many2one(
@@ -140,22 +176,199 @@ class ResPartner(models.Model):
         string="Groupe",
     )
 
-    @api.depends_context("church_id")
-    def _compute_academy_domain(self):
-        for rec in self:
-            if rec.church_id:
-                rec.academy_domain = [
-                    ("organization_type", "=", "academy"),
-                    ("academy_church_id", "=", rec.church_id.id),
-                ]
-            else:
-                rec.academy_domain = []
+    # ========== NOUVEAUX CHAMPS POUR LES GROUPES SPÉCIALISÉS ==========
 
-    academy_domain = fields.Char(compute="_compute_academy_domain")
-    academy_id = fields.Many2one(
+    # Groupes de chant (Many2many car un membre peut appartenir à plusieurs groupes)
+    communication_ids = fields.Many2many(
         "res.partner",
-        string="Autre Structure",
+        "partner_communication_rel",
+        "partner_id",
+        "communication_id",
+        string="Groupes de communication",
+        domain="[('organization_type', '=', 'communication'), ('church_id', '=', church_id)]",
+        help="Groupes de communication auxquels ce membre appartient",
     )
+
+    # Groupes de danse (Many2many)
+    artistic_group_ids = fields.Many2many(
+        "res.partner",
+        "partner_artistic_group_rel",
+        "partner_id",
+        "artistic_group_id",
+        string="Groupes artistiques",
+        domain="[('organization_type', '=', 'artistic_group'), ('church_id', '=', church_id)]",
+        help="Groupes artistiques auxquels ce membre appartient",
+    )
+
+    # ONG (Many2many)
+    ngo_ids = fields.Many2many(
+        "res.partner",
+        "partner_ngo_rel",
+        "partner_id",
+        "ngo_id",
+        string="ONG",
+        domain="[('organization_type', '=', 'ngo'), ('church_id', '=', church_id)]",
+        help="ONG auxquelles ce membre appartient",
+    )
+
+    # Écoles (Many2many)
+    school_ids = fields.Many2many(
+        "res.partner",
+        "partner_school_rel",
+        "partner_id",
+        "school_id",
+        string="Écoles",
+        domain="[('organization_type', '=', 'school'), ('church_id', '=', church_id)]",
+        help="Écoles auxquelles ce membre appartient",
+    )
+
+    # Autres groupes (Many2many)
+    other_group_ids = fields.Many2many(
+        "res.partner",
+        "partner_other_group_rel",
+        "partner_id",
+        "other_group_id",
+        string="Groupes spécialisés",
+        domain="[('organization_type', '=', 'other_group'), ('church_id', '=', church_id)]",
+        help="Groupes spécialisés auxquels ce membre appartient",
+    )
+
+    # Groupes sportifs (Many2many)
+    sports_group_ids = fields.Many2many(
+        "res.partner",
+        "partner_sports_group_rel",
+        "partner_id",
+        "sports_group_id",
+        string="Groupes sportifs",
+        domain="[('organization_type', '=', 'sports_group'), ('church_id', '=', church_id)]",
+        help="Groupes sportifs auxquels ce membre appartient",
+    )
+
+    # Groupes éducatifs (Many2many)
+    educational_group_ids = fields.Many2many(
+        "res.partner",
+        "partner_educational_group_rel",
+        "partner_id",
+        "educational_group_id",
+        string="Groupes éducatifs",
+        domain="[('organization_type', '=', 'educational_group'), ('church_id', '=', church_id)]",
+        help="Groupes éducatifs auxquels ce membre appartient",
+    )
+
+    # Membres pour les nouveaux types d'organisations
+    communication_members = fields.Many2many(
+        "res.partner",
+        "partner_communication_rel",
+        "communication_id",
+        "partner_id",
+        string="Membres du groupe de communication",
+    )
+    artistic_group_members = fields.Many2many(
+        "res.partner",
+        "partner_artistic_group_rel",
+        "artistic_group_id",
+        "partner_id",
+        string="Membres du groupe artistique",
+    )
+    ngo_members = fields.Many2many(
+        "res.partner",
+        "partner_ngo_rel",
+        "ngo_id",
+        "partner_id",
+        string="Membres de l'ONG",
+    )
+    school_members = fields.Many2many(
+        "res.partner",
+        "partner_school_rel",
+        "school_id",
+        "partner_id",
+        string="Membres de l'école",
+    )
+    other_group_members = fields.Many2many(
+        "res.partner",
+        "partner_other_group_rel",
+        "other_group_id",
+        "partner_id",
+        string="Membres du groupe spécialisé",
+    )
+    sports_group_members = fields.Many2many(
+        "res.partner",
+        "partner_sports_group_rel",
+        "sports_group_id",
+        "partner_id",
+        string="Membres du groupe sportif",
+    )
+    educational_group_members = fields.Many2many(
+        "res.partner",
+        "partner_educational_group_rel",
+        "educational_group_id",
+        "partner_id",
+        string="Membres du groupe éducatif",
+    )
+
+    # Compteurs pour les nouveaux groupes
+    communication_count = fields.Integer(
+        string="Nombre de groupes de communication", compute="_compute_specialized_group_counts"
+    )
+    artistic_group_count = fields.Integer(
+        string="Nombre de groupes artistiques", compute="_compute_specialized_group_counts"
+    )
+    ngo_count = fields.Integer(
+        string="Nombre d'ONG", compute="_compute_specialized_group_counts"
+    )
+    school_count = fields.Integer(
+        string="Nombre d'écoles", compute="_compute_specialized_group_counts"
+    )
+    other_group_count = fields.Integer(
+        string="Nombre des groupes spécialisés",
+        compute="_compute_specialized_group_counts",
+    )
+    sports_group_count = fields.Integer(
+        string="Nombre de groupes sportifs", compute="_compute_specialized_group_counts"
+    )
+    educational_group_count = fields.Integer(
+        string="Nombre de groupes éducatifs",
+        compute="_compute_specialized_group_counts",
+    )
+
+    # Responsables pour les nouveaux groupes
+    communication_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable du groupe de communication",
+        domain="[('is_leader','=',True)]",
+    )
+    artistic_group_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable du groupe artistique",
+        domain="[('is_leader','=',True)]",
+    )
+    ngo_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable de l'ONG",
+        domain="[('is_leader','=',True)]",
+    )
+    school_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable de l'école",
+        domain="[('is_leader','=',True)]",
+    )
+    other_group_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable du groupe spécialisé",
+        domain="[('is_leader','=',True)]",
+    )
+    sports_group_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable du groupe sportif",
+        domain="[('is_leader','=',True)]",
+    )
+    educational_group_leader_id = fields.Many2one(
+        "res.partner",
+        string="Responsable du groupe éducatif",
+        domain="[('is_leader','=',True)]",
+    )
+
+    # ========== FIN DES NOUVEAUX CHAMPS ==========
 
     region_id = fields.Many2one(
         "res.partner", string="Région", domain="[('organization_type', '=', 'region')]"
@@ -285,9 +498,6 @@ class ResPartner(models.Model):
     group_members = fields.One2many(
         "res.partner", "group_id", string="Membres du groupe"
     )
-    academy_members = fields.One2many(
-        "res.partner", "academy_id", string="Membres de la structure"
-    )
     tribe_members = fields.One2many(
         "res.partner", "tribe_id", string="Membres de la tribu"
     )
@@ -308,9 +518,6 @@ class ResPartner(models.Model):
     group_team_ids = fields.Many2many(
         "random.team", compute="_compute_team_memberships", string="Équipes Groupe"
     )
-    academy_team_ids = fields.Many2many(
-        "random.team", compute="_compute_team_memberships", string="Équipes Structure"
-    )
 
     # Compteurs pour les boutons intelligents (organisations)
     team_count = fields.Integer(
@@ -324,9 +531,6 @@ class ResPartner(models.Model):
     )
     group_count = fields.Integer(
         string="Nombre de groupes", compute="_compute_organization_counts"
-    )
-    academy_count = fields.Integer(
-        string="Nombre de structures", compute="_compute_organization_counts"
     )
 
     # Compteurs pour les boutons intelligents (contacts individuels)
@@ -344,9 +548,6 @@ class ResPartner(models.Model):
     )
     group_teams_count = fields.Integer(
         string="Équipes Groupe", compute="_compute_team_counts"
-    )
-    academy_teams_count = fields.Integer(
-        string="Équipes Structure", compute="_compute_team_counts"
     )
 
     # Tranches d'âge pour les groupes
@@ -472,21 +673,6 @@ class ResPartner(models.Model):
         domain="[('is_elder','=',True)]",
     )
 
-    academy_leader_id = fields.Many2one(
-        "res.partner",
-        string="Responsable de la structure",
-        domain="[('is_leader','=',True), ('academy_id','=',id)]",
-    )
-    # Pour les responsables adjoints de structure
-    academy_assistant_leader_ids = fields.Many2many(
-        "res.partner",
-        "academy_assistant_leader_rel",
-        "academy_id",
-        "leader_id",
-        string="Responsables adjoints de la structure",
-        domain="[('is_leader','=',True), ('academy_id','=',id)]",
-    )
-
     # Champ calculé pour compter les églises filles
     child_church_count = fields.Integer(
         string="Nombre d'églises filles", compute="_compute_child_church_count"
@@ -494,6 +680,250 @@ class ResPartner(models.Model):
     regional_church_count = fields.Integer(
         string="Nombre d'églises régionales", compute="_compute_regional_church_count"
     )
+
+    # ========== NOUVELLES MÉTHODES DE CALCUL POUR LES GROUPES SPÉCIALISÉS ==========
+
+    @api.depends()
+    def _compute_specialized_group_counts(self):
+        """Calcule le nombre de groupes spécialisés pour les églises."""
+        for partner in self:
+            if partner.is_company and partner.is_church:
+                partner.communication_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "communication"),
+                        ("communication_church_id", "=", partner.id),
+                    ]
+                )
+                partner.artistic_group_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "artistic_group"),
+                        ("artistic_group_church_id", "=", partner.id),
+                    ]
+                )
+                partner.ngo_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "ngo"),
+                        ("ngo_church_id", "=", partner.id),
+                    ]
+                )
+                partner.school_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "school"),
+                        ("school_church_id", "=", partner.id),
+                    ]
+                )
+                partner.other_group_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "other_group"),
+                        ("other_group_church_id", "=", partner.id),
+                    ]
+                )
+                partner.sports_group_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "sports_group"),
+                        ("sports_group_church_id", "=", partner.id),
+                    ]
+                )
+                partner.educational_group_count = self.env["res.partner"].search_count(
+                    [
+                        ("is_company", "=", True),
+                        ("organization_type", "=", "educational_group"),
+                        ("educational_group_church_id", "=", partner.id),
+                    ]
+                )
+            else:
+                partner.communication_count = 0
+                partner.artistic_group_count = 0
+                partner.ngo_count = 0
+                partner.school_count = 0
+                partner.other_group_count = 0
+                partner.sports_group_count = 0
+                partner.educational_group_count = 0
+
+    # ========== ACTIONS POUR LES NOUVEAUX GROUPES SPÉCIALISÉS ==========
+
+    def action_view_communications(self):
+        """Action pour afficher les groupes de communication de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        communications = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "communication"),
+                ("communication_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"Groupes de communication de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", communications.ids)],
+            "context": {
+                "default_organization_type": "communication",
+                "default_communication_church_id": self.id,
+            },
+        }
+
+    def action_view_artistic_groups(self):
+        """Action pour afficher les groupes de danse de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        artistic_groups = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "artistic_group"),
+                ("artistic_group_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"Groupes artistiques de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", artistic_groups.ids)],
+            "context": {
+                "default_organization_type": "artistic_group",
+                "default_artistic_group_church_id": self.id,
+            },
+        }
+
+    def action_view_ngos(self):
+        """Action pour afficher les ONG de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        ngos = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "ngo"),
+                ("ngo_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"ONG de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", ngos.ids)],
+            "context": {
+                "default_organization_type": "ngo",
+                "default_ngo_church_id": self.id,
+            },
+        }
+
+    def action_view_schools(self):
+        """Action pour afficher les écoles de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        schools = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "school"),
+                ("school_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"Écoles de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", schools.ids)],
+            "context": {
+                "default_organization_type": "school",
+                "default_school_church_id": self.id,
+            },
+        }
+
+    def action_view_other_groups(self):
+        """Action pour afficher les groupes spécialisés de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        other_groups = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "other_group"),
+                ("other_group_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"Groupes spécialisés de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", other_groups.ids)],
+            "context": {
+                "default_organization_type": "other_group",
+                "default_other_group_church_id": self.id,
+            },
+        }
+
+    def action_view_sports_groups(self):
+        """Action pour afficher les groupes sportifs de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        sports_groups = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "sports_group"),
+                ("sports_group_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"Groupes sportifs de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", sports_groups.ids)],
+            "context": {
+                "default_organization_type": "sports_group",
+                "default_sports_group_church_id": self.id,
+            },
+        }
+
+    def action_view_educational_groups(self):
+        """Action pour afficher les groupes éducatifs de cette église."""
+        if not self.is_company or not self.is_church:
+            return False
+
+        educational_groups = self.env["res.partner"].search(
+            [
+                ("is_company", "=", True),
+                ("organization_type", "=", "educational_group"),
+                ("educational_group_church_id", "=", self.id),
+            ]
+        )
+
+        return {
+            "name": f"Groupes éducatifs de {self.name}",
+            "type": "ir.actions.act_window",
+            "res_model": "res.partner",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", educational_groups.ids)],
+            "context": {
+                "default_organization_type": "educational_group",
+                "default_educational_group_church_id": self.id,
+            },
+        }
+
+    # ========== MÉTHODES EXISTANTES (MAINTENUES POUR COMPATIBILITÉ) ==========
 
     def _compute_regional_church_count(self):
         """Calcule le nombre d'églises régionales associées à cette région."""
@@ -522,9 +952,6 @@ class ResPartner(models.Model):
     def action_validate_inscription(self):
         self.ensure_one()
         self.write({"active": True})
-        # Envoyer un email de confirmation
-        # template = self.env.ref('random_team_generator.email_template_inscription_validated')
-        # template.send_mail(self.id, force_send=True)
         return True
 
     def action_archive(self):
@@ -538,7 +965,6 @@ class ResPartner(models.Model):
                 [("parent_church_id", "=", partner.id), ("is_church", "=", True)]
             )
 
-    # Action pour voir les églises filles
     def action_view_child_churches(self):
         self.ensure_one()
         return {
@@ -550,7 +976,6 @@ class ResPartner(models.Model):
             "context": {"default_parent_church_id": self.id, "default_is_church": True},
         }
 
-    # Contrainte pour la femme de pasteur
     @api.constrains("is_pastor_wife", "spouse_id")
     def _check_pastor_wife(self):
         for partner in self:
@@ -561,7 +986,6 @@ class ResPartner(models.Model):
                     "Une femme de pasteur doit avoir un conjoint qui est pasteur"
                 )
 
-    # Mise à jour automatique quand on définit le conjoint
     @api.onchange("spouse_id")
     def _onchange_spouse_id(self):
         if self.gender == "female" and self.spouse_id and self.spouse_id.is_pastor:
@@ -588,8 +1012,6 @@ class ResPartner(models.Model):
     def _cron_check_birthdays(self):
         """Méthode appelée par le cron pour vérifier les anniversaires."""
         today = date.today()
-        # Recherche tous les contacts dont c'est l'anniversaire aujourd'hui
-        # et pour lesquels l'alerte n'a pas encore été envoyée
         birthday_contacts = self.search(
             [
                 ("birthdate", "!=", False),
@@ -603,12 +1025,9 @@ class ResPartner(models.Model):
         )
 
         if birthday_contacts:
-            # Envoie les notifications
             self._send_birthday_alerts(birthday_contacts)
-            # Marque les alertes comme envoyées
             birthday_contacts.write({"birthday_alert_sent": True})
 
-        # Réinitialise le flag pour les contacts dont ce n'est plus l'anniversaire
         yesterday = today - timedelta(days=1)
         self.search(
             [
@@ -626,7 +1045,6 @@ class ResPartner(models.Model):
     def _send_birthday_alerts(self, contacts):
         """Envoie les notifications d'anniversaire."""
         for contact in contacts:
-            # Crée une activité pour alerter les utilisateurs
             self.env["mail.activity"].create(
                 {
                     "activity_type_id": self.env.ref("mail.mail_activity_data_todo").id,
@@ -639,7 +1057,6 @@ class ResPartner(models.Model):
                 }
             )
 
-            # Envoie une notification à tous les utilisateurs
             partner_ids = self.env["res.users"].search([]).mapped("partner_id").ids
             if partner_ids:
                 self.env["mail.message"].create(
@@ -657,8 +1074,6 @@ class ResPartner(models.Model):
     def _is_age_group(self):
         """Détermine si ce partenaire est un groupe avec tranche d'âge"""
         return self.is_company and self.organization_type == "group"
-
-    # ========== NOUVELLES MÉTHODES DE CALCUL ==========
 
     @api.depends("birthdate")
     def _compute_age(self):
@@ -712,7 +1127,6 @@ class ResPartner(models.Model):
     def _assign_age_group(self):
         """Assigne automatiquement le groupe en fonction de l'âge, du sexe et de la situation matrimoniale."""
         if not self.is_company and self.age > 0:
-            # Trouver le groupe approprié en fonction des critères
             domain = [
                 ("is_company", "=", True),
                 ("organization_type", "=", "group"),
@@ -720,18 +1134,14 @@ class ResPartner(models.Model):
                 ("max_age", ">=", self.age),
             ]
 
-            # Ajouter les critères de sexe si définis
             if self.gender:
-                # Recherche les groupes qui acceptent le sexe du membre ou qui sont mixtes
                 domain += [
                     "|",
                     ("required_gender", "=", "mixed"),
                     ("required_gender", "=", self.gender),
                 ]
 
-            # Ajouter les critères de situation matrimoniale si définis
             if self.marital_status:
-                # Recherche les groupes qui acceptent la situation du membre
                 domain += [
                     "|",
                     ("marital_requirement", "=", "any"),
@@ -749,11 +1159,9 @@ class ResPartner(models.Model):
                 ]
 
             age_group = self.env["res.partner"].search(domain, limit=1)
-
             if age_group:
                 self.group_id = age_group.id
 
-    # ========== CONTRAINTES ET VALIDATIONS ==========
     @api.constrains("required_gender", "marital_requirement")
     def _check_group_requirements(self):
         """Vérifie que les critères du groupe sont cohérents."""
@@ -787,7 +1195,6 @@ class ResPartner(models.Model):
         """Vérifie que la relation de mariage est réciproque."""
         for partner in self:
             if partner.spouse_id and partner.spouse_id.spouse_id != partner:
-                # Mise à jour automatique de la relation réciproque
                 partner.spouse_id.spouse_id = partner
                 if partner.spouse_id.marital_status != "married":
                     partner.spouse_id.marital_status = "married"
@@ -797,10 +1204,8 @@ class ResPartner(models.Model):
         """Vérifie la cohérence entre le statut marital et le conjoint."""
         for partner in self:
             if partner.marital_status == "married" and not partner.spouse_id:
-                # On permet d'être marié sans avoir le conjoint renseigné
                 pass
             elif partner.marital_status != "married" and partner.spouse_id:
-                # Si on a un conjoint mais qu'on n'est pas marié, on met à jour le statut
                 partner.marital_status = "married"
 
     @api.onchange("marital_status")
@@ -808,8 +1213,6 @@ class ResPartner(models.Model):
         """Nettoie le champ conjoint si le statut n'est plus marié."""
         if self.marital_status != "married":
             self.spouse_id = False
-
-    # ========== ACTIONS POUR LES BOUTONS INTELLIGENTS ==========
 
     def action_view_children(self):
         if self.is_company:
@@ -833,7 +1236,6 @@ class ResPartner(models.Model):
         if not self.is_company or self.organization_type != "group":
             return False
 
-        # Construction du domaine de base avec l'âge
         domain = [
             ("is_company", "=", False),
             ("group_id", "=", self.id),
@@ -841,11 +1243,9 @@ class ResPartner(models.Model):
             ("age", "<=", self.max_age),
         ]
 
-        # Ajout du critère de sexe si nécessaire
         if self.required_gender != "mixed":
             domain.append(("gender", "=", self.required_gender))
 
-        # Ajout du critère de situation matrimoniale si nécessaire
         if self.marital_requirement == "married_only":
             domain.append(("marital_status", "=", "married"))
         elif self.marital_requirement == "single_only":
@@ -856,7 +1256,7 @@ class ResPartner(models.Model):
                     ["single", "divorced", "widowed", "separated", "cohabiting"],
                 )
             )
-        # Retourne l'action pour afficher les membres du groupe
+
         return {
             "name": f"Membres du groupe {self.name} (Âge: {self.min_age}-{self.max_age})",
             "type": "ir.actions.act_window",
@@ -865,8 +1265,6 @@ class ResPartner(models.Model):
             "domain": domain,
             "context": {"default_group_id": self.id},
         }
-
-    # ========== MÉTHODES EXISTANTES ==========
 
     @api.depends()
     def _compute_organization_counts(self):
@@ -879,13 +1277,10 @@ class ResPartner(models.Model):
                     else "company"
                 )
 
-                # Compte les équipes selon le type d'organisation
                 teams = self._get_existing_teams(partner, org_type)
                 partner.team_count = len(teams)
 
-                # Compte les organisations enfants selon le type
                 if org_type == "company":
-                    # Une compagnie peut avoir des tribus, groupes et structures
                     partner.tribe_count = self.env["res.partner"].search_count(
                         [
                             ("is_company", "=", True),
@@ -900,16 +1295,8 @@ class ResPartner(models.Model):
                             ("church_id", "=", partner.id),
                         ]
                     )
-                    partner.academy_count = self.env["res.partner"].search_count(
-                        [
-                            ("is_company", "=", True),
-                            ("organization_type", "=", "academy"),
-                            ("church_id", "=", partner.id),
-                        ]
-                    )
                     partner.prayer_cell_count = 0
                 elif org_type == "tribe":
-                    # Une tribu peut avoir des cellules de prière
                     partner.prayer_cell_count = self.env["res.partner"].search_count(
                         [
                             ("is_company", "=", True),
@@ -919,34 +1306,26 @@ class ResPartner(models.Model):
                     )
                     partner.tribe_count = 0
                     partner.group_count = 0
-                    partner.academy_count = 0
                 else:
-                    # Autres types n'ont pas d'organisations enfants
                     partner.tribe_count = 0
                     partner.prayer_cell_count = 0
                     partner.group_count = 0
-                    partner.academy_count = 0
             else:
-                # Pour les contacts individuels, tous les compteurs d'organisations sont à 0
                 partner.team_count = 0
                 partner.tribe_count = 0
                 partner.prayer_cell_count = 0
                 partner.group_count = 0
-                partner.academy_count = 0
 
     @api.depends()
     def _compute_team_memberships(self):
         """Calcule les équipes dont fait partie ce contact."""
         for partner in self:
             if partner.is_company:
-                # Pour les organisations, on ne calcule pas les appartenances d'équipe
                 partner.company_team_ids = False
                 partner.tribe_team_ids = False
                 partner.prayer_cell_team_ids = False
                 partner.group_team_ids = False
-                partner.academy_team_ids = False
             else:
-                # Cherche toutes les équipes dont fait partie ce contact
                 all_teams = self.env["random.team"].search(
                     [("members_ids", "in", partner.id)]
                 )
@@ -963,9 +1342,6 @@ class ResPartner(models.Model):
                 partner.group_team_ids = all_teams.filtered(
                     lambda t: t.team_type == "group"
                 )
-                partner.academy_team_ids = all_teams.filtered(
-                    lambda t: t.team_type == "academy"
-                )
 
     @api.depends()
     def _compute_team_counts(self):
@@ -976,20 +1352,17 @@ class ResPartner(models.Model):
                 partner.tribe_teams_count = 0
                 partner.prayer_cell_teams_count = 0
                 partner.group_teams_count = 0
-                partner.academy_teams_count = 0
                 partner.total_teams_count = 0
             else:
                 partner.company_teams_count = len(partner.company_team_ids)
                 partner.tribe_teams_count = len(partner.tribe_team_ids)
                 partner.prayer_cell_teams_count = len(partner.prayer_cell_team_ids)
                 partner.group_teams_count = len(partner.group_team_ids)
-                partner.academy_teams_count = len(partner.academy_team_ids)
                 partner.total_teams_count = (
                     partner.company_teams_count
                     + partner.tribe_teams_count
                     + partner.prayer_cell_teams_count
                     + partner.group_teams_count
-                    + partner.academy_teams_count
                 )
 
     def action_view_tribes(self):
@@ -1063,29 +1436,6 @@ class ResPartner(models.Model):
             "domain": [("id", "in", groups.ids)],
         }
 
-    def action_view_academies(self):
-        """Action pour afficher les structures de cette compagnie."""
-        if not self.is_company or (
-            self.organization_type and self.organization_type != "company"
-        ):
-            return False
-
-        academies = self.env["res.partner"].search(
-            [
-                ("is_company", "=", True),
-                ("organization_type", "=", "academy"),
-                ("church_id", "=", self.id),
-            ]
-        )
-
-        return {
-            "name": f"Structures de {self.name}",
-            "type": "ir.actions.act_window",
-            "res_model": "res.partner",
-            "view_mode": "tree,form",
-            "domain": [("id", "in", academies.ids)],
-        }
-
     def action_view_my_teams(self):
         """Action pour afficher toutes les équipes de ce contact."""
         if self.is_company:
@@ -1115,7 +1465,6 @@ class ResPartner(models.Model):
             "tribe": "Tribu",
             "prayer_cell": "Cellule de prière",
             "group": "Groupe",
-            "academy": "Structure",
         }
 
         return {
@@ -1142,7 +1491,6 @@ class ResPartner(models.Model):
         org_type = self.organization_type if self.organization_type else "company"
         members = self._get_members_by_type(org_type, self.id)
 
-        # Information de debug
         debug_info = []
         debug_info.append(f"Organisation: {self.name}")
         debug_info.append(f"Type: {org_type}")
@@ -1150,7 +1498,6 @@ class ResPartner(models.Model):
         debug_info.append(f"Nombre de membres trouvés: {len(members)}")
 
         if org_type == "tribe":
-            # Info spécifique pour les tribus
             direct_members = self.env["res.partner"].search(
                 [("is_company", "=", False), ("tribe_id", "=", self.id)]
             )
@@ -1196,7 +1543,6 @@ class ResPartner(models.Model):
         org_type = self.organization_type if self.organization_type else "company"
         teams = self._generate_teams_for_organization(self.id, org_type)
 
-        # Rafraîchit les compteurs
         self._compute_organization_counts()
 
         return {
@@ -1218,7 +1564,6 @@ class ResPartner(models.Model):
             .get_param("random_team_generator.team_size", default=3)
         )
 
-        # Récupère tous les membres de l'organisation
         members = self._get_members_by_type(organization_type, organization_id)
 
         if not members:
@@ -1229,18 +1574,15 @@ class ResPartner(models.Model):
 
         teams = []
 
-        # Supprime les équipes existantes pour cette organisation
         organization = self.env["res.partner"].browse(organization_id)
         existing_teams = self._get_existing_teams(organization, organization_type)
         existing_teams.unlink()
 
-        # Détermine le préfixe du nom d'équipe selon le type
         type_names = {
             "company": "Équipe",
             "tribe": "Équipe Tribu",
             "prayer_cell": "Équipe Cellule",
             "group": "Équipe Groupe",
-            "academy": "Équipe Structure",
         }
         team_prefix = type_names.get(organization_type, "Équipe")
 
@@ -1250,7 +1592,6 @@ class ResPartner(models.Model):
                 team_name = f"{team_prefix} n° {len(teams) + 1}"
                 team_lead = random.choice(team_members)
 
-                # Prépare les valeurs pour créer l'équipe avec le bon type et la bonne organisation
                 team_vals = {
                     "name": team_name,
                     "members_ids": [(6, 0, [member.id for member in team_members])],
@@ -1258,7 +1599,6 @@ class ResPartner(models.Model):
                     "team_type": organization_type,
                 }
 
-                # Définit l'organisation appropriée selon le type
                 if organization_type == "company":
                     team_vals["company_id"] = organization_id
                 elif organization_type == "tribe":
@@ -1267,8 +1607,6 @@ class ResPartner(models.Model):
                     team_vals["prayer_cell_id"] = organization_id
                 elif organization_type == "group":
                     team_vals["group_id"] = organization_id
-                elif organization_type == "academy":
-                    team_vals["academy_id"] = organization_id
 
                 team = self.env["random.team"].sudo().create(team_vals)
                 teams.append(team)
@@ -1278,17 +1616,14 @@ class ResPartner(models.Model):
     def _get_members_by_type(self, organization_type, organization_id):
         """Retourne les membres d'une organisation selon son type."""
         if organization_type == "company":
-            # Pour une compagnie, on récupère tous les contacts directs
             return self.env["res.partner"].search(
                 [("is_company", "=", False), ("church_id", "=", organization_id)]
             )
         elif organization_type == "tribe":
-            # Pour une tribu, on récupère d'abord les membres directs de la tribu
             direct_members = self.env["res.partner"].search(
                 [("is_company", "=", False), ("tribe_id", "=", organization_id)]
             )
 
-            # Puis on récupère tous les membres des cellules de prière de cette tribu
             prayer_cells = self.env["res.partner"].search(
                 [
                     ("is_company", "=", True),
@@ -1304,7 +1639,6 @@ class ResPartner(models.Model):
                 )
                 cell_members |= members
 
-            # On combine les membres directs et ceux des cellules (sans doublons)
             all_members = direct_members | cell_members
             return all_members
         elif organization_type == "prayer_cell":
@@ -1315,10 +1649,7 @@ class ResPartner(models.Model):
             return self.env["res.partner"].search(
                 [("is_company", "=", False), ("group_id", "=", organization_id)]
             )
-        elif organization_type == "academy":
-            return self.env["res.partner"].search(
-                [("is_company", "=", False), ("academy_id", "=", organization_id)]
-            )
+
         return self.env["res.partner"]
 
     def _get_existing_teams(self, organization, organization_type):
@@ -1339,11 +1670,6 @@ class ResPartner(models.Model):
             ]
         elif organization_type == "group":
             domain = [("team_type", "=", "group"), ("group_id", "=", organization.id)]
-        elif organization_type == "academy":
-            domain = [
-                ("team_type", "=", "academy"),
-                ("academy_id", "=", organization.id),
-            ]
 
         return self.env["random.team"].search(domain)
 

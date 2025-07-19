@@ -278,7 +278,8 @@
                                                             </div>
                                                         </t>
                                                         <t t-else="">
-                                                            <div class="text-muted fst-italic mb-2">Responsable de suivi
+                                                            <div class="text-muted fst-italic mb-2">Responsable
+                                                                de suivi
                                                                 non assigné</div>
                                                         </t>
                                                     </td>
@@ -870,6 +871,21 @@
                 color: #dc3545;
                 font-weight: bold;
                 }
+
+                /* Style pour les sections de groupes spécialisés */
+                .specialized-group-section {
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 20px;
+                }
+
+                .specialized-group-title {
+                font-size: 1.1rem;
+                color: #495057;
+                margin-bottom: 15px;
+                font-weight: 600;
+                }
             </style>
 
             <div class="container mt-5 mb-5">
@@ -1030,6 +1046,20 @@
                                                 <option value="cohabiting"
                                                     t-att-selected="'cohabiting' == values.get('marital_status', '')">En
                                                     concubinage</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section Conjoint -->
+                                    <h4 class="border-bottom pb-2 mb-3 mt-4">Samonim</h4>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Femme de pasteur</label>
+                                            <select name="is_pastor_wife" class="form-select">
+                                                <option value="False">Non</option>
+                                                <option value="True"
+                                                    t-att-selected="values.get('is_pastor_wife', '') == 'True'">
+                                                    Oui</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1219,18 +1249,134 @@
                                                 </t>
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Autre structure</label>
-                                            <select name="academy_id"
-                                                class="form-select searchable-select">
-                                                <option value="">-- Sélectionnez --</option>
-                                                <t t-foreach="academies" t-as="academy">
-                                                    <option t-att-value="academy.id"
-                                                        t-att-selected="str(academy.id) == values.get('academy_id', '')">
-                                                        <t t-esc="academy.name" />
-                                                    </option>
-                                                </t>
-                                            </select>
+                                    </div>
+
+                                    <!-- Section Groupes spécialisés -->
+                                    <h4 class="border-bottom pb-2 mb-3 mt-4">Groupes spécialisés</h4>
+
+                                    <!-- Groupe de communication -->
+                                    <div class="specialized-group-section">
+                                        <h5 class="specialized-group-title">Communication</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Groupe de communication</label>
+                                                <select name="communication_ids"
+                                                    class="form-select searchable-select"
+                                                    multiple="multiple">
+                                                    <option value="">-- Sélectionnez --</option>
+                                                    <t t-foreach="communications" t-as="comm">
+                                                        <option t-att-value="comm.id"
+                                                            t-att-selected="'selected' if str(comm.id) in (values.get('communication_ids', '').split(',') if values.get('communication_ids') else []) else None">
+                                                            <t t-esc="comm.name" />
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Groupe artistique -->
+                                    <div class="specialized-group-section">
+                                        <h5 class="specialized-group-title">Artistique</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Groupe artistique</label>
+                                                <select name="artistic_group_ids"
+                                                    class="form-select searchable-select"
+                                                    multiple="multiple">
+                                                    <option value="">-- Sélectionnez --</option>
+                                                    <t t-foreach="artistic_groups" t-as="art_group">
+                                                        <option t-att-value="art_group.id"
+                                                            t-att-selected="'selected' if str(art_group.id) in (values.get('artistic_group_ids', '').split(',') if values.get('artistic_group_ids') else []) else None">
+                                                            <t t-esc="art_group.name" />
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ONG -->
+                                    <div class="specialized-group-section">
+                                        <h5 class="specialized-group-title">ONG</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">ONG</label>
+                                                <select name="ngo_ids"
+                                                    class="form-select searchable-select"
+                                                    multiple="multiple">
+                                                    <option value="">-- Sélectionnez --</option>
+                                                    <t t-foreach="ngos" t-as="ngo">
+                                                        <option t-att-value="ngo.id"
+                                                            t-att-selected="'selected' if str(ngo.id) in (values.get('ngo_ids', '').split(',') if values.get('ngo_ids') else []) else None">
+                                                            <t t-esc="ngo.name" />
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Écoles -->
+                                    <div class="specialized-group-section">
+                                        <h5 class="specialized-group-title">Éducation</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">École</label>
+                                                <select name="school_ids"
+                                                    class="form-select searchable-select"
+                                                    multiple="multiple">
+                                                    <option value="">-- Sélectionnez --</option>
+                                                    <t t-foreach="schools" t-as="school">
+                                                        <option t-att-value="school.id"
+                                                            t-att-selected="'selected' if str(school.id) in (values.get('school_ids', '').split(',') if values.get('school_ids') else []) else None">
+                                                            <t t-esc="school.name" />
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Groupes sportifs -->
+                                    <div class="specialized-group-section">
+                                        <h5 class="specialized-group-title">Sport</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Groupe sportif</label>
+                                                <select name="sports_group_ids"
+                                                    class="form-select searchable-select"
+                                                    multiple="multiple">
+                                                    <option value="">-- Sélectionnez --</option>
+                                                    <t t-foreach="sports_groups" t-as="sport_group">
+                                                        <option t-att-value="sport_group.id"
+                                                            t-att-selected="'selected' if str(sport_group.id) in (values.get('sports_group_ids', '').split(',') if values.get('sports_group_ids') else []) else None">
+                                                            <t t-esc="sport_group.name" />
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Autres groupes -->
+                                    <div class="specialized-group-section">
+                                        <h5 class="specialized-group-title">Autres groupes</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Groupe spécialisé</label>
+                                                <select name="other_group_ids"
+                                                    class="form-select searchable-select"
+                                                    multiple="multiple">
+                                                    <option value="">-- Sélectionnez --</option>
+                                                    <t t-foreach="other_groups" t-as="other_group">
+                                                        <option t-att-value="other_group.id"
+                                                            t-att-selected="'selected' if str(other_group.id) in (values.get('other_group_ids', '').split(',') if values.get('other_group_ids') else []) else None">
+                                                            <t t-esc="other_group.name" />
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -1261,6 +1407,23 @@
                         </div>
                     </div>
                 </div>
+
+                <script> document.addEventListener('DOMContentLoaded', function() { // Initialiser
+                    tous les select2 $('.searchable-select').select2({ theme: 'bootstrap-5', width:
+                    '100%', placeholder: $(this).data('placeholder'), allowClear:
+                    Boolean($(this).data('allow-clear')), closeOnSelect: !$(this).attr('multiple'),
+                    }); // Gérer la sélection multiple pour les groupes spécialisés
+                    $('select[multiple="multiple"]').select2({ theme: 'bootstrap-5', width: '100%',
+                    placeholder: 'Sélectionnez un ou plusieurs éléments', closeOnSelect: false });
+                    // Mise à jour dynamique des tribus en fonction de l'église sélectionnée
+                    $('select[name="church_id"]').on('change', function() { var churchId =
+                    $(this).val(); if (churchId) { // Faire une requête AJAX pour récupérer les
+                    tribus de cette église // et mettre à jour le select des tribus // Exemple
+                    simplifié: // $.get('/get_tribes?church_id=' + churchId, function(data) { // var
+                    tribeSelect = $('select[name="tribe_id"]'); // tribeSelect.empty().append('<option
+                        value="">-- Sélectionnez --</option>'); // $.each(data, function(index,
+                    tribe) { // tribeSelect.append('<option value="' + tribe.id + '">' + tribe.name
+                        + '</option>'); // }); // }); } }); }); </script>
             </div>
         </t>
     </template>
@@ -1442,11 +1605,6 @@
                             <label class="form-label">Cellule de prière</label>
                             <input type="text" class="form-control"
                                 t-att-value="partner.prayer_cell_id.name" disabled="disabled" />
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Structure</label>
-                            <input type="text" class="form-control"
-                                t-att-value="partner.academy_id.name" disabled="disabled" />
                         </div>
                     </div>
 

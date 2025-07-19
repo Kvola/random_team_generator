@@ -75,7 +75,6 @@
                 <field name="tribe_id" column_invisible="context.get('hide_organization_fields', False)"  optional="hide"/>
                 <field name="prayer_cell_id" column_invisible="context.get('hide_organization_fields', False)"  optional="hide"/>
                 <field name="group_id" column_invisible="context.get('hide_organization_fields', False)"  optional="hide"/>
-                <field name="academy_id" column_invisible="context.get('hide_organization_fields', False)"  optional="hide"/>
             </tree>
         </field>
     </record>
@@ -96,7 +95,6 @@
                             <field name="tribe_id" invisible="team_type != 'tribe'"/>
                             <field name="prayer_cell_id" invisible="team_type != 'prayer_cell'"/>
                             <field name="group_id" invisible="team_type != 'group'"/>
-                            <field name="academy_id" invisible="team_type != 'academy'"/>
                         </group>
                     </group>
                     <group>
@@ -154,7 +152,6 @@
                 <field name="tribe_id"/>
                 <field name="prayer_cell_id"/>
                 <field name="group_id"/>
-                <field name="academy_id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click"
@@ -201,9 +198,6 @@
                                             <t t-elif="record.team_type.raw_value == 'group' and record.group_id.value">
                                                 Groupe
                                             </t>
-                                            <t t-elif="record.team_type.raw_value == 'academy' and record.academy_id.value">
-                                                Structure
-                                            </t>
                                             <t t-else="">
                                                 <span class="text-muted fst-italic">Non définie</span>
                                             </t>
@@ -220,9 +214,6 @@
                                             </t>
                                             <t t-elif="record.team_type.raw_value == 'group' and record.group_id.value">
                                                 <field name="group_id"/>
-                                            </t>
-                                            <t t-elif="record.team_type.raw_value == 'academy' and record.academy_id.value">
-                                                <field name="academy_id"/>
                                             </t>
                                             <t t-else="">
                                                 <span class="text-muted fst-italic">Non définie</span>
@@ -361,14 +352,6 @@
         <field name="view_mode">tree,form</field>
         <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'group')]</field>
         <field name="context">{'default_team_type': 'group', 'hide_organization_fields': True}</field>
-    </record>
-
-    <record id="action_view_academy_teams" model="ir.actions.act_window">
-        <field name="name">Mes Équipes Structure</field>
-        <field name="res_model">random.team</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('members_ids', 'in', active_id), ('team_type', '=', 'academy')]</field>
-        <field name="context">{'default_team_type': 'academy', 'hide_organization_fields': True}</field>
     </record>
 
     <!-- Configuration des équipes -->

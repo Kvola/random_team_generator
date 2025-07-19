@@ -222,6 +222,7 @@ class ResPartnerPortal(http.Controller):
             'total_assistant_pastors': total_assistant_pastors,
         })
 
+
     @http.route('/inscription', type='http', auth="user", website=True, csrf=False)
     def inscription_complete_form(self, **post):
         # Récupération des données pour les selects
@@ -245,16 +246,37 @@ class ResPartnerPortal(http.Controller):
             ('active', '=', True)
         ])
         
-        academies = request.env['res.partner'].sudo().search([
-            ('organization_type', '=', 'academy'),
+        # Récupération des groupes spécialisés
+        communications = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'communication'),
             ('active', '=', True)
         ])
         
-        existing_members = request.env['res.partner'].sudo().search([
-            ('is_company', '=', False),
+        artistic_groups = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'artistic_group'),
             ('active', '=', True)
-        ], limit=100)  # Limite pour des raisons de performance
+        ])
         
+        ngos = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'ngo'),
+            ('active', '=', True)
+        ])
+        
+        schools = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'school'),
+            ('active', '=', True)
+        ])
+        
+        sports_groups = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'sports_group'),
+            ('active', '=', True)
+        ])
+        
+        other_groups = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'other_group'),
+            ('active', '=', True)
+        ])
+
         if post and request.httprequest.method == 'POST':
             try:
                 if not post.get('accept_terms'):
@@ -278,6 +300,11 @@ class ResPartnerPortal(http.Controller):
                     arrival_date = f"{post['arrival_year']}-{post['arrival_month'].zfill(2)}-{post['arrival_day'].zfill(2)}"
                     arrival_date_value = arrival_date
 
+                # Gestion des groupes spécialisés (Many2many)
+                def process_multi_select(field_name):
+                    ids = post.get(field_name, '').split(',') if post.get(field_name) else []
+                    return [(6, 0, [int(id) for id in ids if id.isdigit()])] if ids else False
+
                 # Préparation des valeurs
                 partner_vals = {
                     'name': post.get('name'),
@@ -294,11 +321,12 @@ class ResPartnerPortal(http.Controller):
                     'tribe_id': int(post.get('tribe_id')) if post.get('tribe_id') else False,
                     'prayer_cell_id': int(post.get('prayer_cell_id')) if post.get('prayer_cell_id') else False,
                     'group_id': int(post.get('group_id')) if post.get('group_id') else False,
-                    'academy_id': int(post.get('academy_id')) if post.get('academy_id') else False,
                     'spouse_id': int(post.get('spouse_id')) if post.get('spouse_id') else False,
                     'function': post.get('function', ''),
                     'street2': post.get('street2', ''),
-                    'active': False,  # Inactif jusqu'à validation
+                    'tribe_type_id': int(post.get('tribe_type_id')) if post.get('tribe_type_id') else False,
+                    'is_pastor_wife': bool(post.get('is_pastor_wife')),
+                    'active': False,
                     'is_company': False,
                     'type': 'contact',
                     'comment': post.get('comment', ''),
@@ -320,6 +348,22 @@ class ResPartnerPortal(http.Controller):
                 # Création du partenaire
                 partner = request.env['res.partner'].sudo().create(partner_vals)
                 
+                # Gestion des relations Many2many après la création
+                m2m_fields = {
+                    'communication_ids': communications,
+                    'artistic_group_ids': artistic_groups,
+                    'ngo_ids': ngos,
+                    'school_ids': schools,
+                    'sports_group_ids': sports_groups,
+                    'other_group_ids': other_groups
+                }
+                
+                for field_name, records in m2m_fields.items():
+                    ids = post.get(field_name, '').split(',') if post.get(field_name) else []
+                    if ids:
+                        valid_ids = [int(id) for id in ids if id.isdigit() and int(id) in records.ids]
+                        partner.write({field_name: [(6, 0, valid_ids)]})
+                
                 # Assignation automatique au groupe d'âge si pertinent
                 if partner.birthdate:
                     partner._assign_age_group()
@@ -332,6 +376,7 @@ class ResPartnerPortal(http.Controller):
                 error = e
             except Exception as e:
                 error = _("Une erreur est survenue lors de l'inscription : %s") % str(e)
+                _logger.error("Erreur inscription: %s", str(e))
                 request.env.cr.rollback()
         else:
             error = False
@@ -341,11 +386,16 @@ class ResPartnerPortal(http.Controller):
             'tribes': tribes,
             'prayer_cells': prayer_cells,
             'groups': groups,
-            'academies': academies,
-            'existing_members': existing_members,
+            'communications': communications,
+            'artistic_groups': artistic_groups,
+            'ngos': ngos,
+            'schools': schools,
+            'sports_groups': sports_groups,
+            'other_groups': other_groups,
             'error': error,
             'values': post
         })
+
 
     @http.route('/my/fathered-children', type='http', auth='user', website=True)
     def portal_fathered_children(self):

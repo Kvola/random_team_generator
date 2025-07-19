@@ -35,7 +35,6 @@ class Team(models.Model):
         ('tribe', 'Équipe Tribu'),
         ('prayer_cell', 'Équipe Cellule de prière'),
         ('group', 'Équipe Groupe'),
-        ('academy', 'Équipe Structure'),
     ], string='Type d\'équipe', required=True, default='company')
     
     # Relations vers les organisations
@@ -47,10 +46,8 @@ class Team(models.Model):
                                    domain=[('organization_type', '=', 'prayer_cell')])
     group_id = fields.Many2one('res.partner', string='Groupe', 
                               domain=[('organization_type', '=', 'group')])
-    academy_id = fields.Many2one('res.partner', string='Structure', 
-                                domain=[('organization_type', '=', 'academy')])
 
-    @api.depends('team_type', 'company_id', 'tribe_id', 'prayer_cell_id', 'group_id', 'academy_id')
+    @api.depends('team_type', 'company_id', 'tribe_id', 'prayer_cell_id', 'group_id')
     def _compute_members_domain(self):
         """Calcule le domaine pour les membres disponibles selon le type d'équipe et l'organisation."""
         for team in self:
@@ -90,15 +87,12 @@ class Team(models.Model):
                 elif team.team_type == 'group' and team.group_id:
                     # Pour les équipes groupe
                     domain.append(('group_id', '=', team.group_id.id))
-                elif team.team_type == 'academy' and team.academy_id:
-                    # Pour les équipes structure
-                    domain.append(('academy_id', '=', team.academy_id.id))
             
             team.members_domain = str(domain)
 
     members_domain = fields.Char(compute='_compute_members_domain', store=False)
 
-    @api.constrains('members_ids', 'team_type', 'company_id', 'tribe_id', 'prayer_cell_id', 'group_id', 'academy_id')
+    @api.constrains('members_ids', 'team_type', 'company_id', 'tribe_id', 'prayer_cell_id', 'group_id')
     def _check_unique_member_per_organization_team(self):
         """Vérifie qu'un membre ne fait partie que d'une seule équipe par type d'organisation."""
         for team in self:
@@ -134,8 +128,6 @@ class Team(models.Model):
             return team.prayer_cell_id.id
         elif team.team_type == 'group':
             return team.group_id.id
-        elif team.team_type == 'academy':
-            return team.academy_id.id
         return False
 
     @api.onchange('team_type')
@@ -149,8 +141,6 @@ class Team(models.Model):
             self.prayer_cell_id = False
         if self.team_type != 'group':
             self.group_id = False
-        if self.team_type != 'academy':
-            self.academy_id = False
 
     @api.model
     def create(self, vals):
@@ -168,8 +158,6 @@ class Team(models.Model):
                     team.prayer_cell_id = member.prayer_cell_id.id if member.prayer_cell_id else False
                 elif team.team_type == 'group':
                     team.group_id = member.group_id.id if member.group_id else False
-                elif team.team_type == 'academy':
-                    team.academy_id = member.academy_id.id if member.academy_id else False
         return team
 
     def name_get(self):
@@ -187,8 +175,6 @@ class Team(models.Model):
                 organization_name = f" ({team.prayer_cell_id.name})"
             elif team.team_type == 'group' and team.group_id:
                 organization_name = f" ({team.group_id.name})"
-            elif team.team_type == 'academy' and team.academy_id:
-                organization_name = f" ({team.academy_id.name})"
             
             result.append((team.id, name + organization_name))
         return result
