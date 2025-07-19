@@ -2,9 +2,10 @@ from odoo import http, fields, _
 from odoo.http import request
 from datetime import date
 import logging
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError  # <-- Cet import est crucial
 import math
 from odoo.addons.portal.controllers.portal import pager as portal_pager
+
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
@@ -277,8 +278,14 @@ class ResPartnerPortal(http.Controller):
             ('active', '=', True)
         ])
 
+        # Initialisation de la variable error
+        error = False
+
         if post and request.httprequest.method == 'POST':
             try:
+                # Import de ValidationError dans le scope local pour éviter les problèmes d'import
+                from odoo.exceptions import ValidationError
+                
                 if not post.get('accept_terms'):
                     raise ValidationError(_("Vous devez accepter les conditions d'utilisation"))
                 
@@ -325,7 +332,6 @@ class ResPartnerPortal(http.Controller):
                     'function': post.get('function', ''),
                     'street2': post.get('street2', ''),
                     'tribe_type_id': int(post.get('tribe_type_id')) if post.get('tribe_type_id') else False,
-                    'is_pastor_wife': bool(post.get('is_pastor_wife')),
                     'active': False,
                     'is_company': False,
                     'type': 'contact',
@@ -373,13 +379,15 @@ class ResPartnerPortal(http.Controller):
                 })
                 
             except ValidationError as e:
-                error = e
+                error = str(e)
             except Exception as e:
                 error = _("Une erreur est survenue lors de l'inscription : %s") % str(e)
                 _logger.error("Erreur inscription: %s", str(e))
-                request.env.cr.rollback()
-        else:
-            error = False
+                # Rollback de la transaction en cas d'erreur
+                try:
+                    request.env.cr.rollback()
+                except:
+                    pass
         
         return request.render("random_team_generator.inscription_form", {
             'churches': churches,

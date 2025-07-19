@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import random
+from odoo.exceptions import ValidationError  # <-- Cet import est crucial
 
 class RandomTask(models.Model):
     _name = 'random.task'

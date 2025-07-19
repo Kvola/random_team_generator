@@ -1050,20 +1050,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Section Conjoint -->
-                                    <h4 class="border-bottom pb-2 mb-3 mt-4">Samonim</h4>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Femme de pasteur</label>
-                                            <select name="is_pastor_wife" class="form-select">
-                                                <option value="False">Non</option>
-                                                <option value="True"
-                                                    t-att-selected="values.get('is_pastor_wife', '') == 'True'">
-                                                    Oui</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
                                     <!-- Section Lieu d'habitation et profession -->
                                     <h4 class="border-bottom pb-2 mb-3 mt-4">Lieu d'habitation et
                                         profession</h4>

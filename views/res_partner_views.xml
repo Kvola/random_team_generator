@@ -30,37 +30,7 @@
                 <field name="marital_requirement"
                     invisible="not is_company or organization_type != 'group'" />
             </field>
-
-            <!-- Add specialized relations for contacts -->
-            <field name="parent_id" position="after">
-                <field name="church_id" invisible="is_company" placeholder="Église" />
-                <field name="tribe_domain" invisible="1" />
-                <field name="tribe_id" invisible="is_company" domain="tribe_domain"
-                    placeholder="Tribu" />
-                <field name="prayer_cell_domain" invisible="1" />
-                <field name="prayer_cell_id" invisible="is_company" domain="prayer_cell_domain"
-                    placeholder="Cellule de prière" />
-                <field name="group_domain" invisible="1" />
-                <field name="group_id" invisible="is_company" domain="group_domain"
-                    placeholder="Groupe" />
-
-                <!-- New specialized group fields -->
-                <field name="communication_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="Communication" />
-                <field name="artistic_group_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="Artistique" />
-                <field name="ngo_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="ONG" />
-                <field name="school_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="Écoles" />
-                <field name="sports_group_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="Sportifs" />
-                <field name="educational_group_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="Éducatifs" />
-                <field name="other_group_ids" invisible="is_company" widget="many2many_tags"
-                    placeholder="Autres Structures" />
-            </field>
-
+            
             <!-- Ajout des informations personnelles après le champ parent_id -->
             <page name="contact_addresses" position="before">
                 <!-- Groupe d'informations personnelles -->
@@ -225,20 +195,46 @@
                 </page>
 
                 <!-- Onglet pour les rôles dans l'église (pour les membres) -->
-                <page string="Rôles dans l'église" name="church_roles"
+                <page string="Structures et Rôles" name="church_roles"
                     invisible="is_company or not is_in_a_church">
                     <group>
                         <!--<field
                         name="church_id"/>-->
-                        <group>
+                        <group string="Structures">
+                            <field name="church_id" invisible="is_company" placeholder="Église" />
+                            <field name="tribe_domain" invisible="1" />
+                            <field name="tribe_id" invisible="is_company" domain="tribe_domain"
+                                placeholder="Tribu" />
+                            <field name="prayer_cell_domain" invisible="1" />
+                            <field name="prayer_cell_id" invisible="is_company" domain="prayer_cell_domain"
+                                placeholder="Cellule de prière" />
+                            <field name="group_domain" invisible="1" />
+                            <field name="group_id" invisible="is_company" domain="group_domain"
+                                placeholder="Groupe" />
+
+                            <!-- New specialized group fields -->
+                            <field name="communication_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="Communication" />
+                            <field name="artistic_group_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="Artistique" />
+                            <field name="ngo_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="ONG" />
+                            <field name="school_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="Écoles" />
+                            <field name="sports_group_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="Sportifs" />
+                            <field name="educational_group_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="Éducatifs" />
+                            <field name="other_group_ids" invisible="is_company" widget="many2many_tags"
+                                placeholder="Autres Structures" />
+                        </group>
+                        <group string="Rôles">
                             <field name="is_pastor" />
                             <field name="is_elder" />
                             <field name="is_deacon" />
-                        </group>
-                        <group>
                             <field name="is_missionary" />
                             <field name="is_leader" />
-                            <field name="is_pastor_wife" invisible="[(gender,'!=','female')]" />
+                            <field name="is_pastor_wife" invisible="[(gender,'!=','female')]" />                            
                         </group>
                     </group>
                 </page>
@@ -374,14 +370,14 @@
                 <button name="action_view_communications" type="object" class="oe_stat_button"
                     icon="fa-music"
                     invisible="communication_count == 0 or not is_company or not is_church">
-                    <field name="communication_count" widget="statinfo" string="Groupes de chant" />
+                    <field name="communication_count" widget="statinfo" string="Groupes de communication" />
                 </button>
 
                 <!-- Dance Groups Button -->
                 <button name="action_view_artistic_groups" type="object" class="oe_stat_button"
                     icon="fa-music"
                     invisible="artistic_group_count == 0 or not is_company or not is_church">
-                    <field name="artistic_group_count" widget="statinfo" string="Groupes de danse" />
+                    <field name="artistic_group_count" widget="statinfo" string="Groupes artistiques" />
                 </button>
 
                 <!-- NGOs Button -->
@@ -403,7 +399,7 @@
                     icon="fa-money-bill-wave"
                     invisible="other_group_count == 0 or not is_company or not is_church">
                     <field name="other_group_count" widget="statinfo"
-                        string="Groupes financiers" />
+                        string="Groupes spécialisés" />
                 </button>
 
                 <!-- Sports Groups Button -->
@@ -875,7 +871,7 @@
 
 
                 <!-- Choir Group Members Tab -->
-                <page string="Membres du groupe de chant" name="communication_members"
+                <page string="Membres du groupe de communication" name="communication_members"
                     invisible="organization_type != 'communication' or not is_company">
                     <field name="communication_members" mode="kanban">
                         <kanban>
@@ -948,7 +944,7 @@
                 </page>
 
                 <!-- Dance Group Members Tab -->
-                <page string="Membres du groupe de danse" name="artistic_group_members"
+                <page string="Membres du groupe artistique" name="artistic_group_members"
                     invisible="organization_type != 'artistic_group' or not is_company">
                     <field name="artistic_group_members" mode="kanban">
                         <kanban>
@@ -1167,7 +1163,7 @@
                 </page>
 
                 <!-- Financial Group Members Tab -->
-                <page string="Membres du groupe financier" name="other_group_members"
+                <page string="Membres du groupe spécialisé" name="other_group_members"
                     invisible="organization_type != 'other_group' or not is_company">
                     <field name="other_group_members" mode="kanban">
                         <kanban>
@@ -1387,7 +1383,7 @@
 
 
                 <!-- Choir Group Info Page -->
-                <page string="Informations Groupe de Chant" name="communication_info"
+                <page string="Informations Groupe de Communication" name="communication_info"
                     invisible="organization_type != 'communication' or not is_company">
                     <group>
                         <field name="communication_church_id" />
@@ -1396,7 +1392,7 @@
                 </page>
 
                 <!-- Dance Group Info Page -->
-                <page string="Informations Groupe de Danse" name="artistic_group_info"
+                <page string="Informations Groupe artistique" name="artistic_group_info"
                     invisible="organization_type != 'artistic_group' or not is_company">
                     <group>
                         <field name="artistic_group_church_id" />
@@ -1423,7 +1419,7 @@
                 </page>
 
                 <!-- Financial Group Info Page -->
-                <page string="Informations Groupe Financier" name="other_group_info"
+                <page string="Informations Groupe Spécialisé" name="other_group_info"
                     invisible="organization_type != 'other_group' or not is_company">
                     <group>
                         <field name="other_group_church_id" />

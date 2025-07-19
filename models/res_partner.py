@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from datetime import datetime, timedelta, date
 import random
+from odoo.exceptions import ValidationError  # <-- Cet import est crucial
 
 class RandomTribe(models.Model):
     _name = "random.tribe"
