@@ -196,8 +196,7 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <span class="badge bg-success">
-                                                            <span
-                                                                t-esc="len(school.school_teacher_ids)" />
+                                                            <span t-esc="len(school.school_monitor_ids)"/>
                                                         </span>
                                                     </td>
                                                     <td>
