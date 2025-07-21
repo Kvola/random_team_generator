@@ -9,6 +9,76 @@ from odoo.addons.portal.controllers.portal import pager as portal_pager
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
+    @http.route('/inscription-ecole', type='http', auth="public", website=True, csrf=False)
+    def inscription_ecole_form(self, **post):
+        # Récupération des écoles
+        schools = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'school'),
+            ('active', '=', True)
+        ])
+        
+        # Initialisation de la variable error
+        error = False
+
+        if post and request.httprequest.method == 'POST':
+            try:
+                from odoo.exceptions import ValidationError
+                
+                # Validation des données obligatoires
+                required_fields = ['name', 'gender', 'birthdate', 'school_id', 'function_type']
+                for field in required_fields:
+                    if not post.get(field):
+                        raise ValidationError(_("Le champ %s est obligatoire") % field)
+                
+                # Préparation des valeurs
+                partner_vals = {
+                    'name': post.get('name'),
+                    'email': post.get('email') if post.get('email') else False,
+                    'phone': post.get('phone') if post.get('phone') else False,
+                    'mobile': post.get('mobile') if post.get('mobile') else False,
+                    'gender': post.get('gender'),
+                    'birthdate': post.get('birthdate'),
+                    'active': False,
+                    'is_company': False,
+                    'type': 'contact',
+                }
+                
+                # Gestion du type de fonction
+                function_type = post.get('function_type')
+                if function_type == 'monitor':
+                    partner_vals.update({'is_monitor': True})
+                elif function_type == 'teacher':
+                    partner_vals.update({'is_teacher': True})
+                elif function_type == 'leader':
+                    partner_vals.update({'is_leader': True})
+                
+                # Création du partenaire
+                partner = request.env['res.partner'].sudo().create(partner_vals)
+                
+                # Ajout comme moniteur/professeur à l'école sélectionnée
+                school = request.env['res.partner'].sudo().browse(int(post.get('school_id')))
+                school.write({'school_monitor_ids': [(4, partner.id)]})
+                
+                return request.render("random_team_generator.inscription_success", {
+                    'partner': partner
+                })
+                
+            except ValidationError as e:
+                error = str(e)
+            except Exception as e:
+                error = _("Une erreur est survenue lors de l'inscription : %s") % str(e)
+                _logger.error("Erreur inscription école: %s", str(e))
+                try:
+                    request.env.cr.rollback()
+                except:
+                    pass
+        
+        return request.render("random_team_generator.inscription_ecole_form", {
+            'schools': schools,
+            'error': error,
+            'values': post
+        })
+        
     @http.route('/cellules-priere/pdf', type='http', auth="public", website=True)
     def pdf_prayer_cells(self, **post):
         prayer_cells = request.env['res.partner'].sudo().search([
