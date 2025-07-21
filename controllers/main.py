@@ -19,7 +19,6 @@ class ResPartnerPortal(http.Controller):
         
         # Calcul des totaux
         total_monitors = sum(len(school.school_monitor_ids) for school in schools)
-        total_teachers = sum(len(school.school_teacher_ids) for school in schools)
         
         pdf = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
             'random_team_generator.school_list_pdf', 
@@ -27,7 +26,6 @@ class ResPartnerPortal(http.Controller):
             data={
                 'schools': schools,
                 'total_monitors': total_monitors,
-                'total_teachers': total_teachers
             }
         )
         
