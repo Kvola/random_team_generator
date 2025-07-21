@@ -339,6 +339,7 @@ class ResPartnerPortal(http.Controller):
                 }
                 
                 # Gestion des fonctions spécifiques
+                # Dans la méthode inscription_complete_form, remplacez cette partie :
                 function_type = post.get('function_type')
                 if function_type == 'pastor':
                     partner_vals.update({'is_pastor': True})
@@ -350,6 +351,16 @@ class ResPartnerPortal(http.Controller):
                     partner_vals.update({'is_missionary': True})
                 elif function_type == 'leader':
                     partner_vals.update({'is_leader': True})
+
+                # Par cette nouvelle version qui gère plusieurs fonctions :
+                function_types = post.get('function_types', '').split(',') if post.get('function_types') else []
+                partner_vals.update({
+                    'is_pastor': 'pastor' in function_types,
+                    'is_elder': 'elder' in function_types,
+                    'is_deacon': 'deacon' in function_types,
+                    'is_missionary': 'missionary' in function_types,
+                    'is_leader': 'leader' in function_types,
+                })
                 
                 # Création du partenaire
                 partner = request.env['res.partner'].sudo().create(partner_vals)
