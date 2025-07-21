@@ -792,7 +792,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group required-field">
-                                            <label class="form-label">Fonction souhaitée</label>
+                                            <label class="form-label">Fonction exercée</label>
                                             <select name="function_type" class="form-select"
                                                 required="required">
                                                 <option value="">-- Sélectionnez votre fonction --</option>
@@ -833,7 +833,7 @@
 
                                 <!-- Bouton de soumission -->
                                 <button type="submit" class="submit-btn" id="submitBtn">
-                                    <i class="fas fa-paper-plane me-2"></i> Soumettre ma candidature </button>
+                                    <i class="fas fa-paper-plane me-2"></i> Soumettre </button>
                             </form>
                         </div>
                     </div>
