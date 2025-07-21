@@ -795,6 +795,25 @@ class ResPartner(models.Model):
         store=True
     )
 
+    # Responsable de suivi de l'école (doit être un pasteur)
+    school_follower_id = fields.Many2one(
+        'res.partner',
+        string="Responsable de suivi de l'école",
+        domain="[('is_pastor','=',True)]",
+        help="Pasteur responsable du suivi pastoral de cette école"
+    )
+
+    # Responsables adjoints de suivi (doivent être des pasteurs)
+    school_assistant_follower_ids = fields.Many2many(
+        'res.partner',
+        'school_assistant_follower_rel',
+        'school_id',
+        'pastor_id',
+        string="Responsables adjoints de suivi",
+        domain="[('is_pastor','=',True)]",
+        help="Pasteurs adjoints responsables du suivi pastoral de cette école"
+    )
+
     @api.depends('school_monitor_ids')
     def _compute_monitor_count(self):
         for record in self:

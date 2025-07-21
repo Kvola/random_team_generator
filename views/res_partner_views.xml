@@ -240,7 +240,7 @@
                             <field name="educational_group_ids" invisible="is_company"
                                 widget="many2many_tags"
                                 placeholder="Éducatifs" domain="educational_group_domain" />
-                                
+
                             <field name="other_group_domain" invisible="1" />
                             <field name="other_group_ids" invisible="is_company"
                                 widget="many2many_tags"
@@ -286,7 +286,8 @@
                 <!-- Champ unique_code -->
                 <div class="oe_button_box" name="button_box">
                     <span class="badge badge-primary o_field_widget o_readonly_modifier">
-                        <i class="fa fa-id-card" /> <field name="unique_code" readonly="1" />
+                        <i class="fa fa-id-card" />
+                        <field name="unique_code" readonly="1" />
                     </span>
                 </div>
             </field>
@@ -1217,7 +1218,8 @@
                                                                 <i class="fa fa-user" /> Moniteur </span>
                                                             <span t-if="record.is_teacher.raw_value"
                                                                 class="badge badge-success ml-2">
-                                                                <i class="fa fa-graduation-cap" /> Professeur </span>
+                                                                <i class="fa fa-graduation-cap" />
+                                                                Professeur </span>
                                                         </strong>
                                                         <div t-if="record.email.value">
                                                             <i class="fa fa-envelope" />
@@ -1240,6 +1242,61 @@
                             </kanban>
                         </field>
                     </group>
+                </page>
+
+                <!-- School Teachers Tab -->
+                <page string="Moniteurs/Professeurs" name="school_teachers"
+                    invisible="organization_type != 'school' or not is_company">
+                    <field name="school_monitor_ids" mode="kanban">
+                        <kanban>
+                            <field name="name" />
+                            <field name="email" />
+                            <field name="phone" />
+                            <field name="mobile" />
+                            <field name="avatar_128" />
+                            <field name="gender" />
+                            <field name="is_monitor" />
+                            <field name="is_teacher" />
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_content">
+                                            <div class="oe_kanban_details">
+                                                <img
+                                                    t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)"
+                                                    class="oe_kanban_avatar float-start"
+                                                    alt="Avatar" />
+                                                <div class="oe_kanban_details_body">
+                                                    <strong>
+                                                        <field name="name" />
+                                                        <span t-if="record.is_monitor.raw_value"
+                                                            class="badge badge-info ml-2">
+                                                            <i class="fa fa-user" /> Moniteur </span>
+                                                        <span t-if="record.is_teacher.raw_value"
+                                                            class="badge badge-success ml-2">
+                                                            <i class="fa fa-graduation-cap" />
+                                                            Professeur </span>
+                                                    </strong>
+                                                    <div t-if="record.email.value">
+                                                        <i class="fa fa-envelope" />
+                                                        <field name="email" />
+                                                    </div>
+                                                    <div t-if="record.phone.value">
+                                                        <i class="fa fa-phone" />
+                                                        <field name="phone" />
+                                                    </div>
+                                                    <div t-if="record.mobile.value">
+                                                        <i class="fa fa-mobile" />
+                                                        <field name="mobile" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
                 </page>
 
                 <!-- Financial Group Members Tab -->
@@ -1494,13 +1551,14 @@
                 <page string="Informations École" name="school_info"
                     invisible="organization_type != 'school' or not is_company">
                     <group>
-                        <field name="school_church_id" />
-                        <field name="school_leader_id" />
+                        <group>
+                            <field name="school_church_id" />
+                            <field name="school_leader_id" />
+                            <field name="school_follower_id" string="Responsable de suivi"/>
+                        </group>
                         <group>
                             <field name="school_monitor_ids" widget="many2many_tags" />
-                            <field name="monitor_count" widget="statinfo" string="Moniteurs/Professeurs" />
-                            <button name="action_view_school_monitors" type="object" 
-                                class="oe_stat_button" icon="fa-graduation-cap"/>
+                            <field name="school_assistant_follower_ids" widget="many2many_tags" string="Responsables adjoints de suivi"/>
                         </group>
                     </group>
                 </page>
@@ -1596,8 +1654,8 @@
     </record>
     <record id="action_generate_codes_for_partners" model="ir.actions.server">
         <field name="name">Générer les codes uniques</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="model_id" ref="base.model_res_partner" />
+        <field name="binding_model_id" ref="base.model_res_partner" />
         <field name="state">code</field>
         <field name="code">model.generate_codes_for_existing_partners()</field>
         <field name="binding_type">action</field>
