@@ -24,6 +24,298 @@
         <field name="sequence">55</field>
     </record>
 
+    <!-- Template pour la vue web des écoles -->
+    <template id="school_list" name="Liste des écoles">
+        <t t-call="website.layout">
+            <style>
+                .classes-list {
+                max-height: 200px;
+                overflow-y: auto;
+                padding: 5px;
+                }
+                .class-card {
+                background-color: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                transition: all 0.2s ease-in-out;
+                }
+                .class-card:hover {
+                background-color: #e9ecef !important;
+                border-color: #adb5bd !important;
+                }
+                .class-card:last-child {
+                margin-bottom: 0 !important;
+                }
+                @media (max-width: 768px) {
+                .classes-list {
+                max-height: 150px;
+                }
+                .class-card {
+                padding: 8px !important;
+                }
+                }
+            </style>
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card shadow-lg">
+                            <div class="card-header bg-gradient-primary">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h3 class="mb-0"><i class="fas fa-graduation-cap me-1"></i>
+                                            Liste des Écoles</h3>
+                                        <small class="text-light">
+                                            <i class="fa fa-calendar me-1"></i> Dernière mise à jour
+                                            : <span
+                                                t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <span class="badge bg-light text-primary fs-6">
+                                            <i class="fas fa-school me-1"></i>
+                                            <span
+                                                t-esc="pager['total']" /> école(s) </span>
+                                        <br />
+                                        <span class="badge bg-light text-primary fs-6 mt-1">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>
+                                            <span
+                                                t-esc="total_monitors" /> moniteur(s) </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="searchInput"
+                                                placeholder="Rechercher une école, église ou responsable..." />
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col-md-6 text-end d-flex justify-content-end align-items-center">
+                                        <select id="itemsPerPage" class="form-select me-2"
+                                            style="width: auto;">
+                                            <option value="10"
+                                                t-att-selected="'selected' if pager['limit'] == 10 else None">
+                                                10</option>
+                                            <option value="20"
+                                                t-att-selected="'selected' if pager['limit'] == 20 else None">
+                                                20</option>
+                                            <option value="50"
+                                                t-att-selected="'selected' if pager['limit'] == 50 else None">
+                                                50</option>
+                                            <option value="100"
+                                                t-att-selected="'selected' if pager['limit'] == 100 else None">
+                                                100</option>
+                                        </select>
+                                        <a href="/ecoles/pdf" class="btn btn-outline-primary me-2">
+                                            <i class="fa fa-file-pdf me-1"></i> PDF </a>
+                                        <button class="btn btn-outline-secondary"
+                                            onclick="window.print()">
+                                            <i class="fa fa-print me-1"></i> Imprimer </button>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted"> Affichage de <span
+                                                t-esc="pager['offset'] + 1" /> à <span
+                                                t-esc="min(pager['offset'] + pager['limit'], pager['total'])" />
+                                            sur <span t-esc="pager['total']" /> écoles </small>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <small class="text-muted"> Page <span t-esc="pager['page']" />
+                                            sur <span t-esc="pager['page_count']" />
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped" id="schoolsTable">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th class="text-center">École</th>
+                                                <th class="text-center">Église</th>
+                                                <th class="text-center">Responsable</th>
+                                                <th class="text-center">Moniteurs</th>
+                                                <th class="text-center">Professeurs</th>
+                                                <th class="text-center">Classes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="schools" t-as="school">
+                                                <tr>
+                                                    <td class="fw-bold">
+                                                        <i
+                                                            class="fas fa-graduation-cap text-primary me-1"></i>
+                                                        <span t-esc="school.name" />
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            t-esc="school.school_church_id.name or 'Non définie'" />
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="school.school_leader_id">
+                                                            <div class="mb-2">
+                                                                <div
+                                                                    class="d-flex align-items-center">
+                                                                    <i
+                                                                        class="fa fa-user-tie me-2 text-primary"></i>
+                                                                    <div>
+                                                                        <div class="fw-bold">
+                                                                            <span
+                                                                                t-esc="school.school_leader_id.name" />
+                                                                        </div>
+                                                                        <t
+                                                                            t-if="school.school_leader_id.phone">
+                                                                            <div
+                                                                                class="text-muted small">
+                                                                                <i
+                                                                                    class="fa fa-phone me-1"></i>
+                                                                                <span
+                                                                                    t-esc="school.school_leader_id.phone" />
+                                                                            </div>
+                                                                        </t>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <div class="text-muted fst-italic">Responsable
+                                                                non assigné</div>
+                                                        </t>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-info">
+                                                            <span
+                                                                t-esc="len(school.school_monitor_ids)" />
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-success">
+                                                            <span
+                                                                t-esc="len(school.school_teacher_ids)" />
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="school.school_class_ids">
+                                                            <div class="classes-list">
+                                                                <t
+                                                                    t-foreach="school.school_class_ids"
+                                                                    t-as="classroom">
+                                                                    <div
+                                                                        class="class-card bg-light border rounded p-2 mb-2">
+                                                                        <div
+                                                                            class="d-flex align-items-center">
+                                                                            <i
+                                                                                class="fas fa-door-open text-primary me-2"></i>
+                                                                            <div class="flex-grow-1">
+                                                                                <div class="fw-bold">
+                                                                                    <span
+                                                                                        t-esc="classroom.name" />
+                                                                                </div>
+                                                                                <div
+                                                                                    class="text-muted small">
+                                                                                    <i
+                                                                                        class="fas fa-users me-1"></i>
+                                                                                    <span
+                                                                                        t-esc="len(classroom.class_member_ids)" />
+                                                                                    élèves </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </t>
+                                                            </div>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted fst-italic">Aucune
+                                                                classe</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-md-12">
+                                        <nav aria-label="Navigation des pages">
+                                            <ul class="pagination justify-content-center">
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if pager['page'] == 1 else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_first']">
+                                                        <i class="fa fa-angle-double-left"></i>
+                                                    </a>
+                                                </li>
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if not pager['url_previous'] else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_previous'] or '#'">
+                                                        <i class="fa fa-angle-left"></i>
+                                                    </a>
+                                                </li>
+                                                <t t-foreach="pager['page_range']" t-as="page_num">
+                                                    <li
+                                                        t-att-class="'page-item' + (' active' if page_num == pager['page'] else '')">
+                                                        <a class="page-link"
+                                                            t-att-href="pager['url_page'] % page_num">
+                                                            <span t-esc="page_num" />
+                                                        </a>
+                                                    </li>
+                                                </t>
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if not pager['url_next'] else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_next'] or '#'">
+                                                        <i class="fa fa-angle-right"></i>
+                                                    </a>
+                                                </li>
+                                                <li
+                                                    t-att-class="'page-item' + (' disabled' if pager['page'] == pager['page_count'] else '')">
+                                                    <a class="page-link"
+                                                        t-att-href="pager['url_last']">
+                                                        <i class="fa fa-angle-double-right"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                    // Gestion de la recherche
+                    const searchInput = document.getElementById('searchInput');
+                    const rows = document.querySelectorAll('#schoolsTable tbody tr');
+                    searchInput.addEventListener('input', function() {
+                    const term = this.value.toLowerCase();
+                    rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                    });
+                    });
+
+                    // Gestion du nombre d'éléments par page
+                    document.getElementById('itemsPerPage').addEventListener('change', function() {
+                    const limit = this.value;
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('limit', limit);
+                    currentUrl.searchParams.set('page', 1); // reset to first page
+                    window.location.href = currentUrl.toString();
+                    });
+                    });
+                </script>
+            </div>
+        </t>
+    </template>
     <template id="inscription_ecole_form" name="Formulaire d'inscription pour école du dimanche">
         <t t-call="website.layout">
             <div class="container mt-5 mb-5">
@@ -174,6 +466,33 @@
     <!-- Template pour la vue web des cellules de prière -->
     <template id="prayer_cell_list" name="Liste des cellules de prière">
         <t t-call="website.layout">
+            <style>
+                .members-list {
+                max-height: 200px;
+                overflow-y: auto;
+                padding: 5px;
+                }
+                .member-card {
+                background-color: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                transition: all 0.2s ease-in-out;
+                }
+                .member-card:hover {
+                background-color: #e9ecef !important;
+                border-color: #adb5bd !important;
+                }
+                .member-card:last-child {
+                margin-bottom: 0 !important;
+                }
+                @media (max-width: 768px) {
+                .members-list {
+                max-height: 150px;
+                }
+                .member-card {
+                padding: 8px !important;
+                }
+                }
+            </style>
             <div class="container mt-4 mb-5">
                 <div class="row">
                     <div class="col-md-12">
@@ -491,35 +810,6 @@
                         </div>
                     </div>
                 </div>
-
-                <style>
-                    .members-list {
-                    max-height: 200px;
-                    overflow-y: auto;
-                    padding: 5px;
-                    }
-                    .member-card {
-                    background-color: #f8f9fa !important;
-                    border: 1px solid #dee2e6 !important;
-                    transition: all 0.2s ease-in-out;
-                    }
-                    .member-card:hover {
-                    background-color: #e9ecef !important;
-                    border-color: #adb5bd !important;
-                    }
-                    .member-card:last-child {
-                    margin-bottom: 0 !important;
-                    }
-                    @media (max-width: 768px) {
-                    .members-list {
-                    max-height: 150px;
-                    }
-                    .member-card {
-                    padding: 8px !important;
-                    }
-                    }
-                </style>
-
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                     const searchInput = document.getElementById('searchInput');

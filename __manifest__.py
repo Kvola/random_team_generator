@@ -21,6 +21,7 @@
         'views/portal_templates.xml',
         'reports/churches.xml',
         'reports/prayer_cell.xml',
+        'reports/schools.xml',
         'data/ir_cron.xml',
         'views/menu.xml',
     ],

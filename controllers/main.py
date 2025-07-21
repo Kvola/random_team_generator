@@ -9,6 +9,115 @@ from odoo.addons.portal.controllers.portal import pager as portal_pager
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
+
+    @http.route('/ecoles/pdf', type='http', auth="public", website=True)
+    def pdf_schools(self, **post):
+        schools = request.env['res.partner'].sudo().search([
+            ('organization_type', '=', 'school'),
+            ('active', '=', True)
+        ], order='name')
+        
+        # Calcul des totaux
+        total_monitors = sum(len(school.school_monitor_ids) for school in schools)
+        total_teachers = sum(len(school.school_teacher_ids) for school in schools)
+        
+        pdf = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            'random_team_generator.school_list_pdf', 
+            [0],
+            data={
+                'schools': schools,
+                'total_monitors': total_monitors,
+                'total_teachers': total_teachers
+            }
+        )
+        
+        pdfhttpheaders = [
+            ('Content-Type', 'application/pdf'),
+            ('Content-Length', len(pdf[0])),
+            ('Content-Disposition', 'attachment; filename=liste_ecoles.pdf')
+        ]
+        
+        return request.make_response(pdf[0], headers=pdfhttpheaders)
+
+    @http.route('/ecoles', type='http', auth="public", website=True)
+    def list_schools(self, **post):
+        # Récupération des paramètres de pagination
+        page = int(post.get('page', 1))
+        limit = int(post.get('limit', 10))  # 10 par défaut
+        
+        # Calcul de l'offset
+        offset = (page - 1) * limit
+        
+        # Domaine de recherche
+        domain = [
+            ('organization_type', '=', 'school'),
+            ('active', '=', True)
+        ]
+        
+        # Compte total des écoles
+        total_count = request.env['res.partner'].sudo().search_count(domain)
+        
+        # Récupération des écoles pour la page actuelle
+        schools = request.env['res.partner'].sudo().search(
+            domain,
+            offset=offset,
+            limit=limit,
+            order='name'
+        )
+        
+        # Calcul du nombre total de pages
+        page_count = math.ceil(total_count / limit) if total_count > 0 else 1
+        
+        # Construction des URLs pour la pagination
+        base_url = '/ecoles'
+        
+        def build_url(page_num, limit_val=limit):
+            return f"{base_url}?page={page_num}&limit={limit_val}"
+        
+        # URLs de navigation
+        url_first = build_url(1)
+        url_last = build_url(page_count)
+        url_previous = build_url(page - 1) if page > 1 else None
+        url_next = build_url(page + 1) if page < page_count else None
+        
+        # Génération de la plage de pages à afficher (5 pages max)
+        start_page = max(1, page - 2)
+        end_page = min(page_count, page + 2)
+        
+        # Ajustement si on est proche du début ou de la fin
+        if end_page - start_page < 4:
+            if start_page == 1:
+                end_page = min(page_count, start_page + 4)
+            else:
+                start_page = max(1, end_page - 4)
+        
+        page_range = list(range(start_page, end_page + 1))
+        
+        # Création de l'objet pager
+        pager = {
+            'total': total_count,
+            'limit': limit,
+            'offset': offset,
+            'page': page,
+            'page_count': page_count,
+            'url_first': url_first,
+            'url_last': url_last,
+            'url_previous': url_previous,
+            'url_next': url_next,
+            'url_page': f"{base_url}?page=%s&limit={limit}",
+            'page_range': page_range,
+        }
+        
+        # Calcul des totaux pour toutes les écoles (pas seulement la page actuelle)
+        all_schools = request.env['res.partner'].sudo().search(domain)
+        total_monitors = sum(len(school.school_monitor_ids) for school in all_schools)
+        
+        return request.render("random_team_generator.school_list", {
+            'schools': schools,
+            'pager': pager,
+            'total_monitors': total_monitors
+        })
+
     @http.route('/inscription-ecole', type='http', auth="public", website=True, csrf=False)
     def inscription_ecole_form(self, **post):
         # Récupération des écoles
