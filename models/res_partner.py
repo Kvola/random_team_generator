@@ -773,6 +773,49 @@ class ResPartner(models.Model):
         help="Code unique généré automatiquement pour identifier ce partenaire",
     )
 
+    # Ajouter dans la classe ResPartner(models.Model)
+    # Pour les écoles
+    school_monitor_ids = fields.Many2many(
+        'res.partner',
+        'school_monitor_rel',
+        'school_id',
+        'monitor_id',
+        string='Moniteurs/Professeurs',
+        domain="[('id', '!=', id), '|', ('is_teacher', '=', True), ('is_monitor', '=', True)]",
+        help="Moniteurs ou professeurs de cette école"
+    )
+
+    is_monitor = fields.Boolean(string="Est moniteur")
+    is_teacher = fields.Boolean(string="Est professeur")
+
+    # Compteur de moniteurs/professeurs
+    monitor_count = fields.Integer(
+        string="Nombre de moniteurs/professeurs",
+        compute="_compute_monitor_count",
+        store=True
+    )
+
+    @api.depends('school_monitor_ids')
+    def _compute_monitor_count(self):
+        for record in self:
+            record.monitor_count = len(record.school_monitor_ids)
+
+    # Méthode pour ouvrir la vue des moniteurs/professeurs
+    def action_view_school_monitors(self):
+        self.ensure_one()
+        return {
+            'name': f"Moniteurs/Professeurs de {self.name}",
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', self.school_monitor_ids.ids)],
+            'context': {
+                'default_is_monitor': True,
+                'search_default_is_monitor': True,
+                'search_default_is_teacher': True
+            }
+        }
+
     @api.model
     def create(self, vals):
         """Générer un code unique lors de la création"""

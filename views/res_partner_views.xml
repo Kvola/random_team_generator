@@ -438,6 +438,12 @@
                     <field name="educational_group_count" widget="statinfo"
                         string="Groupes éducatifs" />
                 </button>
+
+                <button name="action_view_school_monitors" type="object" class="oe_stat_button"
+                    icon="fa-graduation-cap"
+                    invisible="organization_type != 'school' or not is_company">
+                    <field name="monitor_count" widget="statinfo" string="Moniteurs/Professeurs" />
+                </button>
             </div>
 
             <!-- Add generate teams button -->
@@ -1182,6 +1188,58 @@
                             </templates>
                         </kanban>
                     </field>
+                    <group>
+                        <h2>Moniteurs/Professeurs</h2>
+                        <field name="school_monitor_ids" mode="kanban">
+                            <kanban>
+                                <field name="name" />
+                                <field name="email" />
+                                <field name="phone" />
+                                <field name="mobile" />
+                                <field name="avatar_128" />
+                                <field name="gender" />
+                                <field name="is_monitor" />
+                                <field name="is_teacher" />
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_card oe_kanban_global_click">
+                                            <div class="oe_kanban_content">
+                                                <div class="oe_kanban_details">
+                                                    <img
+                                                        t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)"
+                                                        class="oe_kanban_avatar float-start"
+                                                        alt="Avatar" />
+                                                    <div class="oe_kanban_details_body">
+                                                        <strong>
+                                                            <field name="name" />
+                                                            <span t-if="record.is_monitor.raw_value"
+                                                                class="badge badge-info ml-2">
+                                                                <i class="fa fa-user" /> Moniteur </span>
+                                                            <span t-if="record.is_teacher.raw_value"
+                                                                class="badge badge-success ml-2">
+                                                                <i class="fa fa-graduation-cap" /> Professeur </span>
+                                                        </strong>
+                                                        <div t-if="record.email.value">
+                                                            <i class="fa fa-envelope" />
+                                                            <field name="email" />
+                                                        </div>
+                                                        <div t-if="record.phone.value">
+                                                            <i class="fa fa-phone" />
+                                                            <field name="phone" />
+                                                        </div>
+                                                        <div t-if="record.mobile.value">
+                                                            <i class="fa fa-mobile" />
+                                                            <field name="mobile" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </group>
                 </page>
 
                 <!-- Financial Group Members Tab -->
@@ -1432,11 +1490,18 @@
                 </page>
 
                 <!-- School Info Page -->
+                <!-- School Info Page - Ajouter les champs pour les moniteurs/professeurs -->
                 <page string="Informations École" name="school_info"
                     invisible="organization_type != 'school' or not is_company">
                     <group>
                         <field name="school_church_id" />
                         <field name="school_leader_id" />
+                        <group>
+                            <field name="school_monitor_ids" widget="many2many_tags" />
+                            <field name="monitor_count" widget="statinfo" string="Moniteurs/Professeurs" />
+                            <button name="action_view_school_monitors" type="object" 
+                                class="oe_stat_button" icon="fa-graduation-cap"/>
+                        </group>
                     </group>
                 </page>
 
