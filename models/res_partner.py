@@ -764,14 +764,14 @@ class ResPartner(models.Model):
         string="Nombre d'églises régionales", compute="_compute_regional_church_count"
     )
 
-    # Champ pour stocker le code unique
-    unique_code = fields.Char(
-        string="Code unique",
-        readonly=True,
-        copy=False,
-        index=True,
-        help="Code unique généré automatiquement pour identifier ce partenaire",
-    )
+    # # Champ pour stocker le code unique
+    # unique_code = fields.Char(
+    #     string="Code unique",
+    #     readonly=True,
+    #     copy=False,
+    #     index=True,
+    #     help="Code unique généré automatiquement pour identifier ce partenaire",
+    # )
 
     @api.model
     def create(self, vals):

@@ -284,11 +284,11 @@
                         <i class="fa fa-church" /> Église </span>
                 </div>
                 <!-- Champ unique_code -->
-                <div class="oe_button_box" name="button_box">
+                <!-- <div class="oe_button_box" name="button_box">
                     <span class="badge badge-primary o_field_widget o_readonly_modifier">
                         <i class="fa fa-id-card" /> <field name="unique_code" readonly="1" />
                     </span>
-                </div>
+                </div> -->
             </field>
 
             <!-- Boutons intelligents -->
