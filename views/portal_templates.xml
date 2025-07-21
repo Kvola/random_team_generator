@@ -157,6 +157,8 @@
                                                         <span
                                                             t-esc="school.school_church_id.name or 'Non définie'" />
                                                     </td>
+                                                    <!-- Dans le template school_list, modifiez la
+                                                    partie responsable pour ajouter l'âge -->
                                                     <td>
                                                         <t t-if="school.school_leader_id">
                                                             <div class="mb-2">
@@ -169,6 +171,11 @@
                                                                             <span
                                                                                 t-esc="school.school_leader_id.name" />
                                                                         </div>
+                                                                        <div
+                                                                            class="text-muted small">
+                                                                            <span
+                                                                                t-esc="school.school_leader_id.age" />
+                                                                            ans </div>
                                                                         <t
                                                                             t-if="school.school_leader_id.phone">
                                                                             <div
@@ -196,7 +203,8 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <span class="badge bg-success">
-                                                            <span t-esc="len(school.school_monitor_ids)"/>
+                                                            <span
+                                                                t-esc="len(school.school_monitor_ids)" />
                                                         </span>
                                                     </td>
                                                     <td>
@@ -315,8 +323,25 @@
             </div>
         </t>
     </template>
+
     <template id="inscription_ecole_form" name="Formulaire d'inscription pour école du dimanche">
         <t t-call="website.layout">
+            <style>
+                /* Ajout des styles pour les sélecteurs de date */
+                .date-selectors {
+                display: flex;
+                gap: 10px;
+                }
+                .date-selector {
+                flex: 1;
+                }
+                @media (max-width: 768px) {
+                .date-selectors {
+                flex-direction: column;
+                gap: 8px;
+                }
+                }
+            </style>
             <div class="container mt-5 mb-5">
                 <div class="row justify-content-center">
                     <div class="col-md-8">
@@ -360,17 +385,155 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
+                                        <!-- Date de naissance améliorée -->
+                                        <div class="col-md-6 mb-3 required-field">
                                             <label class="form-label">Date de naissance</label>
-                                            <input type="date" name="birthdate" class="form-control"
-                                                required="required"
-                                                t-att-value="values and values.get('birthdate', '') or ''" />
+                                            <div class="row date-selectors">
+                                                <div class="col-4">
+                                                    <select name="birth_day"
+                                                        class="form-select date-selector"
+                                                        required="required">
+                                                        <option value="">Jour</option>
+                                                        <t t-foreach="range(1, 32)" t-as="day">
+                                                            <option t-att-value="day"
+                                                                t-att-selected="'selected' if (values and str(day) == values.get('birth_day')) else None">
+                                                                <t t-out="day" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="birth_month"
+                                                        class="form-select date-selector"
+                                                        required="required">
+                                                        <option value="">Mois</option>
+                                                        <option value="1"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '1') else None">
+                                                            Janvier</option>
+                                                        <option value="2"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '2') else None">
+                                                            Février</option>
+                                                        <option value="3"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '3') else None">
+                                                            Mars</option>
+                                                        <option value="4"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '4') else None">
+                                                            Avril</option>
+                                                        <option value="5"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '5') else None">
+                                                            Mai</option>
+                                                        <option value="6"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '6') else None">
+                                                            Juin</option>
+                                                        <option value="7"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '7') else None">
+                                                            Juillet</option>
+                                                        <option value="8"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '8') else None">
+                                                            Août</option>
+                                                        <option value="9"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '9') else None">
+                                                            Septembre</option>
+                                                        <option value="10"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '10') else None">
+                                                            Octobre</option>
+                                                        <option value="11"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '11') else None">
+                                                            Novembre</option>
+                                                        <option value="12"
+                                                            t-att-selected="'selected' if (values and values.get('birth_month') == '12') else None">
+                                                            Décembre</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="birth_year"
+                                                        class="form-select date-selector"
+                                                        required="required">
+                                                        <option value="">Année</option>
+                                                        <t
+                                                            t-foreach="range(datetime.datetime.now().year, datetime.datetime.now().year - 100, -1)"
+                                                            t-as="year">
+                                                            <option t-att-value="year"
+                                                                t-att-selected="'selected' if (values and str(year) == values.get('birth_year')) else None">
+                                                                <t t-out="year" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Date de salut</label>
-                                            <input type="date" name="arrival_date"
-                                                class="form-control" required="required"
-                                                t-att-value="values and values.get('arrival_date', '') or ''" />
+                                            <div class="row date-selectors">
+                                                <div class="col-4">
+                                                    <select name="arrival_day"
+                                                        class="form-select date-selector">
+                                                        <option value="">Jour</option>
+                                                        <t t-foreach="range(1, 32)" t-as="day">
+                                                            <option t-att-value="day"
+                                                                t-att-selected="'selected' if (values and str(day) == values.get('arrival_day')) else None">
+                                                                <t t-out="day" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="arrival_month"
+                                                        class="form-select date-selector">
+                                                        <option value="">Mois</option>
+                                                        <option value="1"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '1') else None">
+                                                            Janvier</option>
+                                                        <option value="2"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '2') else None">
+                                                            Février</option>
+                                                        <option value="3"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '3') else None">
+                                                            Mars</option>
+                                                        <option value="4"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '4') else None">
+                                                            Avril</option>
+                                                        <option value="5"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '5') else None">
+                                                            Mai</option>
+                                                        <option value="6"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '6') else None">
+                                                            Juin</option>
+                                                        <option value="7"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '7') else None">
+                                                            Juillet</option>
+                                                        <option value="8"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '8') else None">
+                                                            Août</option>
+                                                        <option value="9"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '9') else None">
+                                                            Septembre</option>
+                                                        <option value="10"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '10') else None">
+                                                            Octobre</option>
+                                                        <option value="11"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '11') else None">
+                                                            Novembre</option>
+                                                        <option value="12"
+                                                            t-att-selected="'selected' if (values and values.get('arrival_month') == '12') else None">
+                                                            Décembre</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <select name="arrival_year"
+                                                        class="form-select date-selector">
+                                                        <option value="">Année</option>
+                                                        <t
+                                                            t-foreach="range(datetime.datetime.now().year, datetime.datetime.now().year - 50, -1)"
+                                                            t-as="year">
+                                                            <option t-att-value="year"
+                                                                t-att-selected="'selected' if (values and str(year) == values.get('arrival_year')) else None">
+                                                                <t t-out="year" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -446,7 +609,23 @@
                     </div>
                 </div>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                // Validation du formulaire
+                const form = document.querySelector('form');
+                form.addEventListener('submit', function(e) {
+                // Validation des dates
+                const birthDay = form.querySelector('[name="birth_day"]');
+                const birthMonth = form.querySelector('[name="birth_month"]');
+                const birthYear = form.querySelector('[name="birth_year"]');
 
+                if (!birthDay.value || !birthMonth.value || !birthYear.value) {
+                alert('Veuillez remplir tous les champs de la date de naissance');
+                e.preventDefault();
+                }
+                });
+                });
+            </script>
             <script> document.addEventListener('DOMContentLoaded', function() { // Validation du
                 formulaire const form = document.querySelector('form');
                 form.addEventListener('submit', function(e) { const requiredFields =

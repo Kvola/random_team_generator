@@ -3,14 +3,14 @@
     <!-- Format de papier paysage pour le rapport des écoles -->
     <record id="paperformat_school_list_landscape" model="report.paperformat">
         <field name="name">School List Landscape</field>
-        <field name="default" eval="False"/>
+        <field name="default" eval="False" />
         <field name="format">A4</field>
         <field name="orientation">Landscape</field>
         <field name="margin_top">12</field>
         <field name="margin_bottom">12</field>
         <field name="margin_left">8</field>
         <field name="margin_right">8</field>
-        <field name="header_line" eval="False"/>
+        <field name="header_line" eval="False" />
         <field name="header_spacing">8</field>
         <field name="dpi">96</field>
     </record>
@@ -22,64 +22,63 @@
                 <div class="page">
                     <style>
                         .no-repeat-header thead {
-                            display: table-row-group;
+                        display: table-row-group;
                         }
                         .school-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 20px;
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
                         }
                         .school-table th {
-                            background-color: #343a40;
-                            color: white;
-                            padding: 8px;
-                            text-align: left;
+                        background-color: #343a40;
+                        color: white;
+                        padding: 8px;
+                        text-align: left;
                         }
                         .school-table td {
-                            padding: 8px;
-                            border-bottom: 1px solid #dee2e6;
-                            vertical-align: top;
+                        padding: 8px;
+                        border-bottom: 1px solid #dee2e6;
+                        vertical-align: top;
                         }
                         .school-table tr:nth-child(even) {
-                            background-color: #f8f9fa;
+                        background-color: #f8f9fa;
                         }
                         .text-muted {
-                            color: #6c757d;
+                        color: #6c757d;
                         }
                         .small {
-                            font-size: 0.875em;
+                        font-size: 0.875em;
                         }
                         .class-item {
-                            margin-bottom: 5px;
-                            padding: 3px;
-                            border-left: 3px solid #6c757d;
-                            padding-left: 5px;
+                        margin-bottom: 5px;
+                        padding: 3px;
+                        border-left: 3px solid #6c757d;
+                        padding-left: 5px;
                         }
                     </style>
 
                     <div class="header">
                         <h1 class="text-center">
-                            <i class="fas fa-graduation-cap me-1"></i> Liste des Écoles
-                        </h1>
+                            <i class="fas fa-graduation-cap me-1"></i> Liste des Écoles </h1>
                         <div class="text-center">
                             <small class="text-muted">
-                                <i class="fa fa-calendar me-1"></i> Généré le 
-                                <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                                <i class="fa fa-calendar me-1"></i> Généré le <span
+                                    t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
                             </small>
                         </div>
                         <div class="text-center mt-2">
                             <span class="badge bg-primary">
                                 <i class="fas fa-school me-1"></i>
-                                <span t-esc="len(schools)" /> école(s)
-                            </span>
+                                <span t-esc="len(schools)" />
+                                école(s) </span>
                             <span class="badge bg-secondary ms-2">
                                 <i class="fas fa-chalkboard-teacher me-1"></i>
-                                <span t-esc="total_monitors" /> moniteur(s)
-                            </span>
+                                <span
+                                    t-esc="total_monitors" /> moniteur(s) </span>
                             <span class="badge bg-info ms-2">
                                 <i class="fas fa-user-tie me-1"></i>
-                                <span t-esc="total_teachers" /> professeur(s)
-                            </span>
+                                <span t-esc="total_teachers" />
+                                professeur(s) </span>
                         </div>
                     </div>
 
@@ -103,12 +102,16 @@
                                     <td>
                                         <span t-esc="school.school_church_id.name or 'Non définie'" />
                                     </td>
+                                    <!-- Dans le template school_list_pdf, modifiez la partie
+                                    responsable -->
                                     <td>
                                         <t t-if="school.school_leader_id">
                                             <div class="mb-1">
                                                 <i class="fa fa-user-tie me-1"></i>
                                                 <span t-esc="school.school_leader_id.name" />
                                             </div>
+                                            <div class="text-muted small">
+                                                <span t-esc="school.school_leader_id.age" /> ans </div>
                                             <t t-if="school.school_leader_id.phone">
                                                 <div class="text-muted small">
                                                     <i class="fa fa-phone me-1"></i>
@@ -117,7 +120,8 @@
                                             </t>
                                         </t>
                                         <t t-else="">
-                                            <span class="text-muted fst-italic">Responsable non assigné</span>
+                                            <span class="text-muted fst-italic">Responsable non
+                                                assigné</span>
                                         </t>
                                     </td>
                                     <td style="text-align: center;">
@@ -126,13 +130,15 @@
                                     <td>
                                         <t t-if="school.school_class_ids">
                                             <ul class="list-unstyled">
-                                                <t t-foreach="school.school_class_ids" t-as="classroom">
+                                                <t t-foreach="school.school_class_ids"
+                                                    t-as="classroom">
                                                     <li class="class-item">
-                                                        <i class="fas fa-door-open text-primary me-1"></i>
+                                                        <i
+                                                            class="fas fa-door-open text-primary me-1"></i>
                                                         <span t-esc="classroom.name" />
-                                                        <span class="text-muted small ms-2">
-                                                            (<span t-esc="len(classroom.class_member_ids)" /> élèves)
-                                                        </span>
+                                                        <span class="text-muted small ms-2"> (<span
+                                                                t-esc="len(classroom.class_member_ids)" />
+                                                            élèves) </span>
                                                     </li>
                                                 </t>
                                             </ul>
@@ -147,9 +153,8 @@
                     </table>
 
                     <div class="footer mt-4">
-                        <div class="text-center text-muted small">
-                            émis par <span t-esc="user.name" /> le 
-                            <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
+                        <div class="text-center text-muted small"> émis par <span t-esc="user.name" />
+                            le <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
                         </div>
                     </div>
                 </div>
@@ -163,7 +168,8 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">random_team_generator.school_list_pdf</field>
         <field name="report_file">random_team_generator.school_list_pdf</field>
-        <field name="print_report_name">'Ecoles_' + datetime.datetime.now().strftime('%Y%m%d_%H%M') + '.pdf'</field>
+        <field name="print_report_name">'Ecoles_' + datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            + '.pdf'</field>
         <field name="binding_model_id" ref="model_res_partner" />
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="random_team_generator.paperformat_school_list_landscape" />
