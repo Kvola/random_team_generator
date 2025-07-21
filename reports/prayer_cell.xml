@@ -185,7 +185,8 @@
 
                     <div class="footer mt-4">
                         <div class="text-center text-muted small">
-                            Document généré automatiquement par le système
+                            émis par <span t-esc="user.name" /> le 
+                            <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
                         </div>
                     </div>
                 </div>

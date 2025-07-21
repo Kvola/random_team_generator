@@ -90,7 +90,6 @@
                                 <th style="width: 20%;">Église</th>
                                 <th style="width: 20%;">Responsable</th>
                                 <th style="width: 10%; text-align: center;">Moniteurs</th>
-                                <th style="width: 10%; text-align: center;">Professeurs</th>
                                 <th style="width: 20%;">Classes</th>
                             </tr>
                         </thead>
@@ -124,9 +123,6 @@
                                     <td style="text-align: center;">
                                         <span t-esc="len(school.school_monitor_ids)" />
                                     </td>
-                                    <td style="text-align: center;">
-                                        <span t-esc="len(school.school_teacher_ids)" />
-                                    </td>
                                     <td>
                                         <t t-if="school.school_class_ids">
                                             <ul class="list-unstyled">
@@ -152,7 +148,8 @@
 
                     <div class="footer mt-4">
                         <div class="text-center text-muted small">
-                            Document généré automatiquement par le système
+                            émis par <span t-esc="user.name" /> le 
+                            <span t-esc="datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')" />
                         </div>
                     </div>
                 </div>
