@@ -1,13 +1,28 @@
 <odoo>
     <!-- Menus -->
-    <menuitem id="menu_random_team_root" name="Gestion des équipes" sequence="10"/>
-    <menuitem id="menu_random_team" name="Équipes" parent="menu_random_team_root" action="action_random_team"/>
-    <menuitem id="menu_waiting_register_people" name="Inscriptions en attente" parent="menu_random_team_root" action="action_waiting_register_people_form"  sequence="20"/>
-    <menuitem id="menu_team_settings" name="Configurations" parent="menu_random_team_root" sequence="30"/>
+    <menuitem id="menu_random_team_root" name="Gestion des équipes" sequence="10" />
+    <menuitem id="menu_random_team" name="Équipes" parent="menu_random_team_root"
+        action="action_random_team" />
+    <menuitem id="menu_waiting_register_people" name="Inscriptions en attente"
+        parent="menu_random_team_root" action="action_waiting_register_people_form" sequence="20" />
+    <menuitem id="menu_team_settings" name="Configurations" parent="menu_random_team_root"
+        sequence="30" />
 
     <!-- Sous menus configuration -->
-    <menuitem id="menu_setting" name="Paramètres" parent="menu_team_settings" action="action_team_settings" sequence="10"/>
-    <menuitem id="menu_random_task" name="Tâches" parent="menu_team_settings" action="action_random_task" sequence="20"/>
-    <menuitem id="menu_random_tribe" name="Tribus" parent="menu_team_settings" action="action_tribe" sequence="30"/>
-    <menuitem id="menu_prayer_cell" name="Cellules de Prière" parent="menu_team_settings" action="action_prayer_cell" sequence="40"/>
+    <menuitem id="menu_setting" name="Paramètres" parent="menu_team_settings"
+        action="action_team_settings" sequence="10" />
+    <menuitem id="menu_random_task" name="Tâches" parent="menu_team_settings"
+        action="action_random_task" sequence="20" />
+    <menuitem id="menu_random_tribe" name="Tribus" parent="menu_team_settings" action="action_tribe"
+        sequence="30" />
+    <menuitem id="menu_prayer_cell" name="Cellules de Prière" parent="menu_team_settings"
+        action="action_prayer_cell" sequence="40" />
+    <!-- Ajout au menu (optionnel) -->
+    <menuitem
+        id="menu_school_class"
+        name="Classes"
+        parent="menu_team_settings"
+        action="action_school_class"
+        sequence="10"
+    />
 </odoo>

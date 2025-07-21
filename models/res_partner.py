@@ -24,6 +24,14 @@ class RandomPrayerCell(models.Model):
         help="Tribu à laquelle cette cellule de prière est associée",
     )
 
+class SchoolClass(models.Model):
+    _name = "school.class"
+    _description = "Classe scolaire"
+    
+    name = fields.Char(string="Nom de la classe", required=True)
+    school_id = fields.Many2one("res.partner", string="École", domain="[('organization_type', '=', 'school')]")
+    teacher_id = fields.Many2one("res.partner", string="Professeur principal", domain="[('is_teacher', '=', True)]")
+    student_ids = fields.Many2many("res.partner", string="Élèves")
 
 # Extension du modèle res.partner pour la gestion des équipes et informations personnelles
 class ResPartner(models.Model):
@@ -812,6 +820,14 @@ class ResPartner(models.Model):
         string="Responsables adjoints de suivi",
         domain="[('is_pastor','=',True)]",
         help="Pasteurs adjoints responsables du suivi pastoral de cette école"
+    )
+
+    # Dans la classe ResPartner
+    school_class_ids = fields.One2many(
+        "school.class",  # Modèle lié
+        "school_id",     # Champ inverse dans school.class
+        string="Classes de l'école",
+        help="Classes associées à cette école"
     )
 
     @api.depends('school_monitor_ids')

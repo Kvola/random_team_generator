@@ -4,3 +4,4 @@ access_random_task_user,access_random_task_user,model_random_task,,1,1,1,1
 access_res_partner_portal_user,res.partner portal,model_res_partner,base.group_portal,1,1,1,1
 access_random_tribe_user,access_random_tribe,model_random_tribe,,1,1,1,1
 access_random_prayer_cell_user,access_random_prayer_cell,model_random_prayer_cell,,1,1,1,1
+access_school_class_user,access_school_class,model_school_class,,1,1,1,1

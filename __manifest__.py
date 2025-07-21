@@ -18,6 +18,7 @@
         'data/prayer_cell_type_data.xml',
         'views/team_views.xml',
         'views/res_partner_views.xml',
+        'views/school_class_views.xml',
         'views/portal_templates.xml',
         'reports/churches.xml',
         'reports/prayer_cell.xml',
