@@ -54,9 +54,32 @@
                                                 t-att-value="values and values.get('name', '') or ''" />
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" name="email" class="form-control"
-                                                t-att-value="values and values.get('email', '') or ''" />
+                                            <label class="form-label">Sexe</label>
+                                            <select name="gender" class="form-select"
+                                                required="required">
+                                                <option value="">-- Sélectionnez --</option>
+                                                <option value="male"
+                                                    t-att-selected="'selected' if (values and values.get('gender') == 'male') else None">
+                                                    Homme</option>
+                                                <option value="female"
+                                                    t-att-selected="'selected' if (values and values.get('gender') == 'female') else None">
+                                                    Femme</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Date de naissance</label>
+                                            <input type="date" name="birthdate" class="form-control"
+                                                required="required"
+                                                t-att-value="values and values.get('birthdate', '') or ''" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Date de salut</label>
+                                            <input type="date" name="arrival_date"
+                                                class="form-control" required="required"
+                                                t-att-value="values and values.get('arrival_date', '') or ''" />
                                         </div>
                                     </div>
 
@@ -70,36 +93,6 @@
                                             <label class="form-label">Whatsapp</label>
                                             <input type="tel" name="mobile" class="form-control"
                                                 t-att-value="values and values.get('mobile', '') or ''" />
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Sexe</label>
-                                            <select name="gender" class="form-select" required="required">
-                                                <option value="">-- Sélectionnez --</option>
-                                                <option value="male"
-                                                    t-att-selected="'selected' if (values and values.get('gender') == 'male') else None">
-                                                    Homme</option>
-                                                <option value="female"
-                                                    t-att-selected="'selected' if (values and values.get('gender') == 'female') else None">
-                                                    Femme</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Date de naissance</label>
-                                            <input type="date" name="birthdate" class="form-control" required="required"
-                                                t-att-value="values and values.get('birthdate', '') or ''" />
-                                        </div>
-                                    </div>
-
-                                    <!-- Nouveau champ Date de salut -->
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Date de salut</label>
-                                            <input type="date" name="arrival_date"
-                                                class="form-control" required="required"
-                                                t-att-value="values and values.get('arrival_date', '') or ''" />
                                         </div>
                                     </div>
 
