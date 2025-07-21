@@ -9,7 +9,7 @@ from odoo.addons.portal.controllers.portal import pager as portal_pager
 _logger = logging.getLogger(__name__)
 
 class ResPartnerPortal(http.Controller):
-    @http.route('/cellules-priere/pdf', type='http', auth="user", website=True)
+    @http.route('/cellules-priere/pdf', type='http', auth="public", website=True)
     def pdf_prayer_cells(self, **post):
         prayer_cells = request.env['res.partner'].sudo().search([
             ('organization_type', '=', 'prayer_cell'),
@@ -36,7 +36,7 @@ class ResPartnerPortal(http.Controller):
         
         return request.make_response(pdf[0], headers=pdfhttpheaders)
 
-    @http.route('/cellules-priere', type='http', auth="user", website=True)
+    @http.route('/cellules-priere', type='http', auth="public", website=True)
     def list_prayer_cells(self, **post):
         # Récupération des paramètres de pagination
         page = int(post.get('page', 1))
@@ -117,7 +117,7 @@ class ResPartnerPortal(http.Controller):
             'pager': pager
         })
 
-    @http.route('/eglises/pdf', type='http', auth="user", website=True)
+    @http.route('/eglises/pdf', type='http', auth="public", website=True)
     def pdf_churches(self, **post):
         churches = request.env['res.partner'].sudo().search([
             ('is_church', '=', True),
@@ -138,7 +138,7 @@ class ResPartnerPortal(http.Controller):
         
         return request.make_response(pdf[0], headers=pdfhttpheaders)
 
-    @http.route('/eglises', type='http', auth="user", website=True)
+    @http.route('/eglises', type='http', auth="public", website=True)
     def list_churches(self, **post):
         # Récupération des paramètres de pagination
         page = int(post.get('page', 1))
@@ -224,7 +224,7 @@ class ResPartnerPortal(http.Controller):
         })
 
 
-    @http.route('/inscription', type='http', auth="user", website=True, csrf=False)
+    @http.route('/inscription', type='http', auth="public", website=True, csrf=False)
     def inscription_complete_form(self, **post):
         # Récupération des données pour les selects
         churches = request.env['res.partner'].sudo().search([

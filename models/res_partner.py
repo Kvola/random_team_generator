@@ -3,12 +3,14 @@ from datetime import datetime, timedelta, date
 import random
 from odoo.exceptions import ValidationError  # <-- Cet import est crucial
 
+
 class RandomTribe(models.Model):
     _name = "random.tribe"
     _description = "Tribu"
 
     name = fields.Char(string="Nom de la tribu", required=True)
     description = fields.Text(string="Description")
+
 
 class RandomPrayerCell(models.Model):
     _name = "random.prayer.cell"
@@ -21,6 +23,7 @@ class RandomPrayerCell(models.Model):
         string="Tribu associée",
         help="Tribu à laquelle cette cellule de prière est associée",
     )
+
 
 # Extension du modèle res.partner pour la gestion des équipes et informations personnelles
 class ResPartner(models.Model):
@@ -185,11 +188,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.communication_domain = [
-                    ('organization_type', '=', 'communication'),
+                    ("organization_type", "=", "communication"),
                     ("communication_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.communication_domain = []
+
     communication_domain = fields.Char(compute="_compute_communication_domain")
     communication_ids = fields.Many2many(
         "res.partner",
@@ -197,7 +201,6 @@ class ResPartner(models.Model):
         "partner_id",
         "communication_id",
         string="Groupes de communication",
-        #domain="[('organization_type', '=', 'communication'), ('church_id', '=', church_id)]",
         help="Groupes de communication auxquels ce membre appartient",
     )
 
@@ -207,11 +210,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.artistic_domain = [
-                    ('organization_type', '=', 'artistic_group'),
+                    ("organization_type", "=", "artistic_group"),
                     ("artistic_group_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.artistic_domain = []
+
     artistic_domain = fields.Char(compute="_compute_artistic_domain")
     artistic_group_ids = fields.Many2many(
         "res.partner",
@@ -219,7 +223,6 @@ class ResPartner(models.Model):
         "partner_id",
         "artistic_group_id",
         string="Groupes artistiques",
-        #domain="[('organization_type', '=', 'artistic_group'), ('church_id', '=', church_id)]",
         help="Groupes artistiques auxquels ce membre appartient",
     )
 
@@ -229,11 +232,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.ngo_domain = [
-                    ('organization_type', '=', 'ngo'),
+                    ("organization_type", "=", "ngo"),
                     ("ngo_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.ngo_domain = []
+
     ngo_domain = fields.Char(compute="_compute_ngo_domain")
     ngo_ids = fields.Many2many(
         "res.partner",
@@ -241,7 +245,6 @@ class ResPartner(models.Model):
         "partner_id",
         "ngo_id",
         string="ONG",
-        #domain="[('organization_type', '=', 'ngo'), ('church_id', '=', church_id)]",
         help="ONG auxquelles ce membre appartient",
     )
 
@@ -251,11 +254,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.school_domain = [
-                    ('organization_type', '=', 'school'),
+                    ("organization_type", "=", "school"),
                     ("school_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.school_domain = []
+
     school_domain = fields.Char(compute="_compute_school_domain")
     school_ids = fields.Many2many(
         "res.partner",
@@ -263,7 +267,6 @@ class ResPartner(models.Model):
         "partner_id",
         "school_id",
         string="Écoles",
-        domain="[('organization_type', '=', 'school'), ('church_id', '=', church_id)]",
         help="Écoles auxquelles ce membre appartient",
     )
 
@@ -273,11 +276,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.other_group_domain = [
-                    ('organization_type', '=', 'other_group'),
+                    ("organization_type", "=", "other_group"),
                     ("other_group_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.other_group_domain = []
+
     other_group_domain = fields.Char(compute="_compute_other_group_domain")
     other_group_ids = fields.Many2many(
         "res.partner",
@@ -285,7 +289,6 @@ class ResPartner(models.Model):
         "partner_id",
         "other_group_id",
         string="Groupes spécialisés",
-        domain="[('organization_type', '=', 'other_group'), ('church_id', '=', church_id)]",
         help="Groupes spécialisés auxquels ce membre appartient",
     )
 
@@ -295,11 +298,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.sports_group_domain = [
-                    ('organization_type', '=', 'sports_group'),
+                    ("organization_type", "=", "sports_group"),
                     ("sports_group_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.sports_group_domain = []
+
     sports_group_domain = fields.Char(compute="_compute_sports_group_domain")
     sports_group_ids = fields.Many2many(
         "res.partner",
@@ -307,7 +311,6 @@ class ResPartner(models.Model):
         "partner_id",
         "sports_group_id",
         string="Groupes sportifs",
-        domain="[('organization_type', '=', 'sports_group'), ('church_id', '=', church_id)]",
         help="Groupes sportifs auxquels ce membre appartient",
     )
 
@@ -317,11 +320,12 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.church_id:
                 rec.educational_group_domain = [
-                    ('organization_type', '=', 'educational_group'),
+                    ("organization_type", "=", "educational_group"),
                     ("educational_group_church_id", "=", rec.church_id.id),
                 ]
             else:
                 rec.educational_group_domain = []
+
     educational_group_domain = fields.Char(compute="_compute_educational_group_domain")
     educational_group_ids = fields.Many2many(
         "res.partner",
@@ -329,7 +333,6 @@ class ResPartner(models.Model):
         "partner_id",
         "educational_group_id",
         string="Groupes éducatifs",
-        #domain="[('organization_type', '=', 'educational_group'), ('church_id', '=', church_id)]",
         help="Groupes éducatifs auxquels ce membre appartient",
     )
 
@@ -386,10 +389,12 @@ class ResPartner(models.Model):
 
     # Compteurs pour les nouveaux groupes
     communication_count = fields.Integer(
-        string="Nombre de groupes de communication", compute="_compute_specialized_group_counts"
+        string="Nombre de groupes de communication",
+        compute="_compute_specialized_group_counts",
     )
     artistic_group_count = fields.Integer(
-        string="Nombre de groupes artistiques", compute="_compute_specialized_group_counts"
+        string="Nombre de groupes artistiques",
+        compute="_compute_specialized_group_counts",
     )
     ngo_count = fields.Integer(
         string="Nombre d'ONG", compute="_compute_specialized_group_counts"
@@ -758,6 +763,195 @@ class ResPartner(models.Model):
     regional_church_count = fields.Integer(
         string="Nombre d'églises régionales", compute="_compute_regional_church_count"
     )
+
+    # Champ pour stocker le code unique
+    unique_code = fields.Char(
+        string="Code unique",
+        readonly=True,
+        copy=False,
+        index=True,
+        help="Code unique généré automatiquement pour identifier ce partenaire",
+    )
+
+    @api.model
+    def create(self, vals):
+        """Générer un code unique lors de la création"""
+        if not vals.get("unique_code"):
+            vals["unique_code"] = self._generate_unique_code(vals)
+        return super(ResPartner, self).create(vals)
+
+    def _generate_unique_code(self, vals=None):
+        """
+        Génère un code unique basé sur le type d'organisation et d'autres critères
+        Format : [PREFIXE][ANNEE][NUMERO_SEQUENCE]
+        """
+        if vals is None:
+            vals = {}
+
+        # Déterminer le préfixe selon le type d'organisation ou si c'est une personne
+        prefixes = {
+            "company": "EGL",  # Église
+            "tribe": "TRB",  # Tribu
+            "prayer_cell": "CEL",  # Cellule de prière
+            "group": "GRP",  # Groupe
+            "region": "REG",  # Région
+            "communication": "COM",  # Communication
+            "artistic_group": "ART",  # Groupe Artistique
+            "ngo": "ONG",  # ONG
+            "school": "ECO",  # École
+            "sports_group": "SPO",  # Groupe Sportif
+            "educational_group": "EDU",  # Groupe Éducatif
+            "other_group": "AUT",  # Autres Structures
+        }
+
+        organization_type = vals.get("organization_type") or self.organization_type
+        is_company = vals.get(
+            "is_company", self.is_company if hasattr(self, "is_company") else False
+        )
+
+        if organization_type and organization_type in prefixes:
+            prefix = prefixes[organization_type]
+        elif is_company:
+            prefix = "ENT"  # Entreprise générique
+        else:
+            prefix = "PER"  # Personne physique
+
+        # Année courante
+        current_year = fields.Date.today().year
+        year_suffix = str(current_year)[2:]  # Les 2 derniers chiffres de l'année
+
+        # Générer un numéro de séquence unique
+        sequence_number = self._get_next_sequence_number(prefix, year_suffix)
+
+        # Format final : PREFIXE + ANNEE + NUMERO (ex: EGL24001, PER24001, etc.)
+        unique_code = f"{prefix}{year_suffix}{sequence_number:04d}"
+
+        return unique_code
+
+    def _get_next_sequence_number(self, prefix, year_suffix):
+        """
+        Génère le prochain numéro de séquence pour un préfixe et année donnés
+        """
+        # Rechercher le dernier code avec ce préfixe et cette année
+        pattern = f"{prefix}{year_suffix}%"
+
+        last_partner = self.env["res.partner"].search(
+            [("unique_code", "like", pattern)], order="unique_code desc", limit=1
+        )
+
+        if last_partner and last_partner.unique_code:
+            # Extraire le numéro de séquence du dernier code
+            try:
+                last_number = int(
+                    last_partner.unique_code[-4:]
+                )  # Les 4 derniers chiffres
+                return last_number + 1
+            except (ValueError, IndexError):
+                return 1
+        else:
+            return 1
+
+    @api.model
+    def generate_codes_for_existing_partners(self):
+        """
+        Méthode utilitaire pour générer des codes pour les partenaires existants
+        qui n'en ont pas encore
+        """
+        partners_without_code = self.search([("unique_code", "=", False)])
+
+        for partner in partners_without_code:
+            partner.unique_code = partner._generate_unique_code()
+
+        return len(partners_without_code)
+
+    @api.constrains("unique_code")
+    def _check_unique_code(self):
+        """Vérifier que le code unique est vraiment unique"""
+        for record in self:
+            if record.unique_code:
+                duplicate = self.search(
+                    [("unique_code", "=", record.unique_code), ("id", "!=", record.id)],
+                    limit=1,
+                )
+                if duplicate:
+                    raise ValidationError(
+                        f"Le code unique '{record.unique_code}' existe déjà pour un autre partenaire."
+                    )
+
+    def regenerate_unique_code(self):
+        """
+        Méthode pour régénérer le code unique (utile en cas de problème)
+        """
+        for record in self:
+            record.unique_code = record._generate_unique_code()
+
+    def name_get(self):
+        """
+        Surcharger name_get pour inclure le code unique dans l'affichage
+        """
+        result = []
+        for record in self:
+            name = record.name or ""
+            if record.unique_code:
+                name = f"[{record.unique_code}] {name}"
+            result.append((record.id, name))
+        return result
+
+    @api.model
+    def name_search(self, name="", args=None, operator="ilike", limit=100):
+        """
+        Permettre la recherche par code unique
+        """
+        if args is None:
+            args = []
+
+        # Si le terme de recherche ressemble à un code (commence par des lettres majuscules)
+        if name and len(name) >= 3 and name[:3].isupper():
+            # Rechercher d'abord par code unique
+            partners = self.search(
+                [("unique_code", operator, name)] + args, limit=limit
+            )
+            if partners:
+                return partners.name_get()
+
+        # Sinon, utiliser la recherche normale
+        return super(ResPartner, self).name_search(name, args, operator, limit)
+
+    # Méthodes utilitaires pour obtenir des statistiques sur les codes
+    @api.model
+    def get_code_statistics(self):
+        """
+        Retourne des statistiques sur les codes générés
+        """
+        current_year = fields.Date.today().year
+        year_suffix = str(current_year)[2:]
+
+        prefixes = [
+            "EGL",
+            "TRB",
+            "CEL",
+            "GRP",
+            "REG",
+            "COM",
+            "ART",
+            "ONG",
+            "ECO",
+            "SPO",
+            "EDU",
+            "AUT",
+            "ENT",
+            "PER",
+        ]
+        stats = {}
+
+        for prefix in prefixes:
+            count = self.search_count(
+                [("unique_code", "like", f"{prefix}{year_suffix}%")]
+            )
+            if count > 0:
+                stats[prefix] = count
+
+        return stats
 
     # ========== NOUVELLES MÉTHODES DE CALCUL POUR LES GROUPES SPÉCIALISÉS ==========
 

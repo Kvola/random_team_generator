@@ -250,7 +250,7 @@
                 </page>
 
                 <!-- Onglet pour les rôles dans l'église (pour les membres) -->
-                <page string="Structures et Rôles" name="church_roles"
+                <page string="Rôles" name="church_roles"
                     invisible="is_company or not is_in_a_church">
                     <group>
                         <group>
@@ -282,6 +282,12 @@
                 <div class="oe_button_box" invisible="not is_church">
                     <span class="badge badge-warning o_field_widget o_readonly_modifier">
                         <i class="fa fa-church" /> Église </span>
+                </div>
+                <!-- Champ unique_code -->
+                <div class="oe_button_box" name="button_box">
+                    <span class="badge badge-primary o_field_widget o_readonly_modifier">
+                        <i class="fa fa-id-card" /> <field name="unique_code" readonly="1" />
+                    </span>
                 </div>
             </field>
 
@@ -1461,17 +1467,6 @@
                     </group>
                 </page>
             </page>
-            <!-- Add age range fields for groups -->
-            <!-- <field name="organization_type" position="after">
-                <field name="min_age" invisible="not is_company or organization_type != 'group'" />
-                <field name="max_age" invisible="not is_company or organization_type != 'group'" />
-                <field name="required_gender"
-                    invisible="not is_company or organization_type != 'group'" />
-                <field name="marital_requirement"
-                    invisible="not is_company or organization_type != 'group'" />
-                <field name="is_church" invisible="not is_company or organization_type != 'company'" />
-                <field name="is_in_a_church" invisible="1" />
-            </field> -->
         </field>
     </record>
     <record id="view_partner_inscription_kanban" model="ir.ui.view">
@@ -1534,6 +1529,15 @@
             </tree>
         </field>
     </record>
+    <record id="action_generate_codes_for_partners" model="ir.actions.server">
+        <field name="name">Générer les codes uniques</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">model.generate_codes_for_existing_partners()</field>
+        <field name="binding_type">action</field>
+    </record>
+
     <record id="view_partner_inscription_search" model="ir.ui.view">
         <field name="name">res.partner.inscription.search</field>
         <field name="model">res.partner</field>
