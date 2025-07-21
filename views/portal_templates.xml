@@ -390,7 +390,7 @@
 
                                     <div class="row">
                                         <!-- Date de naissance améliorée -->
-                                        <div class="col-md-4 mb-3 required-field">
+                                        <div class="col-md-6 mb-4 required-field">
                                             <label class="form-label">Date de naissance</label>
                                             <div class="row date-selectors">
                                                 <div class="col-4">
@@ -466,7 +466,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-6 mb-4">
                                             <label class="form-label">Date de salut</label>
                                             <div class="row date-selectors">
                                                 <div class="col-4">
