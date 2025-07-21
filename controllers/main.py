@@ -115,76 +115,329 @@ class ResPartnerPortal(http.Controller):
             'pager': pager,
             'total_monitors': total_monitors
         })
-
-    @http.route('/inscription-ecole', type='http', auth="public", website=True, csrf=False)
+    
+    @http.route('/inscription-ecole', type='http', auth="public", website=True, csrf=True)
     def inscription_ecole_form(self, **post):
-        # Récupération des écoles
-        schools = request.env['res.partner'].sudo().search([
-            ('organization_type', '=', 'school'),
-            ('active', '=', True)
-        ])
-        
-        # Initialisation de la variable error
-        error = False
-
-        if post and request.httprequest.method == 'POST':
-            try:
-                from odoo.exceptions import ValidationError
-                
-                # Validation des données obligatoires
-                required_fields = ['name', 'gender', 'birthdate', 'school_id', 'function_type', 'arrival_date']
-                for field in required_fields:
-                    if not post.get(field):
-                        raise ValidationError(_("Le champ %s est obligatoire") % field)
-                
-                # Préparation des valeurs
-                partner_vals = {
-                    'name': post.get('name'),
-                    'phone': post.get('phone') if post.get('phone') else False,
-                    'mobile': post.get('mobile') if post.get('mobile') else False,
-                    'gender': post.get('gender'),
-                    'birthdate': post.get('birthdate'),
-                    'arrival_date': post.get('arrival_date'),
-                    'active': False,
-                    'is_company': False,
-                    'type': 'contact',
-                }
-                
-                # Gestion du type de fonction
-                function_type = post.get('function_type')
-                if function_type == 'monitor':
-                    partner_vals.update({'is_monitor': True})
-                elif function_type == 'teacher':
-                    partner_vals.update({'is_teacher': True})
-                elif function_type == 'leader':
-                    partner_vals.update({'is_leader': True})
-                
-                # Création du partenaire
-                partner = request.env['res.partner'].sudo().create(partner_vals)
-                
-                # Ajout comme moniteur/professeur à l'école sélectionnée
-                school = request.env['res.partner'].sudo().browse(int(post.get('school_id')))
-                school.write({'school_monitor_ids': [(4, partner.id)]})
-                
-                return request.render("random_team_generator.inscription_success", {
-                    'partner': partner
+        """
+        Formulaire d'inscription pour l'école du dimanche
+        Gère l'affichage du formulaire et le traitement des données soumises
+        """
+        try:
+            # Récupération des écoles actives
+            schools = self._get_active_schools()
+            
+            if not schools:
+                error = _("Aucune école du dimanche n'est actuellement disponible pour l'inscription.")
+                return request.render("random_team_generator.inscription_ecole_form", {
+                    'schools': [],
+                    'error': error,
+                    'values': {}
                 })
-                
-            except ValidationError as e:
-                error = str(e)
-            except Exception as e:
-                error = _("Une erreur est survenue lors de l'inscription : %s") % str(e)
-                _logger.error("Erreur inscription école: %s", str(e))
-                try:
-                    request.env.cr.rollback()
-                except:
-                    pass
+            
+            # Traitement de la soumission du formulaire
+            if post and request.httprequest.method == 'POST':
+                return self._process_form_submission(post, schools)
+            
+            # Affichage du formulaire vide
+            return request.render("random_team_generator.inscription_ecole_form", {
+                'schools': schools,
+                'error': False,
+                'values': {}
+            })
+            
+        except Exception as e:
+            _logger.error("Erreur inattendue dans inscription_ecole_form: %s", str(e))
+            return request.render("website.404")
+    
+    def _get_active_schools(self):
+        """Récupère la liste des écoles actives"""
+        try:
+            return request.env['res.partner'].sudo().search([
+                ('organization_type', '=', 'school'),
+                ('active', '=', True)
+            ], order='name')
+        except Exception as e:
+            _logger.error("Erreur lors de la récupération des écoles: %s", str(e))
+            return request.env['res.partner']
+    
+    def _process_form_submission(self, post, schools):
+        """Traite la soumission du formulaire"""
+        error = False
         
+        try:
+            # Validation et nettoyage des données
+            cleaned_data = self._validate_and_clean_data(post, schools)
+            
+            # Vérification de doublons
+            existing_partner = self._check_duplicate_registration(cleaned_data)
+            if existing_partner:
+                error = _("Une inscription avec ce nom et cette date de naissance existe déjà.")
+                return self._render_form_with_error(schools, error, post)
+            
+            # Création de l'enregistrement
+            partner = self._create_partner_record(cleaned_data)
+            
+            # Association à l'école
+            self._associate_partner_to_school(partner, cleaned_data['school_id'], cleaned_data['function_type'])
+            
+            # Envoi d'email de confirmation (optionnel)
+            self._send_confirmation_email(partner)
+            
+            # Redirection vers la page de succès
+            return request.render("random_team_generator.inscription_success", {
+                'partner': partner,
+                'school': request.env['res.partner'].sudo().browse(cleaned_data['school_id'])
+            })
+            
+        except ValidationError as e:
+            error = str(e)
+            _logger.warning("Erreur de validation: %s", error)
+        except UserError as e:
+            error = str(e)
+            _logger.warning("Erreur utilisateur: %s", error)
+        except Exception as e:
+            error = _("Une erreur inattendue est survenue. Veuillez réessayer plus tard.")
+            _logger.error("Erreur lors de l'inscription: %s", str(e))
+            # Rollback de la transaction en cas d'erreur
+            try:
+                request.env.cr.rollback()
+            except:
+                pass
+        
+        return self._render_form_with_error(schools, error, post)
+    
+    def _validate_and_clean_data(self, post, schools):
+        """Valide et nettoie les données du formulaire"""
+        cleaned_data = {}
+        
+        # Validation des champs obligatoires
+        required_fields = {
+            'name': 'Nom complet',
+            'gender': 'Sexe', 
+            'birth_day': 'Jour de naissance',
+            'birth_month': 'Mois de naissance',
+            'birth_year': 'Année de naissance',
+            'school_id': 'École du dimanche',
+            'function_type': 'Fonction',
+            'accept_terms': 'Acceptation des conditions'
+        }
+        
+        for field, label in required_fields.items():
+            value = post.get(field, '').strip() if isinstance(post.get(field, ''), str) else post.get(field, '')
+            if not value:
+                raise ValidationError(_("Le champ '%s' est obligatoire") % label)
+            cleaned_data[field] = value
+        
+        # Validation et construction de la date de naissance
+        cleaned_data['birthdate'] = self._validate_birth_date(
+            cleaned_data['birth_day'], 
+            cleaned_data['birth_month'], 
+            cleaned_data['birth_year']
+        )
+        
+        # Validation de la date de salut (optionnelle)
+        salvation_date = self._validate_salvation_date(
+            post.get('salvation_day', ''),
+            post.get('salvation_month', ''),
+            post.get('salvation_year', '')
+        )
+        if salvation_date:
+            cleaned_data['salvation_date'] = salvation_date
+        
+        # Validation du nom
+        cleaned_data['name'] = self._validate_name(cleaned_data['name'])
+        
+        # Validation du sexe
+        if cleaned_data['gender'] not in ['male', 'female']:
+            raise ValidationError(_("Sexe invalide"))
+        
+        # Validation des numéros de téléphone
+        cleaned_data['phone'] = self._validate_phone(post.get('phone', ''))
+        cleaned_data['mobile'] = self._validate_phone(post.get('mobile', ''))
+        
+        # Validation de l'école
+        school_id = int(cleaned_data['school_id'])
+        if not schools.filtered(lambda s: s.id == school_id):
+            raise ValidationError(_("École sélectionnée invalide"))
+        cleaned_data['school_id'] = school_id
+        
+        # Validation de la fonction
+        if cleaned_data['function_type'] not in ['monitor', 'teacher', 'leader']:
+            raise ValidationError(_("Fonction sélectionnée invalide"))
+        
+        # Validation de l'acceptation des conditions
+        if cleaned_data['accept_terms'] != 'on':
+            raise ValidationError(_("Vous devez accepter les conditions d'utilisation"))
+        
+        return cleaned_data
+    
+    def _validate_birth_date(self, day, month, year):
+        """Valide et construit la date de naissance"""
+        try:
+            day, month, year = int(day), int(month), int(year)
+            birth_date = date(year, month, day)
+            
+            # Vérification de l'âge (entre 16 et 100 ans)
+            today = date.today()
+            age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+            
+            if age < 16:
+                raise ValidationError(_("L'âge minimum requis est de 16 ans"))
+            if age > 100:
+                raise ValidationError(_("Âge invalide"))
+            
+            # Vérification que la date n'est pas dans le futur
+            if birth_date > today:
+                raise ValidationError(_("La date de naissance ne peut pas être dans le futur"))
+            
+            return fields.Date.to_string(birth_date)
+            
+        except ValueError:
+            raise ValidationError(_("Date de naissance invalide"))
+    
+    def _validate_salvation_date(self, day, month, year):
+        """Valide la date de salut (optionnelle)"""
+        if not all([day, month, year]):
+            return None
+        
+        try:
+            day, month, year = int(day), int(month), int(year)
+            salvation_date = date(year, month, day)
+            
+            # Vérification que la date n'est pas dans le futur
+            if salvation_date > date.today():
+                raise ValidationError(_("La date de salut ne peut pas être dans le futur"))
+            
+            return fields.Date.to_string(salvation_date)
+            
+        except ValueError:
+            raise ValidationError(_("Date de salut invalide"))
+    
+    def _validate_name(self, name):
+        """Valide et nettoie le nom"""
+        if len(name) < 2:
+            raise ValidationError(_("Le nom doit contenir au moins 2 caractères"))
+        if len(name) > 100:
+            raise ValidationError(_("Le nom ne peut pas dépasser 100 caractères"))
+        
+        # Nettoyage du nom (suppression des caractères spéciaux dangereux)
+        cleaned_name = re.sub(r'[<>"\']', '', name)
+        return cleaned_name.title()
+    
+    def _validate_phone(self, phone):
+        """Valide le numéro de téléphone"""
+        if not phone:
+            return False
+        
+        phone = re.sub(r'[\s\-\(\)]', '', phone)
+        
+        if not re.match(r'^[+]?[\d]{8,15}$', phone):
+            raise ValidationError(_("Format de téléphone invalide"))
+        
+        return phone
+    
+    def _check_duplicate_registration(self, cleaned_data):
+        """Vérifie s'il existe déjà une inscription similaire"""
+        return request.env['res.partner'].sudo().search([
+            ('name', '=', cleaned_data['name']),
+            ('birthdate', '=', cleaned_data['birthdate']),
+            '|', ('active', '=', True), ('active', '=', False)
+        ], limit=1)
+    
+    def _create_partner_record(self, cleaned_data):
+        """Crée l'enregistrement partner"""
+        partner_vals = {
+            'name': cleaned_data['name'],
+            'phone': cleaned_data.get('phone') or False,
+            'mobile': cleaned_data.get('mobile') or False,
+            'gender': cleaned_data['gender'],
+            'birthdate': cleaned_data['birthdate'],
+            'salvation_date': cleaned_data.get('salvation_date') or False,
+            'active': False,  # Désactivé jusqu'à validation par un admin
+            'is_company': False,
+            'supplier_rank': 0,
+            'customer_rank': 0,
+            'category_id': [(6, 0, [])],
+            'comment': _("Inscription via formulaire web le %s") % fields.Datetime.now().strftime('%d/%m/%Y %H:%M'),
+        }
+        
+        # Ajout des champs spécifiques selon la fonction
+        function_type = cleaned_data['function_type']
+        if function_type == 'monitor':
+            partner_vals.update({
+                'is_monitor': True,
+                'is_teacher': False,
+                'is_leader': False
+            })
+        elif function_type == 'teacher':
+            partner_vals.update({
+                'is_monitor': False,
+                'is_teacher': True,
+                'is_leader': False
+            })
+        elif function_type == 'leader':
+            partner_vals.update({
+                'is_monitor': False,
+                'is_teacher': False,
+                'is_leader': True
+            })
+        
+        return request.env['res.partner'].sudo().create(partner_vals)
+    
+    def _associate_partner_to_school(self, partner, school_id, function_type):
+        """Associe le partenaire à l'école selon sa fonction"""
+        school = request.env['res.partner'].sudo().browse(school_id)
+        
+        if not school.exists():
+            raise ValidationError(_("École introuvable"))
+        
+        # Association selon le type de fonction
+        if function_type == 'monitor':
+            field_name = 'school_monitor_ids'
+        elif function_type == 'teacher':
+            field_name = 'school_teacher_ids'
+        elif function_type == 'leader':
+            field_name = 'school_leader_ids'
+        else:
+            field_name = 'school_monitor_ids'  # Par défaut
+        
+        # Vérification que le champ existe
+        if hasattr(school, field_name):
+            school.write({field_name: [(4, partner.id)]})
+        else:
+            # Fallback sur un champ générique
+            school.write({'school_monitor_ids': [(4, partner.id)]})
+    
+    def _send_confirmation_email(self, partner):
+        """Envoie un email de confirmation (optionnel)"""
+        try:
+            # Vérifier si un template d'email existe
+            template = request.env.ref('random_team_generator.email_template_inscription_confirmation', 
+                                     raise_if_not_found=False)
+            if template and partner.email:
+                template.sudo().send_mail(partner.id, force_send=True)
+        except Exception as e:
+            _logger.warning("Impossible d'envoyer l'email de confirmation: %s", str(e))
+            # Ne pas faire échouer l'inscription si l'email échoue
+            pass
+    
+    def _render_form_with_error(self, schools, error, post):
+        """Rendu du formulaire avec message d'erreur"""
         return request.render("random_team_generator.inscription_ecole_form", {
             'schools': schools,
             'error': error,
             'values': post
         })
+    
+    @http.route('/inscription-ecole/success', type='http', auth="public", website=True)
+    def inscription_success(self, **kwargs):
+        """Page de confirmation d'inscription"""
+        return request.render("random_team_generator.inscription_success", {})
+    
+    @http.route('/inscription-ecole/terms', type='http', auth="public", website=True)
+    def inscription_terms(self, **kwargs):
+        """Page des conditions d'utilisation"""
+        return request.render("random_team_generator.inscription_terms", {})
         
     @http.route('/cellules-priere/pdf', type='http', auth="public", website=True)
     def pdf_prayer_cells(self, **post):

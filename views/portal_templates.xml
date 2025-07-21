@@ -23,6 +23,307 @@
         <field name="parent_id" ref="website.main_menu" />
         <field name="sequence">55</field>
     </record>
+    <record id="menu_school_list" model="website.menu">
+        <field name="name">Liste des écoles</field>
+        <field name="url">/ecoles</field>
+        <field name="parent_id" ref="website.main_menu" />
+        <field name="sequence">65</field>
+    </record>
+    <!-- Template XML pour Odoo - À placer dans views/inscription_terms.xml -->
+    <template id="inscription_terms" name="Conditions d'utilisation">
+        <t t-call="website.layout">
+            <style>
+                /* CSS personnalisé pour la timeline */
+                .timeline {
+                position: relative;
+                padding: 0;
+                list-style: none;
+                }
+
+                .timeline-item {
+                position: relative;
+                margin-bottom: 2rem;
+                padding-left: 3rem;
+                }
+
+                .timeline-marker {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 2rem;
+                height: 2rem;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+
+                .timeline-item:not(:last-child):before {
+                content: '';
+                position: absolute;
+                left: 0.9rem;
+                top: 2rem;
+                width: 2px;
+                height: calc(100% + 1rem);
+                background: #dee2e6;
+                }
+
+                .timeline-title {
+                color: #495057;
+                font-weight: 600;
+                }
+
+                .timeline-content p {
+                color: #6c757d;
+                margin-bottom: 0;
+                }
+
+                /* Responsive adjustments */
+                @media (max-width: 768px) {
+                .timeline-item {
+                padding-left: 2.5rem;
+                }
+
+                .timeline-marker {
+                width: 1.5rem;
+                height: 1.5rem;
+                }
+
+                .timeline-item:not(:last-child):before {
+                left: 0.65rem;
+                }
+                }
+            </style>
+            <div id="wrap">
+                <div class="container mt-4">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10 col-xl-8">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-primary text-white">
+                                    <h1 class="card-title mb-0 h3">
+                                        <i class="fa fa-file-text-o me-2"></i> Conditions
+                                        d'utilisation - Inscription </h1>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle me-2"></i>
+                                            <strong>Information :</strong>
+                                        En vous inscrivant, vous acceptez ces conditions
+                                        d'utilisation. </div>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-user-plus me-2"></i> 1. Inscription et
+                                            Compte Utilisateur </h3>
+                                        <p>En vous inscrivant sur notre plateforme, vous acceptez de
+                                            :</p>
+                                        <ul class="list-unstyled ps-3">
+                                            <li><i class="fa fa-check text-success me-2"></i>Fournir
+                                                des informations exactes et à jour</li>
+                                            <li><i class="fa fa-check text-success me-2"></i>Maintenir
+                                                la confidentialité de vos identifiants</li>
+                                            <li><i class="fa fa-check text-success me-2"></i>Notifier
+                                                immédiatement tout usage non autorisé de votre
+                                                compte</li>
+                                            <li><i class="fa fa-check text-success me-2"></i>Respecter
+                                                les valeurs chrétiennes dans vos interactions</li>
+                                        </ul>
+                                    </section>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-shield me-2"></i> 2. Protection des
+                                            Données Personnelles </h3>
+                                        <p>Nous nous engageons à protéger vos données personnelles
+                                            selon les principes suivants :</p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card border-success mb-3">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title text-success">
+                                                            <i class="fa fa-lock me-2"></i>
+                                                            Confidentialité
+                                                            </h5>
+                                                        <p class="card-text">Vos informations
+                                                            personnelles sont traitées de manière
+                                                            confidentielle et ne sont partagées
+                                                            qu'avec les responsables autorisés de
+                                                            l'église.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-info mb-3">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title text-info">
+                                                            <i class="fa fa-edit me-2"></i>Droit de
+                                                            rectification </h5>
+                                                        <p class="card-text">Vous pouvez demander la
+                                                            modification ou la suppression de vos
+                                                            données à tout moment en contactant
+                                                            l'administration.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-users me-2"></i> 3. Participation aux
+                                            Activités </h3>
+                                        <p>En vous inscrivant comme moniteur, enseignant ou
+                                            responsable, vous vous engagez à :</p>
+                                        <div class="alert alert-warning">
+                                            <h5 class="alert-heading">
+                                                <i class="fa fa-exclamation-triangle me-2"></i>Responsabilités
+                                                importantes </h5>
+                                            <ul class="mb-0">
+                                                <li>Participer régulièrement aux activités de
+                                                    l'école du dimanche</li>
+                                                <li>Respecter les enseignements bibliques dans votre
+                                                    conduite</li>
+                                                <li>Contribuer positivement à l'éducation
+                                                    spirituelle des enfants</li>
+                                                <li>Collaborer harmonieusement avec les autres
+                                                    membres de l'équipe</li>
+                                            </ul>
+                                        </div>
+                                    </section>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-clock-o me-2"></i> 4. Validation et
+                                            Activation du Compte </h3>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="timeline">
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-marker bg-primary"></div>
+                                                        <div class="timeline-content">
+                                                            <h5 class="timeline-title">Étape 1 :
+                                                                Inscription</h5>
+                                                            <p>Votre inscription est enregistrée
+                                                                mais votre compte reste inactif</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-marker bg-warning"></div>
+                                                        <div class="timeline-content">
+                                                            <h5 class="timeline-title">Étape 2 :
+                                                                Validation</h5>
+                                                            <p>Un administrateur vérifie et valide
+                                                                votre demande d'inscription</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-marker bg-success"></div>
+                                                        <div class="timeline-content">
+                                                            <h5 class="timeline-title">Étape 3 :
+                                                                Activation</h5>
+                                                            <p>Votre compte est activé et vous
+                                                                pouvez participer aux activités</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-gavel me-2"></i> 5. Règles de Conduite </h3>
+                                        <div class="alert alert-danger">
+                                            <h5 class="alert-heading">
+                                                <i class="fa fa-ban me-2"></i>Comportements
+                                                interdits </h5>
+                                            <p>Les comportements suivants peuvent entraîner la
+                                                suspension de votre compte :</p>
+                                            <ul class="mb-0">
+                                                <li>Diffusion de contenus inappropriés ou contraires
+                                                    aux valeurs chrétiennes</li>
+                                                <li>Harcèlement ou discrimination envers d'autres
+                                                    membres</li>
+                                                <li>Utilisation abusive des informations
+                                                    personnelles d'autres membres</li>
+                                                <li>Non-respect des responsables et de l'autorité
+                                                    ecclésiastique</li>
+                                            </ul>
+                                        </div>
+                                    </section>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-phone me-2"></i> 6. Contact et Support </h3>
+                                        <p>Pour toute question concernant ces conditions
+                                            d'utilisation ou votre inscription, vous pouvez
+                                            contacter :</p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card border-primary">
+                                                    <div class="card-body text-center">
+                                                        <i
+                                                            class="fa fa-user-circle fa-3x text-primary mb-3"></i>
+                                                        <h5>Administration</h5>
+                                                        <p class="text-muted">Pour les questions
+                                                            d'inscription et de validation de compte</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-success">
+                                                    <div class="card-body text-center">
+                                                        <i
+                                                            class="fa fa-graduation-cap fa-3x text-success mb-3"></i>
+                                                        <h5>Responsables Pédagogiques</h5>
+                                                        <p class="text-muted">Pour les questions
+                                                            liées aux activités d'enseignement</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section class="mb-4">
+                                        <h3 class="h4 text-primary mb-3">
+                                            <i class="fa fa-edit me-2"></i> 7. Modifications des
+                                            Conditions </h3>
+                                        <p>Ces conditions peuvent être modifiées à tout moment. Les
+                                            utilisateurs seront notifiés des changements importants
+                                            par email ou via la plateforme.</p>
+                                    </section>
+
+                                    <div class="alert alert-success text-center">
+                                        <h4 class="alert-heading">
+                                            <i class="fa fa-heart me-2"></i> Merci pour votre
+                                            engagement ! </h4>
+                                        <p class="mb-0">
+                                            Votre participation contribue à l'édification
+                                            spirituelle de notre communauté.
+                                            Que Dieu vous bénisse dans ce ministère !
+                                        </p>
+                                    </div>
+
+                                    <div class="text-center mt-4">
+                                        <a href="/inscription-ecole" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-arrow-left me-2"></i> Retour à
+                                            l'inscription </a>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer text-muted text-center">
+                                    <small>
+                                        <i class="fa fa-calendar me-1"></i> Dernière mise à jour : <t
+                                            t-esc="datetime.datetime.now().strftime('%d/%m/%Y')" />
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
 
     <!-- Template pour la vue web des écoles -->
     <template id="school_list" name="Liste des écoles">
