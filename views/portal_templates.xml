@@ -31,7 +31,8 @@
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header bg-primary text-white">
-                                <h3 class="text-center">Inscription Moniteur/Responsable École du Dimanche</h3>
+                                <h3 class="text-center">Inscription Moniteur/Responsable École du
+                                    Dimanche</h3>
                             </div>
 
                             <div class="card-body">
@@ -40,14 +41,16 @@
                                 </t>
 
                                 <form method="post" class="mt-3">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                    <input type="hidden" name="csrf_token"
+                                        t-att-value="request.csrf_token()" />
 
                                     <!-- Section Informations personnelles -->
                                     <h4 class="border-bottom pb-2 mb-3">Informations personnelles</h4>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Nom complet</label>
-                                            <input type="text" name="name" class="form-control" required="required"
+                                            <input type="text" name="name" class="form-control"
+                                                required="required"
                                                 t-att-value="values and values.get('name', '') or ''" />
                                         </div>
                                         <div class="col-md-6 mb-3">
@@ -90,12 +93,23 @@
                                         </div>
                                     </div>
 
+                                    <!-- Nouveau champ Date de salut -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Date de salut</label>
+                                            <input type="date" name="arrival_date"
+                                                class="form-control" required="required"
+                                                t-att-value="values and values.get('arrival_date', '') or ''" />
+                                        </div>
+                                    </div>
+
                                     <!-- Section Affiliation -->
                                     <h4 class="border-bottom pb-2 mb-3 mt-4">Affiliation à l'école</h4>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">École du dimanche</label>
-                                            <select name="school_id" class="form-select" required="required">
+                                            <select name="school_id" class="form-select"
+                                                required="required">
                                                 <option value="">-- Sélectionnez votre école --</option>
                                                 <t t-if="schools" t-foreach="schools" t-as="school">
                                                     <option t-att-value="school.id"
@@ -107,7 +121,8 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Fonction</label>
-                                            <select name="function_type" class="form-select" required="required">
+                                            <select name="function_type" class="form-select"
+                                                required="required">
                                                 <option value="">-- Sélectionnez --</option>
                                                 <option value="monitor"
                                                     t-att-selected="'selected' if (values and values.get('function_type') == 'monitor') else None">
@@ -123,7 +138,8 @@
                                     </div>
 
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" name="accept_terms"
+                                        <input class="form-check-input" type="checkbox"
+                                            name="accept_terms"
                                             id="accept_terms" required="required"
                                             t-att-checked="'checked' if (values and values.get('accept_terms')) else None" />
                                         <label class="form-check-label" for="accept_terms">
@@ -134,9 +150,10 @@
 
                                     <div class="row">
                                         <div class="col-12">
-                                            <button type="submit" class="btn btn-primary btn-lg w-100">
-                                                <i class="fas fa-paper-plane me-2"></i> Soumettre l'inscription
-                                            </button>
+                                            <button type="submit"
+                                                class="btn btn-primary btn-lg w-100">
+                                                <i class="fas fa-paper-plane me-2"></i> Soumettre
+                                                l'inscription </button>
                                         </div>
                                     </div>
                                 </form>
@@ -146,37 +163,18 @@
                 </div>
             </div>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Validation du formulaire
-                    const form = document.querySelector('form');
-                    form.addEventListener('submit', function(e) {
-                        const requiredFields = form.querySelectorAll('[required]');
-                        let isValid = true;
-                        
-                        requiredFields.forEach(field => {
-                            if (!field.value.trim()) {
-                                isValid = false;
-                                field.classList.add('is-invalid');
-                                
-                                field.addEventListener('input', function() {
-                                    this.classList.remove('is-invalid');
-                                });
-                            }
-                        });
-
-                        if (!isValid) {
-                            e.preventDefault();
-                            alert('Veuillez remplir tous les champs obligatoires.');
-                        } else {
-                            // Afficher un indicateur de chargement
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Envoi en cours...';
-                            submitBtn.disabled = true;
-                        }
-                    });
-                });
-            </script>
+            <script> document.addEventListener('DOMContentLoaded', function() { // Validation du
+                formulaire const form = document.querySelector('form');
+                form.addEventListener('submit', function(e) { const requiredFields =
+                form.querySelectorAll('[required]'); let isValid = true;
+                requiredFields.forEach(field => { if (!field.value.trim()) { isValid = false;
+                field.classList.add('is-invalid'); field.addEventListener('input', function() {
+                this.classList.remove('is-invalid'); }); } }); if (!isValid) { e.preventDefault();
+                alert('Veuillez remplir tous les champs obligatoires.'); } else { // Afficher un
+                indicateur de chargement const submitBtn =
+                form.querySelector('button[type="submit"]'); submitBtn.innerHTML = '<i
+                    class="fas fa-spinner fa-spin me-2"></i>Envoi en cours...'; submitBtn.disabled =
+                true; } }); }); </script>
         </t>
     </template>
 
@@ -977,22 +975,22 @@
                 }
 
                 .ts-dropdown {
-                    border: 2px solid #007bff !important;
-                    border-radius: 8px !important;
-                    background-color: white !important; /* Ajout de cette ligne */
+                border: 2px solid #007bff !important;
+                border-radius: 8px !important;
+                background-color: white !important; /* Ajout de cette ligne */
                 }
 
                 .ts-dropdown .option {
-                    background-color: white !important;
+                background-color: white !important;
                 }
 
                 .ts-dropdown .active {
-                    background-color: #007bff !important;
-                    color: white !important;
+                background-color: #007bff !important;
+                color: white !important;
                 }
 
                 .ts-dropdown .selected {
-                    background-color: #e9ecef !important;
+                background-color: #e9ecef !important;
                 }
 
                 /* Style spécial pour les sélecteurs de date */
@@ -1624,7 +1622,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <input type="hidden" name="communication_ids" t-att-data-selected="values.get('communication_ids', '')" />  
+                                                <input type="hidden" name="communication_ids"
+                                                    t-att-data-selected="values.get('communication_ids', '')" />
                                             </div>
                                         </div>
                                     </div>
@@ -1659,7 +1658,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <input type="hidden" name="artistic_group_ids" t-att-data-selected="values.get('artistic_group_ids', '')" />
+                                                <input type="hidden" name="artistic_group_ids"
+                                                    t-att-data-selected="values.get('artistic_group_ids', '')" />
                                             </div>
                                         </div>
                                     </div>
@@ -1693,7 +1693,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <input type="hidden" name="ngo_ids" t-att-data-selected="values.get('ngo_ids', '')" />
+                                                <input type="hidden" name="ngo_ids"
+                                                    t-att-data-selected="values.get('ngo_ids', '')" />
                                             </div>
                                         </div>
                                     </div>
@@ -1727,7 +1728,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <input type="hidden" name="school_ids" t-att-data-selected="values.get('school_ids', '')" />
+                                                <input type="hidden" name="school_ids"
+                                                    t-att-data-selected="values.get('school_ids', '')" />
                                             </div>
                                         </div>
                                     </div>
@@ -1762,7 +1764,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <input type="hidden" name="sports_group_ids" t-att-data-selected="values.get('sports_group_ids', '')" />
+                                                <input type="hidden" name="sports_group_ids"
+                                                    t-att-data-selected="values.get('sports_group_ids', '')" />
                                             </div>
                                         </div>
                                     </div>
@@ -1797,7 +1800,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <input type="hidden" name="other_group_ids" t-att-data-selected="values.get('other_group_ids', '')" />
+                                                <input type="hidden" name="other_group_ids"
+                                                    t-att-data-selected="values.get('other_group_ids', '')" />
                                             </div>
                                         </div>
                                     </div>
@@ -1816,7 +1820,8 @@
                                             t-att-checked="'checked' if (values and values.get('accept_terms')) else None" />
                                         <label class="form-check-label" for="accept_terms">
                                             J'accepte les <a href="/terms" target="_blank">conditions
-                                            d'utilisation</a> </label>
+                                            d'utilisation</a>
+                                        </label>
                                     </div>
 
                                     <div class="row">
@@ -1834,316 +1839,117 @@
                 </div>
             </div>
 
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialisation Tom Select pour les sélecteurs simples
-                const simpleSelects = document.querySelectorAll('.searchable-select');
-                simpleSelects.forEach(function(select) {
-                    new TomSelect(select, {
-                        create: false,
-                        sortField: {
-                            field: "text",
-                            direction: "asc"
-                        },
-                        allowEmptyOption: true,
-                        placeholder: "Sélectionner...",
-                        searchField: ['text']
-                    });
-                });
-
-                // Initialisation des multi-select personnalisés
-                initializeMultiSelect();
-
-                // Fonction pour initialiser les multi-select
-                function initializeMultiSelect() {
-                    const multiSelects = document.querySelectorAll('.multi-select-container');
-                    
-                    multiSelects.forEach(container => {
-                        const fieldName = container.dataset.name;
-                        const hiddenInput = document.querySelector(`input[name="${fieldName}"]`);
-                        const selectedTags = container.querySelector('.selected-tags');
-                        const placeholder = container.querySelector('.placeholder');
-                        const dropdown = container.querySelector('.options-dropdown');
-                        const searchInput = container.querySelector('.search-input');
-                        const optionsList = container.querySelector('.options-list');
-                        const options = container.querySelectorAll('.option-item');
-                        
-                        let selectedValues = [];
-
-                        // Préremplissage si des valeurs sont déjà présentes
-                        const initial = hiddenInput.dataset.selected;
-                        if (initial) {
-                            const initialValues = initial.split(',').map(val => val.trim()).filter(val => val !== '');
-                            initialValues.forEach(val => {
-                                const option = container.querySelector(`.option-item[data-value="${val}"]`);
-                                if (option) {
-                                    const text = option.dataset.text;
-                                    selectedValues.push(val);
-                                    createTag(val, text);
-                                    updateOptionState(val, true);
-                                }
-                            });
-                            updateHiddenInput();
-                            updatePlaceholder();
-                        }
-
-                        // Gestion du clic sur le conteneur
-                        container.addEventListener('click', function(e) {
-                            if (!e.target.closest('.remove-tag')) {
-                                toggleDropdown();
-                            }
-                        });
-
-                        // Fermer le dropdown si clic à l'extérieur
-                        document.addEventListener('click', function(e) {
-                            if (!container.contains(e.target)) {
-                                closeDropdown();
-                            }
-                        });
-
-                        // Gestion de la recherche
-                        searchInput.addEventListener('input', function() {
-                            filterOptions(this.value.toLowerCase());
-                        });
-
-                        // Gestion du clic sur les options
-                        options.forEach(option => {
-                            option.addEventListener('click', function() {
-                                const value = this.dataset.value;
-                                const text = this.dataset.text;
-                                
-                                if (selectedValues.includes(value)) {
-                                    removeValue(value);
-                                } else {
-                                    addValue(value, text);
-                                }
-                            });
-                        });
-
-                        function toggleDropdown() {
-                            dropdown.classList.toggle('show');
-                            container.classList.toggle('active');
-                            if (dropdown.classList.contains('show')) {
-                                searchInput.focus();
-                            }
-                        }
-
-                        function closeDropdown() {
-                            dropdown.classList.remove('show');
-                            container.classList.remove('active');
-                            searchInput.value = '';
-                            filterOptions('');
-                        }
-
-                        function addValue(value, text) {
-                            if (!selectedValues.includes(value)) {
-                                selectedValues.push(value);
-                                createTag(value, text);
-                                updateHiddenInput();
-                                updatePlaceholder();
-                                updateOptionState(value, true);
-                            }
-                        }
-
-                        function removeValue(value) {
-                            const index = selectedValues.indexOf(value);
-                            if (index > -1) {
-                                selectedValues.splice(index, 1);
-                                removeTag(value);
-                                updateHiddenInput();
-                                updatePlaceholder();
-                                updateOptionState(value, false);
-                            }
-                        }
-
-                        function createTag(value, text) {
-                            const tag = document.createElement('div');
-                            tag.className = 'selected-tag';
-                            tag.dataset.value = value;
-                            tag.innerHTML = `
-                                <span>${text}</span>
-                                <span class="remove-tag" data-value="${value}">×</span>
-                            `;
-                            
-                            tag.querySelector('.remove-tag').addEventListener('click', function(e) {
-                                e.stopPropagation();
-                                removeValue(value);
-                            });
-                            
-                            selectedTags.appendChild(tag);
-                        }
-
-                        function removeTag(value) {
-                            const tag = selectedTags.querySelector(`[data-value="${value}"]`);
-                            if (tag) {
-                                tag.remove();
-                            }
-                        }
-
-                        function updateHiddenInput() {
-                            hiddenInput.value = selectedValues.join(',');
-                        }
-
-                        function updatePlaceholder() {
-                            placeholder.style.display = selectedValues.length === 0 ? 'block' : 'none';
-                        }
-
-                        function updateOptionState(value, selected) {
-                            const option = container.querySelector(`.option-item[data-value="${value}"]`);
-                            if (option) {
-                                if (selected) {
-                                    option.classList.add('selected');
-                                } else {
-                                    option.classList.remove('selected');
-                                }
-                            }
-                        }
-
-                        function filterOptions(searchTerm) {
-                            options.forEach(option => {
-                                const text = option.dataset.text.toLowerCase();
-                                if (text.includes(searchTerm)) {
-                                    option.style.display = 'flex';
-                                } else {
-                                    option.style.display = 'none';
-                                }
-                            });
-
-                            // Vérifier s'il y a des options visibles
-                            const visibleOptions = Array.from(options).filter(opt => opt.style.display !== 'none');
-                            const existingNoOptions = optionsList.querySelector('.no-options');
-                            
-                            if (visibleOptions.length === 0 &amp;&amp; !existingNoOptions) {
-                                const noOptionsDiv = document.createElement('div');
-                                noOptionsDiv.className = 'no-options';
-                                noOptionsDiv.textContent = 'Aucune option trouvée';
-                                optionsList.appendChild(noOptionsDiv);
-                            } else if (visibleOptions.length > 0 &amp;&amp; existingNoOptions) {
-                                existingNoOptions.remove();
-                            }
-                        }
-
-                        // Initialiser l'état
-                        updatePlaceholder();
-                    });
-                }
-
-                // Validation personnalisée du formulaire
-                const form = document.querySelector('form');
-                form.addEventListener('submit', function(e) {
-                    // Validation des champs requis
-                    const requiredFields = form.querySelectorAll('[required]');
-                    let isValid = true;
-                    
-                    requiredFields.forEach(field => {
-                        if (!field.value.trim()) {
-                            isValid = false;
-                            field.classList.add('is-invalid');
-                            
-                            // Supprimer la classe d'erreur après modification
-                            field.addEventListener('input', function() {
-                                this.classList.remove('is-invalid');
-                            });
-                        }
-                    });
-
-                    // Validation de la date de naissance
-                    const birthDay = document.querySelector('[name="birth_day"]');
-                    const birthMonth = document.querySelector('[name="birth_month"]');
-                    const birthYear = document.querySelector('[name="birth_year"]');
-                    
-                    if (!birthDay.value || !birthMonth.value || !birthYear.value) {
-                        isValid = false;
-                        [birthDay, birthMonth, birthYear].forEach(field => {
-                            if (!field.value) {
-                                field.classList.add('is-invalid');
-                            }
-                        });
-                        
-                        if (isValid === false) {
-                            alert('Veuillez remplir tous les champs obligatoires, y compris la date de naissance complète.');
-                        }
-                    }
-
-                    // Validation des conditions d'utilisation
-                    const termsCheckbox = document.querySelector('#accept_terms');
-                    if (!termsCheckbox.checked) {
-                        isValid = false;
-                        termsCheckbox.classList.add('is-invalid');
-                        alert('Vous devez accepter les conditions d\'utilisation pour continuer.');
-                    }
-
-                    if (!isValid) {
-                        e.preventDefault();
-                        
-                        // Faire défiler jusqu'au premier champ invalide
-                        const firstInvalid = form.querySelector('.is-invalid');
-                        if (firstInvalid) {
-                            firstInvalid.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-                        }
-                    } else {
-                        // Afficher un indicateur de chargement
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Envoi en cours...';
-                        submitBtn.disabled = true;
-                    }
-                });
-
-                // Gestion responsive des sélecteurs de date
-                function handleDateSelectorsResize() {
-                    const dateSelectors = document.querySelectorAll('.date-selectors');
-                    dateSelectors.forEach(selector => {
-                        if (window.innerWidth &lt;= 768) {
-                            selector.classList.add('mobile-layout');
-                        } else {
-                            selector.classList.remove('mobile-layout');
-                        }
-                    });
-                }
-
-                // Appel initial et sur redimensionnement
-                handleDateSelectorsResize();
-                window.addEventListener('resize', handleDateSelectorsResize);
-
-                // Animation d'entrée
-                const card = document.querySelector('.card');
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 100);
-
-                // Sauvegarde automatique en local storage (optionnel)
-                const formFields = form.querySelectorAll('input, select, textarea');
-                formFields.forEach(field => {
-                    // Restaurer les valeurs sauvegardées
-                    const savedValue = localStorage.getItem(`form_${field.name}`);
-                    if (savedValue &amp;&amp; !field.value) {
-                        field.value = savedValue;
-                    }
-                    
-                    // Sauvegarder les modifications
-                    field.addEventListener('change', function() {
-                        localStorage.setItem(`form_${field.name}`, field.value);
-                    });
-                });
-
-                // Nettoyer le localStorage après soumission réussie
-                form.addEventListener('submit', function() {
-                    if (this.checkValidity()) {
-                        formFields.forEach(field => {
-                            localStorage.removeItem(`form_${field.name}`);
-                        });
-                    }
-                });
-            });
-        </script>
+            <script> document.addEventListener('DOMContentLoaded', function() { // Initialisation
+                Tom Select pour les sélecteurs simples const simpleSelects =
+                document.querySelectorAll('.searchable-select');
+                simpleSelects.forEach(function(select) { new TomSelect(select, { create: false,
+                sortField: { field: "text", direction: "asc" }, allowEmptyOption: true, placeholder:
+                "Sélectionner...", searchField: ['text'] }); }); // Initialisation des multi-select
+                personnalisés initializeMultiSelect(); // Fonction pour initialiser les multi-select
+                function initializeMultiSelect() { const multiSelects =
+                document.querySelectorAll('.multi-select-container'); multiSelects.forEach(container
+                => { const fieldName = container.dataset.name; const hiddenInput =
+                document.querySelector(`input[name="${fieldName}"]`); const selectedTags =
+                container.querySelector('.selected-tags'); const placeholder =
+                container.querySelector('.placeholder'); const dropdown =
+                container.querySelector('.options-dropdown'); const searchInput =
+                container.querySelector('.search-input'); const optionsList =
+                container.querySelector('.options-list'); const options =
+                container.querySelectorAll('.option-item'); let selectedValues = []; //
+                Préremplissage si des valeurs sont déjà présentes const initial =
+                hiddenInput.dataset.selected; if (initial) { const initialValues =
+                initial.split(',').map(val => val.trim()).filter(val => val !== '');
+                initialValues.forEach(val => { const option =
+                container.querySelector(`.option-item[data-value="${val}"]`); if (option) { const
+                text = option.dataset.text; selectedValues.push(val); createTag(val, text);
+                updateOptionState(val, true); } }); updateHiddenInput(); updatePlaceholder(); } //
+                Gestion du clic sur le conteneur container.addEventListener('click', function(e) {
+                if (!e.target.closest('.remove-tag')) { toggleDropdown(); } }); // Fermer le
+                dropdown si clic à l'extérieur document.addEventListener('click', function(e) { if
+                (!container.contains(e.target)) { closeDropdown(); } }); // Gestion de la recherche
+                searchInput.addEventListener('input', function() {
+                filterOptions(this.value.toLowerCase()); }); // Gestion du clic sur les options
+                options.forEach(option => { option.addEventListener('click', function() { const
+                value = this.dataset.value; const text = this.dataset.text; if
+                (selectedValues.includes(value)) { removeValue(value); } else { addValue(value,
+                text); } }); }); function toggleDropdown() { dropdown.classList.toggle('show');
+                container.classList.toggle('active'); if (dropdown.classList.contains('show')) {
+                searchInput.focus(); } } function closeDropdown() {
+                dropdown.classList.remove('show'); container.classList.remove('active');
+                searchInput.value = ''; filterOptions(''); } function addValue(value, text) { if
+                (!selectedValues.includes(value)) { selectedValues.push(value); createTag(value,
+                text); updateHiddenInput(); updatePlaceholder(); updateOptionState(value, true); } }
+                function removeValue(value) { const index = selectedValues.indexOf(value); if (index
+                > -1) { selectedValues.splice(index, 1); removeTag(value); updateHiddenInput();
+                updatePlaceholder(); updateOptionState(value, false); } } function createTag(value,
+                text) { const tag = document.createElement('div'); tag.className = 'selected-tag';
+                tag.dataset.value = value; tag.innerHTML = ` <span>${text}</span>
+                                <span
+                    class="remove-tag" data-value="${value}">×</span> `;
+                tag.querySelector('.remove-tag').addEventListener('click', function(e) {
+                e.stopPropagation(); removeValue(value); }); selectedTags.appendChild(tag); }
+                function removeTag(value) { const tag =
+                selectedTags.querySelector(`[data-value="${value}"]`); if (tag) { tag.remove(); } }
+                function updateHiddenInput() { hiddenInput.value = selectedValues.join(','); }
+                function updatePlaceholder() { placeholder.style.display = selectedValues.length ===
+                0 ? 'block' : 'none'; } function updateOptionState(value, selected) { const option =
+                container.querySelector(`.option-item[data-value="${value}"]`); if (option) { if
+                (selected) { option.classList.add('selected'); } else {
+                option.classList.remove('selected'); } } } function filterOptions(searchTerm) {
+                options.forEach(option => { const text = option.dataset.text.toLowerCase(); if
+                (text.includes(searchTerm)) { option.style.display = 'flex'; } else {
+                option.style.display = 'none'; } }); // Vérifier s'il y a des options visibles const
+                visibleOptions = Array.from(options).filter(opt => opt.style.display !== 'none');
+                const existingNoOptions = optionsList.querySelector('.no-options'); if
+                (visibleOptions.length === 0 &amp;&amp; !existingNoOptions) { const noOptionsDiv =
+                document.createElement('div'); noOptionsDiv.className = 'no-options';
+                noOptionsDiv.textContent = 'Aucune option trouvée';
+                optionsList.appendChild(noOptionsDiv); } else if (visibleOptions.length > 0
+                &amp;&amp; existingNoOptions) { existingNoOptions.remove(); } } // Initialiser
+                l'état updatePlaceholder(); }); } // Validation personnalisée du formulaire const
+                form = document.querySelector('form'); form.addEventListener('submit', function(e) {
+                // Validation des champs requis const requiredFields =
+                form.querySelectorAll('[required]'); let isValid = true;
+                requiredFields.forEach(field => { if (!field.value.trim()) { isValid = false;
+                field.classList.add('is-invalid'); // Supprimer la classe d'erreur après
+                modification field.addEventListener('input', function() {
+                this.classList.remove('is-invalid'); }); } }); // Validation de la date de naissance
+                const birthDay = document.querySelector('[name="birth_day"]'); const birthMonth =
+                document.querySelector('[name="birth_month"]'); const birthYear =
+                document.querySelector('[name="birth_year"]'); if (!birthDay.value ||
+                !birthMonth.value || !birthYear.value) { isValid = false; [birthDay, birthMonth,
+                birthYear].forEach(field => { if (!field.value) { field.classList.add('is-invalid');
+                } }); if (isValid === false) { alert('Veuillez remplir tous les champs obligatoires,
+                y compris la date de naissance complète.'); } } // Validation des conditions
+                d'utilisation const termsCheckbox = document.querySelector('#accept_terms'); if
+                (!termsCheckbox.checked) { isValid = false;
+                termsCheckbox.classList.add('is-invalid'); alert('Vous devez accepter les conditions
+                d\'utilisation pour continuer.'); } if (!isValid) { e.preventDefault(); // Faire
+                défiler jusqu'au premier champ invalide const firstInvalid =
+                form.querySelector('.is-invalid'); if (firstInvalid) { firstInvalid.scrollIntoView({
+                behavior: 'smooth', block: 'center' }); } } else { // Afficher un indicateur de
+                chargement const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Envoi en
+                cours...'; submitBtn.disabled = true; } }); // Gestion responsive des sélecteurs de
+                date function handleDateSelectorsResize() { const dateSelectors =
+                document.querySelectorAll('.date-selectors'); dateSelectors.forEach(selector => { if
+                (window.innerWidth &lt;= 768) { selector.classList.add('mobile-layout'); } else {
+                selector.classList.remove('mobile-layout'); } }); } // Appel initial et sur
+                redimensionnement handleDateSelectorsResize(); window.addEventListener('resize',
+                handleDateSelectorsResize); // Animation d'entrée const card =
+                document.querySelector('.card'); card.style.opacity = '0'; card.style.transform =
+                'translateY(20px)'; setTimeout(() => { card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 100); //
+                Sauvegarde automatique en local storage (optionnel) const formFields =
+                form.querySelectorAll('input, select, textarea'); formFields.forEach(field => { //
+                Restaurer les valeurs sauvegardées const savedValue =
+                localStorage.getItem(`form_${field.name}`); if (savedValue &amp;&amp; !field.value)
+                { field.value = savedValue; } // Sauvegarder les modifications
+                field.addEventListener('change', function() {
+                localStorage.setItem(`form_${field.name}`, field.value); }); }); // Nettoyer le
+                localStorage après soumission réussie form.addEventListener('submit', function() {
+                if (this.checkValidity()) { formFields.forEach(field => {
+                localStorage.removeItem(`form_${field.name}`); }); } }); }); </script>
         </t>
     </template>
 

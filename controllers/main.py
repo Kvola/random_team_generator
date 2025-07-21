@@ -25,7 +25,7 @@ class ResPartnerPortal(http.Controller):
                 from odoo.exceptions import ValidationError
                 
                 # Validation des données obligatoires
-                required_fields = ['name', 'gender', 'birthdate', 'school_id', 'function_type']
+                required_fields = ['name', 'gender', 'birthdate', 'school_id', 'function_type', 'arrival_date']
                 for field in required_fields:
                     if not post.get(field):
                         raise ValidationError(_("Le champ %s est obligatoire") % field)
@@ -33,11 +33,11 @@ class ResPartnerPortal(http.Controller):
                 # Préparation des valeurs
                 partner_vals = {
                     'name': post.get('name'),
-                    'email': post.get('email') if post.get('email') else False,
                     'phone': post.get('phone') if post.get('phone') else False,
                     'mobile': post.get('mobile') if post.get('mobile') else False,
                     'gender': post.get('gender'),
                     'birthdate': post.get('birthdate'),
+                    'arrival_date': post.get('arrival_date'),
                     'active': False,
                     'is_company': False,
                     'type': 'contact',
