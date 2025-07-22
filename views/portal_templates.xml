@@ -1559,8 +1559,8 @@
                                                                                         t-esc="member.age" />
                                                                                     ans <t
                                                                                         t-if="member.arrival_date">
-                                                                                    - Salut: <span
-                                                                                            t-esc="member.arrival_date" />
+                                                                                    - Sauvé(e) le <span
+                                                                                            t-esc="member.arrival_date.strftime('%d/%m/%Y')" />
                                                                                     </t>
                                                                                 </div>
                                                                                 <t
