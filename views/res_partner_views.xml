@@ -1552,6 +1552,8 @@
                     invisible="organization_type != 'school' or not is_company">
                     <group>
                         <group>
+                            <field name="is_monitor" />
+                            <field name="is_teacher" />
                             <field name="school_church_id" />
                             <field name="school_leader_id" />
                             <field name="school_follower_id" string="Responsable de suivi"/>
