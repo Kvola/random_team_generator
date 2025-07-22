@@ -29,6 +29,89 @@
         <field name="parent_id" ref="website.main_menu" />
         <field name="sequence">65</field>
     </record>
+    <!-- Template 404 personnalisé -->
+    <template id="404_custom" name="Page 404 Personnalisée" inherit_id="http_routing.404">
+        <xpath expr="//div[hasclass('container')]" position="replace">
+            <div class="container text-center py-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <!-- Image ou icône 404 -->
+                        <div class="mb-4">
+                            <i class="fa fa-exclamation-triangle fa-5x text-warning mb-3"></i>
+                            <h1 class="display-1 fw-bold text-primary">404</h1>
+                        </div>
+                        
+                        <!-- Message principal -->
+                        <h2 class="mb-4">Oups ! Page non trouvée</h2>
+                        <p class="lead mb-4">
+                            La page que vous recherchez n'existe pas ou a été déplacée.
+                            Ne vous inquiétez pas, nous pouvons vous aider à trouver ce que vous cherchez.
+                        </p>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="mb-4">
+                            <a href="/" class="btn btn-primary btn-lg me-3">
+                                <i class="fa fa-home"></i> Retour à l'accueil
+                            </a>
+                            <a href="/contactus" class="btn btn-outline-secondary btn-lg">
+                                <i class="fa fa-envelope"></i> Nous contacter
+                            </a>
+                        </div>
+                        
+                        <!-- Suggestions de pages -->
+                        <div class="row mt-5">
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <i class="fa fa-shopping-cart fa-2x text-primary mb-3"></i>
+                                        <h5 class="card-title">Nos Produits</h5>
+                                        <p class="card-text">Découvrez notre gamme complète de produits.</p>
+                                        <a href="/shop" class="btn btn-outline-primary">Voir les produits</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <i class="fa fa-info-circle fa-2x text-success mb-3"></i>
+                                        <h5 class="card-title">À propos</h5>
+                                        <p class="card-text">Apprenez-en plus sur notre entreprise.</p>
+                                        <a href="/aboutus" class="btn btn-outline-success">En savoir plus</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <i class="fa fa-blog fa-2x text-info mb-3"></i>
+                                        <h5 class="card-title">Blog</h5>
+                                        <p class="card-text">Lisez nos derniers articles et actualités.</p>
+                                        <a href="/blog" class="btn btn-outline-info">Lire le blog</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Barre de recherche -->
+                        <div class="mt-5">
+                            <h4 class="mb-3">Ou utilisez la recherche :</h4>
+                            <form class="d-flex justify-content-center" action="/website/search" method="GET">
+                                <div class="input-group" style="max-width: 500px;">
+                                    <input type="text" class="form-control form-control-lg" 
+                                           name="search" placeholder="Rechercher sur le site..." 
+                                           aria-label="Recherche"/>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
     <!-- Template XML pour Odoo - À placer dans views/inscription_terms.xml -->
     <template id="inscription_terms" name="Conditions d'utilisation">
         <t t-call="website.layout">

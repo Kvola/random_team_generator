@@ -2,9 +2,10 @@ from odoo import http, fields, _
 from odoo.http import request
 from datetime import date
 import logging
-from odoo.exceptions import ValidationError  # <-- Cet import est crucial
+from odoo.exceptions import ValidationError, UserError  # <-- Cet import est crucial
 import math
 from odoo.addons.portal.controllers.portal import pager as portal_pager
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -147,7 +148,7 @@ class ResPartnerPortal(http.Controller):
             
         except Exception as e:
             _logger.error("Erreur inattendue dans inscription_ecole_form: %s", str(e))
-            return request.render("website.404")
+            return request.render("random_team_generator.404_custom")
     
     def _get_active_schools(self):
         """Récupère la liste des écoles actives"""
@@ -173,7 +174,16 @@ class ResPartnerPortal(http.Controller):
             if existing_partner:
                 error = _("Une inscription avec ce nom et cette date de naissance existe déjà.")
                 return self._render_form_with_error(schools, error, post)
-            
+
+            # Ajouter l'école de l'école sur le partenaire si nécessaire
+            # Faire une recherche de l'école associée à l'école
+            school = request.env['res.partner'].sudo().search([
+                ('id', '=', cleaned_data['school_id'])
+            ], limit=1)
+
+            if school:
+                cleaned_data['school_church_id'] = school.school_church_id.id if school.school_church_id else False
+
             # Création de l'enregistrement
             partner = self._create_partner_record(cleaned_data)
             
@@ -236,13 +246,13 @@ class ResPartnerPortal(http.Controller):
         )
         
         # Validation de la date de salut (optionnelle)
-        salvation_date = self._validate_salvation_date(
+        arrival_date = self._validate_arrival_date(
             post.get('salvation_day', ''),
             post.get('salvation_month', ''),
             post.get('salvation_year', '')
         )
-        if salvation_date:
-            cleaned_data['salvation_date'] = salvation_date
+        if arrival_date:
+            cleaned_data['arrival_date'] = arrival_date
         
         # Validation du nom
         cleaned_data['name'] = self._validate_name(cleaned_data['name'])
@@ -295,20 +305,20 @@ class ResPartnerPortal(http.Controller):
         except ValueError:
             raise ValidationError(_("Date de naissance invalide"))
     
-    def _validate_salvation_date(self, day, month, year):
+    def _validate_arrival_date(self, day, month, year):
         """Valide la date de salut (optionnelle)"""
         if not all([day, month, year]):
             return None
         
         try:
             day, month, year = int(day), int(month), int(year)
-            salvation_date = date(year, month, day)
+            arrival_date = date(year, month, day)
             
             # Vérification que la date n'est pas dans le futur
-            if salvation_date > date.today():
+            if arrival_date > date.today():
                 raise ValidationError(_("La date de salut ne peut pas être dans le futur"))
             
-            return fields.Date.to_string(salvation_date)
+            return fields.Date.to_string(arrival_date)
             
         except ValueError:
             raise ValidationError(_("Date de salut invalide"))
@@ -352,12 +362,13 @@ class ResPartnerPortal(http.Controller):
             'mobile': cleaned_data.get('mobile') or False,
             'gender': cleaned_data['gender'],
             'birthdate': cleaned_data['birthdate'],
-            'salvation_date': cleaned_data.get('salvation_date') or False,
+            'arrival_date': cleaned_data.get('arrival_date') or False,
             'active': False,  # Désactivé jusqu'à validation par un admin
             'is_company': False,
-            'supplier_rank': 0,
-            'customer_rank': 0,
-            'category_id': [(6, 0, [])],
+            'church_id': cleaned_data.get('school_church_id') or False,
+            #'supplier_rank': 0,
+            #'customer_rank': 0,
+            #'category_id': [(6, 0, [])],
             'comment': _("Inscription via formulaire web le %s") % fields.Datetime.now().strftime('%d/%m/%Y %H:%M'),
         }
         
