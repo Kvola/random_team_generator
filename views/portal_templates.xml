@@ -523,10 +523,8 @@
                                             <tr>
                                                 <th class="text-center">École</th>
                                                 <th class="text-center">Église</th>
-                                                <th class="text-center">Responsable</th>
-                                                <th class="text-center">Moniteurs</th>
-                                                <th class="text-center">Professeurs</th>
-                                                <th class="text-center">Classes</th>
+                                                <th class="text-center">Responsable EDD &amp; Moniteurs</th>
+                                                <th class="text-center">Effectifs</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -554,6 +552,9 @@
                                                                         <div class="fw-bold">
                                                                             <span
                                                                                 t-esc="school.school_leader_id.name" />
+                                                                            <span
+                                                                                class="badge bg-warning text-dark ms-2">
+                                                                                        Responsable EDD</span>
                                                                         </div>
                                                                         <div
                                                                             class="text-muted small">
@@ -575,8 +576,53 @@
                                                             </div>
                                                         </t>
                                                         <t t-else="">
-                                                            <div class="text-muted fst-italic">Responsable
-                                                                non assigné</div>
+                                                            <div class="text-muted fst-italic">Responsables
+                                                                non assignés</div>
+                                                        </t>
+                                                        <!-- Moniteurs -->
+                                                        <t
+                                                            t-if="school.school_leader_id or school.school_monitor_ids">
+                                                            <div class="assistant-leaders">
+                                                                <small
+                                                                    class="text-muted d-block mb-1">Moniteurs:</small>
+                                                                <t
+                                                                    t-foreach="school.school_monitor_ids"
+                                                                    t-as="assistant">
+                                                                    <div
+                                                                        class="assistant-leader bg-light p-2 mb-2 rounded">
+                                                                        <div
+                                                                            class="d-flex align-items-center">
+                                                                            <i
+                                                                                class="fa fa-user me-2 text-secondary"></i>
+                                                                            <div>
+                                                                                <div
+                                                                                    class="fw-semibold">
+                                                                                    <span
+                                                                                        t-esc="assistant.name" />
+                                                                                    <span
+                                                                                        class="badge bg-warning text-dark ms-2">
+                                                                                        Moniteur</span>
+                                                                                </div>
+                                                                                <div
+                                                                                    class="text-muted small">
+                                                                                    <span
+                                                                                        t-esc="assistant.age" />
+                                                                                    ans </div>
+                                                                                <t
+                                                                                    t-if="assistant.phone">
+                                                                                    <div
+                                                                                        class="text-muted small">
+                                                                                        <i
+                                                                                            class="fa fa-phone me-1"></i>
+                                                                                        <span
+                                                                                            t-esc="assistant.phone" />
+                                                                                    </div>
+                                                                                </t>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </t>
+                                                            </div>
                                                         </t>
                                                     </td>
                                                     <td class="text-center">
@@ -584,47 +630,6 @@
                                                             <span
                                                                 t-esc="len(school.school_monitor_ids)" />
                                                         </span>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="badge bg-success">
-                                                            <span
-                                                                t-esc="len(school.school_monitor_ids)" />
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <t t-if="school.school_class_ids">
-                                                            <div class="classes-list">
-                                                                <t
-                                                                    t-foreach="school.school_class_ids"
-                                                                    t-as="classroom">
-                                                                    <div
-                                                                        class="class-card bg-light border rounded p-2 mb-2">
-                                                                        <div
-                                                                            class="d-flex align-items-center">
-                                                                            <i
-                                                                                class="fas fa-door-open text-primary me-2"></i>
-                                                                            <div class="flex-grow-1">
-                                                                                <div class="fw-bold">
-                                                                                    <span
-                                                                                        t-esc="classroom.name" />
-                                                                                </div>
-                                                                                <div
-                                                                                    class="text-muted small">
-                                                                                    <i
-                                                                                        class="fas fa-users me-1"></i>
-                                                                                    <span
-                                                                                        t-esc="len(classroom.class_member_ids)" />
-                                                                                    élèves </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </t>
-                                                            </div>
-                                                        </t>
-                                                        <t t-else="">
-                                                            <span class="text-muted fst-italic">Aucune
-                                                                classe</span>
-                                                        </t>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -983,7 +988,7 @@
                 <div class="container">
                     <div class="form-container">
                         <div class="form-header">
-                            <h1>Inscription École du Dimanche</h1>
+                            <h1>RECENSEMENT DES MONITEURS ET MONITRICES DE CÔTE D'IVOIRE</h1>
                             <div class="subtitle">Formulaire pour moniteurs et responsables</div>
                         </div>
 
@@ -1184,13 +1189,9 @@
                                                     t-att-selected="'selected' if (values and values.get('function_type') == 'monitor') else None">
                                                     Moniteur/Monitrice
                                                 </option>
-                                                <option value="teacher"
-                                                    t-att-selected="'selected' if (values and values.get('function_type') == 'teacher') else None">
-                                                    Professeur/Professeure
-                                                </option>
                                                 <option value="leader"
                                                     t-att-selected="'selected' if (values and values.get('function_type') == 'leader') else None">
-                                                    Responsable
+                                                    Responsable EDD
                                                 </option>
                                             </select>
                                             <div class="invalid-feedback">Veuillez sélectionner une

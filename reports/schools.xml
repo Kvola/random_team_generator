@@ -75,10 +75,6 @@
                                 <i class="fas fa-chalkboard-teacher me-1"></i>
                                 <span
                                     t-esc="total_monitors" /> moniteur(s) </span>
-                            <span class="badge bg-info ms-2">
-                                <i class="fas fa-user-tie me-1"></i>
-                                <span t-esc="total_teachers" />
-                                professeur(s) </span>
                         </div>
                     </div>
 
@@ -87,9 +83,8 @@
                             <tr>
                                 <th style="width: 20%;">École</th>
                                 <th style="width: 20%;">Église</th>
-                                <th style="width: 20%;">Responsable</th>
-                                <th style="width: 10%; text-align: center;">Moniteurs</th>
-                                <th style="width: 20%;">Classes</th>
+                                <th style="width: 20%;">Responsable EDD et Moniteurs</th>
+                                <th style="width: 10%; text-align: center;">Effectifs</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -123,29 +118,33 @@
                                             <span class="text-muted fst-italic">Responsable non
                                                 assigné</span>
                                         </t>
+                                        <t t-if="school.school_monitor_ids">
+                                            <div class="assistant-leaders mt-2">
+                                                <small class="text-muted d-block mb-1">Moniteurs:</small>
+                                                <t t-foreach="school.school_monitor_ids"
+                                                    t-as="monitor">
+                                                    <div
+                                                        class="assistant-leader bg-light p-2 mb-2 rounded">
+                                                        <i class="fas fa-user-tie me-1"></i>
+                                                        <span t-esc="monitor.name" />
+                                                        <span
+                                                            class="badge bg-warning text-dark ms-2">
+                                                            Moniteur</span>
+                                                        <div class="text-muted small">
+                                                            <span t-esc="monitor.age" /> ans </div>
+                                                        <t t-if="monitor.phone">
+                                                            <div class="text-muted small">
+                                                                <i class="fa fa-phone me-1"></i>
+                                                                <span t-esc="monitor.phone" />
+                                                            </div>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </t>
                                     </td>
                                     <td style="text-align: center;">
                                         <span t-esc="len(school.school_monitor_ids)" />
-                                    </td>
-                                    <td>
-                                        <t t-if="school.school_class_ids">
-                                            <ul class="list-unstyled">
-                                                <t t-foreach="school.school_class_ids"
-                                                    t-as="classroom">
-                                                    <li class="class-item">
-                                                        <i
-                                                            class="fas fa-door-open text-primary me-1"></i>
-                                                        <span t-esc="classroom.name" />
-                                                        <span class="text-muted small ms-2"> (<span
-                                                                t-esc="len(classroom.class_member_ids)" />
-                                                            élèves) </span>
-                                                    </li>
-                                                </t>
-                                            </ul>
-                                        </t>
-                                        <t t-else="">
-                                            <span class="text-muted fst-italic">Aucune classe</span>
-                                        </t>
                                     </td>
                                 </tr>
                             </t>
