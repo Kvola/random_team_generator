@@ -627,8 +627,13 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <span class="badge bg-info">
-                                                            <span
-                                                                t-esc="len(school.school_monitor_ids)" />
+                                                            <t t-if="school.school_leader_id"></t>
+                                                                <span
+                                                                    t-esc="len(school.school_monitor_ids) +1" />
+                                                            <t t-else="">
+                                                                <span
+                                                                    t-esc="len(school.school_monitor_ids)" />
+                                                            </t>
                                                         </span>
                                                     </td>
                                                 </tr>
