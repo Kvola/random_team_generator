@@ -104,6 +104,9 @@
                                             <div class="mb-1">
                                                 <i class="fa fa-user-tie me-1"></i>
                                                 <span t-esc="school.school_leader_id.name" />
+                                                <span
+                                                            class="badge bg-success text-dark ms-2">
+                                                            Moniteur</span>
                                             </div>
                                             <div class="text-muted small">
                                                 <span t-esc="school.school_leader_id.age" /> ans </div>
