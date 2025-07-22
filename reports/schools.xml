@@ -108,13 +108,13 @@
                                             </div>
                                             <div class="text-muted small">
                                                 <span class="text-muted small"> (<span
-                                                                t-esc="school.school_leader_id.age" /> ans <t
-                                                                t-if="school.school_leader_id.arrival_date"> -
-                                                            Sauvé(e) le <span
-                                                                    t-esc="school.school_leader_id.arrival_date.strftime('%d/%m/%Y')" />
-                                                            </t>
-                                                            )
-                    </span> </div>
+                                                        t-esc="school.school_leader_id.age" /> ans <t
+                                                        t-if="school.school_leader_id.arrival_date">
+                                                    - Sauvé(e) le <span
+                                                            t-esc="school.school_leader_id.arrival_date.strftime('%d/%m/%Y')" />
+                                                    </t>
+                                                    ) </span>
+                                            </div>
                                             <t t-if="school.school_leader_id.phone">
                                                 <div class="text-muted small">
                                                     <i class="fa fa-phone me-1"></i>
@@ -140,14 +140,14 @@
                                                             Moniteur</span>
                                                         <div class="text-muted small">
                                                             <span class="text-muted small"> (<span
-                                                                t-esc="monitor.age" /> ans <t
-                                                                t-if="monitor.arrival_date"> -
-                                                            Sauvé(e) le <span
-                                                                    t-esc="monitor.arrival_date.strftime('%d/%m/%Y')" />
-                                                            </t>
-                                                            )
-                    </span> </div>
-                                                            
+                                                                    t-esc="monitor.age" /> ans <t
+                                                                    t-if="monitor.arrival_date"> -
+                                                                Sauvé(e) le <span
+                                                                        t-esc="monitor.arrival_date.strftime('%d/%m/%Y')" />
+                                                                </t>
+                                                                ) </span>
+                                                        </div>
+
                                                         <t t-if="monitor.phone">
                                                             <div class="text-muted small">
                                                                 <i class="fa fa-phone me-1"></i>
