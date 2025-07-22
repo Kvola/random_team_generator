@@ -553,8 +553,8 @@
                                                                             <span
                                                                                 t-esc="school.school_leader_id.name" />
                                                                             <span
-                                                                                class="badge bg-warning text-dark ms-2">
-                                                                                        Responsable EDD</span>
+                                                                                class="badge bg-success ms-2">
+                                                                                Responsable EDD</span>
                                                                         </div>
                                                                         <div
                                                                             class="text-muted small">
