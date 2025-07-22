@@ -564,7 +564,12 @@
                                                                             class="text-muted small">
                                                                             <span
                                                                                 t-esc="school.school_leader_id.age" />
-                                                                            ans </div>
+                                                                            ans <t
+                                                                                t-if="school.school_leader_id.arrival_date">
+                                                                            - Sauvé(e) le <span
+                                                                                    t-esc="school.school_leader_id.arrival_date.strftime('%d/%m/%Y')" />
+                                                                            </t>
+                                                                        </div>
                                                                         <t
                                                                             t-if="school.school_leader_id.phone">
                                                                             <div
@@ -612,7 +617,12 @@
                                                                                     class="text-muted small">
                                                                                     <span
                                                                                         t-esc="assistant.age" />
-                                                                                    ans </div>
+                                                                                    ans <t
+                                                                                        t-if="assistant.arrival_date">
+                                                                                    - Sauvé(e) le <span
+                                                                                            t-esc="assistant.arrival_date.strftime('%d/%m/%Y')" />
+                                                                                    </t>
+                                                                                </div>
                                                                                 <t
                                                                                     t-if="assistant.phone">
                                                                                     <div
