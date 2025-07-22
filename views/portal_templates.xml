@@ -1553,6 +1553,16 @@
                                                                                     <span
                                                                                         t-esc="member.name" />
                                                                                 </div>
+                                                                                <div
+                                                                                    class="text-muted small">
+                                                                                    <span
+                                                                                        t-esc="member.age" />
+                                                                                    ans <t
+                                                                                        t-if="member.arrival_date">
+                                                                                    - Salut: <span
+                                                                                            t-esc="member.arrival_date" />
+                                                                                    </t>
+                                                                                </div>
                                                                                 <t
                                                                                     t-if="member.phone">
                                                                                     <div
