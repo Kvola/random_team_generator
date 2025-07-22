@@ -405,20 +405,17 @@ class ResPartnerPortal(http.Controller):
         # Association selon le type de fonction
         if function_type == 'monitor':
             field_name = 'school_monitor_ids'
-        elif function_type == 'teacher':
-            field_name = 'school_teacher_ids'
+            # Vérification que le champ existe
+            if hasattr(school, field_name):
+                school.write({field_name: [(4, partner.id)]})
         elif function_type == 'leader':
-            field_name = 'school_leader_ids'
+            field_name = 'school_leader_id'
+            # Vérification que le champ existe
+            if hasattr(school, field_name):
+                school.write({field_name: partner.id})
         else:
-            field_name = 'school_monitor_ids'  # Par défaut
-        
-        # Vérification que le champ existe
-        if hasattr(school, field_name):
-            school.write({field_name: [(4, partner.id)]})
-        else:
-            # Fallback sur un champ générique
             school.write({'school_monitor_ids': [(4, partner.id)]})
-    
+
     def _send_confirmation_email(self, partner):
         """Envoie un email de confirmation (optionnel)"""
         try:
