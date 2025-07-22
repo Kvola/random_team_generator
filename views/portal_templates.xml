@@ -590,16 +590,16 @@
                                                         </t>
                                                         <!-- Moniteurs -->
                                                         <t
-                                                            t-if="school.school_leader_id or school.school_monitor_ids">
-                                                            <div class="assistant-leaders">
+                                                            t-if="school.school_monitor_ids">
+                                                            <div class="monitor-leaders">
                                                                 <small
                                                                     class="text-muted d-block mb-1">
                                                                     Moniteurs:</small>
                                                                 <t
                                                                     t-foreach="school.school_monitor_ids"
-                                                                    t-as="assistant">
+                                                                    t-as="monitor">
                                                                     <div
-                                                                        class="assistant-leader bg-light p-2 mb-2 rounded">
+                                                                        class="monitor-leader bg-light p-2 mb-2 rounded">
                                                                         <div
                                                                             class="d-flex align-items-center">
                                                                             <i
@@ -608,7 +608,7 @@
                                                                                 <div
                                                                                     class="fw-semibold">
                                                                                     <span
-                                                                                        t-esc="assistant.name" />
+                                                                                        t-esc="monitor.name" />
                                                                                     <span
                                                                                         class="badge bg-warning text-dark ms-2">
                                                                                         Moniteur</span>
@@ -616,21 +616,21 @@
                                                                                 <div
                                                                                     class="text-muted small">
                                                                                     <span
-                                                                                        t-esc="assistant.age" />
+                                                                                        t-esc="monitor.age" />
                                                                                     ans <t
-                                                                                        t-if="assistant.arrival_date">
+                                                                                        t-if="monitor.arrival_date">
                                                                                     - Sauvé(e) le <span
-                                                                                            t-esc="assistant.arrival_date.strftime('%d/%m/%Y')" />
+                                                                                            t-esc="monitor.arrival_date.strftime('%d/%m/%Y')" />
                                                                                     </t>
                                                                                 </div>
                                                                                 <t
-                                                                                    t-if="assistant.phone">
+                                                                                    t-if="monitor.phone">
                                                                                     <div
                                                                                         class="text-muted small">
                                                                                         <i
                                                                                             class="fa fa-phone me-1"></i>
                                                                                         <span
-                                                                                            t-esc="assistant.phone" />
+                                                                                            t-esc="monitor.phone" />
                                                                                     </div>
                                                                                 </t>
                                                                             </div>
