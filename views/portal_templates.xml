@@ -1208,7 +1208,7 @@
                                         required="required"
                                         t-att-checked="'checked' if (values and values.get('accept_terms')) else None" />
                                     <label class="form-check-label" for="accept_terms"> J'accepte
-                                        les <a href="/terms" target="_blank" rel="noopener">conditions
+                                        les <a href="/inscription-ecole/terms" target="_blank" rel="noopener">conditions
                                         d'utilisation</a> et je confirme que les informations
                                         fournies sont exactes. </label>
                                     <div class="invalid-feedback">Vous devez accepter les conditions
