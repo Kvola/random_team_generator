@@ -1,0 +1,53 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond circulaire avec dégradé -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0E7FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Cercle de fond -->
+  <circle cx="100" cy="100" r="90" fill="url(#bgGradient)" stroke="#1E1B4B" stroke-width="4"/>
+  
+  <!-- Groupe de personnes stylisées -->
+  <!-- Personne centrale (leader) -->
+  <circle cx="100" cy="85" r="15" fill="url(#iconGradient)"/>
+  <rect x="88" y="100" width="24" height="30" rx="12" fill="url(#iconGradient)"/>
+  
+  <!-- Personne à gauche -->
+  <circle cx="70" cy="95" r="12" fill="url(#iconGradient)" opacity="0.8"/>
+  <rect x="60" y="107" width="20" height="25" rx="10" fill="url(#iconGradient)" opacity="0.8"/>
+  
+  <!-- Personne à droite -->
+  <circle cx="130" cy="95" r="12" fill="url(#iconGradient)" opacity="0.8"/>
+  <rect x="122" y="107" width="20" height="25" rx="10" fill="url(#iconGradient)" opacity="0.8"/>
+  
+  <!-- Connexions entre les personnes -->
+  <line x1="85" y1="90" x2="70" y2="95" stroke="url(#iconGradient)" stroke-width="3" opacity="0.6"/>
+  <line x1="115" y1="90" x2="130" y2="95" stroke="url(#iconGradient)" stroke-width="3" opacity="0.6"/>
+  
+  <!-- Éléments de gestion (graphiques/statistiques) -->
+  <rect x="50" y="145" width="8" height="20" fill="url(#iconGradient)" opacity="0.7" rx="2"/>
+  <rect x="62" y="140" width="8" height="25" fill="url(#iconGradient)" opacity="0.7" rx="2"/>
+  <rect x="74" y="135" width="8" height="30" fill="url(#iconGradient)" opacity="0.7" rx="2"/>
+  
+  <!-- Engrenage pour symboliser l'organisation -->
+  <g transform="translate(135, 145) scale(0.8)">
+    <circle cx="0" cy="0" r="12" fill="none" stroke="url(#iconGradient)" stroke-width="3"/>
+    <circle cx="0" cy="0" r="4" fill="url(#iconGradient)"/>
+    <rect x="-2" y="-16" width="4" height="6" fill="url(#iconGradient)" rx="2"/>
+    <rect x="-2" y="10" width="4" height="6" fill="url(#iconGradient)" rx="2"/>
+    <rect x="-16" y="-2" width="6" height="4" fill="url(#iconGradient)" rx="2"/>
+    <rect x="10" y="-2" width="6" height="4" fill="url(#iconGradient)" rx="2"/>
+  </g>
+  
+  <!-- Texte -->
+  <text x="100" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1E1B4B">
+    TEAM MANAGER
+  </text>
+</svg>
