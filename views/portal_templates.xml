@@ -898,6 +898,7 @@
                 flex: 1;
                 font-size: 0.95rem;
                 line-height: 1.5;
+                color: #f15e22; !important
                 }
 
                 .form-check-label a {
