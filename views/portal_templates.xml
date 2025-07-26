@@ -881,7 +881,7 @@
                 align-items: flex-start;
                 margin: 1.5rem 0;
                 padding: 1rem;
-                background: var(--light-bg) !important;
+                background: #d3d3d3 !important;
                 border-radius: var(--border-radius);
                 border: 1px solid var(--border-color) !important;
                 }
@@ -898,11 +898,11 @@
                 flex: 1;
                 font-size: 0.95rem;
                 line-height: 1.5;
-                color: #f15e22 !important;
+                color: var(--primary-color) !important;
                 }
 
                 .form-check-label a {
-                color: var(--primary-color);
+                color: var(--primary-color) !important;
                 text-decoration: underline;
                 font-weight: 500;
                 }
