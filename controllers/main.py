@@ -20,6 +20,7 @@ class ResPartnerPortal(http.Controller):
         
         # Calcul des totaux
         total_monitors = sum(len(school.school_monitor_ids) for school in schools)
+        total_leaders = sum(school.school_leader_id for school in schools)
         
         pdf = request.env['ir.actions.report'].sudo()._render_qweb_pdf(
             'random_team_generator.school_list_pdf', 
@@ -27,6 +28,7 @@ class ResPartnerPortal(http.Controller):
             data={
                 'schools': schools,
                 'total_monitors': total_monitors,
+                'total_leaders': total_leaders,
             }
         )
         
@@ -110,11 +112,13 @@ class ResPartnerPortal(http.Controller):
         # Calcul des totaux pour toutes les écoles (pas seulement la page actuelle)
         all_schools = request.env['res.partner'].sudo().search(domain)
         total_monitors = sum(len(school.school_monitor_ids) for school in all_schools)
+        total_leaders = sum(school.school_leader_id for school in schools)
         
         return request.render("random_team_generator.school_list", {
             'schools': schools,
             'pager': pager,
-            'total_monitors': total_monitors
+            'total_monitors': total_monitors,
+            'total_leaders': total_leaders
         })
     
     @http.route('/inscription-ecole', type='http', auth="public", website=True, csrf=True)
@@ -404,15 +408,13 @@ class ResPartnerPortal(http.Controller):
         
         # Association selon le type de fonction
         if function_type == 'monitor':
-            field_name = 'school_monitor_ids'
             # Vérification que le champ existe
-            if hasattr(school, field_name):
-                school.write({field_name: [(4, partner.id)]})
+            if hasattr(school, 'school_monitor_ids'):
+                school.write({'school_monitor_ids': [(4, partner.id)]})
         elif function_type == 'leader':
-            field_name = 'school_leader_id'
             # Vérification que le champ existe
-            if hasattr(school, field_name):
-                school.write({field_name: partner.id})
+            if hasattr(school, 'school_leader_id'):
+                school.write({'school_leader_id': partner.id})
         else:
             school.write({'school_monitor_ids': [(4, partner.id)]})
 
