@@ -553,7 +553,7 @@
                                                                 <div
                                                                     class="d-flex align-items-center">
                                                                     <i
-                                                                        class="fa fa-user-tie me-2 text-primary"></i>
+                                                                        class="fas fa-user-tie me-2 text-primary"></i>
                                                                     <div>
                                                                         <div class="fw-bold">
                                                                             <span
@@ -605,7 +605,7 @@
                                                                         <div
                                                                             class="d-flex align-items-center">
                                                                             <i
-                                                                                class="fa fa-user me-2 text-secondary"></i>
+                                                                                class="fas fa-chalkboard-teacher me-2 text-secondary"></i>
                                                                             <div>
                                                                                 <div
                                                                                     class="fw-semibold">
