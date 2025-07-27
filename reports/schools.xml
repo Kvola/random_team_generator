@@ -106,7 +106,7 @@
                                     <td>
                                         <t t-if="school.school_leader_id">
                                             <div class="mb-1">
-                                                <i class="fas fa-user-tie me-1"></i>
+                                                <i class="fas fa-user-tie text-primary me-1"></i>
                                                 <span t-esc="school.school_leader_id.name" />
                                                 <span class="badge bg-success ms-1">responsable EDD</span>
                                             </div>
@@ -137,7 +137,7 @@
                                                     t-as="monitor">
                                                     <div
                                                         class="assistant-leader bg-light p-2 mb-2 rounded">
-                                                        <i class="fas fa-chalkboard-teacher me-1"></i>
+                                                        <i class="fas fa-chalkboard-teacher text-primary me-1"></i>
                                                         <span t-esc="monitor.name" />
                                                         <span
                                                             class="badge bg-warning text-dark ms-2">
