@@ -112,7 +112,7 @@ class ResPartnerPortal(http.Controller):
         # Calcul des totaux pour toutes les écoles (pas seulement la page actuelle)
         all_schools = request.env['res.partner'].sudo().search(domain)
         total_monitors = sum(len(school.school_monitor_ids) for school in all_schools)
-        total_leaders = sum(1 for school in schools if school.school_leader_id)
+        total_leaders = sum(1 for school in all_schools if school.school_leader_id)
 
         return request.render("random_team_generator.school_list", {
             'schools': schools,
