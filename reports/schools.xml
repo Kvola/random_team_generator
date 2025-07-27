@@ -20,12 +20,6 @@
         <t t-call="web.html_container">
             <t t-call="web.internal_layout">
                 <div class="page">
-                    <!-- Font Awesome 6 - Kit CDN avec Solid -->
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-                        integrity="sha512-...tonHash..." crossorigin="anonymous"
-                        referrerpolicy="no-referrer" />
-
                     <style>
                         .no-repeat-header thead {
                         display: table-row-group;
@@ -112,7 +106,7 @@
                                     <td>
                                         <t t-if="school.school_leader_id">
                                             <div class="mb-1">
-                                                <i class="fa-solid fa-user-tie me-1"></i>
+                                                <i class="fas fa-user-tie text-primary me-1"></i>
                                                 <span t-esc="school.school_leader_id.name" />
                                                 <span class="badge bg-success ms-1">responsable EDD</span>
                                             </div>
@@ -143,7 +137,7 @@
                                                     t-as="monitor">
                                                     <div
                                                         class="assistant-leader bg-light p-2 mb-2 rounded">
-                                                        <i class="fa fa-user me-1"></i>
+                                                        <i class="fas fa-chalkboard-teacher text-primary me-1"></i>
                                                         <span t-esc="monitor.name" />
                                                         <span
                                                             class="badge bg-warning text-dark ms-2">
