@@ -25,4 +25,54 @@
         action="action_school_class"
         sequence="10"
     />
+    <!-- Menu principal pour les rapports -->
+    <menuitem id="menu_church_reports_main" 
+              name="Rapports" 
+              parent="base.menu_church_management_root"
+              sequence="50"/>
+    <!-- Sous-menu pour les listes de membres -->
+    <menuitem id="menu_church_members_reports" 
+              name="Listes de membres" 
+              parent="menu_church_reports_main"
+              sequence="10"/>
+    <!-- Menu pour impression rapide des églises -->
+    <menuitem id="menu_print_church_members" 
+              name="Membres d'églises" 
+              parent="menu_church_members_reports"
+              action="action_print_church_members"
+              sequence="10"/>
+    <!-- Menu pour impression des tribus -->
+    <menuitem id="menu_print_tribe_members" 
+              name="Membres de tribus" 
+              parent="menu_church_members_reports"
+              action="action_print_tribe_members"
+              sequence="20"/>
+    <!-- Menu pour impression des cellules -->
+    <menuitem id="menu_print_prayer_cell_members" 
+              name="Membres de cellules" 
+              parent="menu_church_members_reports"
+              action="action_print_prayer_cell_members"
+              sequence="30"/>
+    <!-- Menu pour impression des groupes -->
+    <menuitem id="menu_print_group_members" 
+              name="Membres de groupes" 
+              parent="menu_church_members_reports"
+              action="action_print_group_members"
+              sequence="40"/>
+    <!-- Menu pour tableau de bord -->
+    <menuitem id="menu_church_statistics_dashboard" 
+              name="Tableau de bord" 
+              parent="menu_church_statistics_reports"
+              action="action_church_statistics_dashboard"
+              sequence="10"/>
+    <!-- Raccourcis rapides dans le menu principal -->
+    <menuitem id="menu_quick_actions" 
+              name="Actions rapides" 
+              parent="base.menu_church_management_root"
+              sequence="60"/>
+    <!-- Menu pour actions rapides -->
+    <menuitem id="menu_print_shortcuts" 
+              name="Impressions rapides" 
+              parent="menu_quick_actions"
+              sequence="10"/>
 </odoo>

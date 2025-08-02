@@ -5,6 +5,31 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
+            <sheet position="before">
+                <header>
+                    <button name="generate_random_teams" string="Générer des équipes" type="object"
+                        class="btn-primary" invisible="not is_company" icon="fa-random" />
+                    
+                    <!-- Boutons d'impression -->
+                    <button name="action_print_members_list" string="Liste complète" 
+                        type="object" class="btn-secondary" icon="fa-print"
+                        invisible="not is_company or organization_type not in ('tribe', 'prayer_cell', 'group', 'communication', 'artistic_group', 'ngo', 'school', 'sports_group', 'educational_group', 'other_group', 'company')" />
+                    
+                    <button name="action_print_compact_list" string="Liste compacte" 
+                        type="object" class="btn-info" icon="fa-list"
+                        invisible="not is_company or organization_type not in ('tribe', 'prayer_cell', 'group', 'communication', 'artistic_group', 'ngo', 'school', 'sports_group', 'educational_group', 'other_group', 'company')" />
+                    
+                    <button name="action_print_attendance_sheet" string="Feuille de présence" 
+                        type="object" class="btn-success" icon="fa-check-square"
+                        invisible="not is_company or organization_type not in ('tribe', 'prayer_cell', 'group', 'communication', 'artistic_group', 'ngo', 'school', 'sports_group', 'educational_group', 'other_group', 'company')" />
+                    
+                    <!-- Bouton pour impression avec options avancées -->
+                    <button name="action_print_members_list_with_filters" string="Options avancées" 
+                        type="object" class="btn-warning" icon="fa-filter"
+                        invisible="not is_company or organization_type not in ('tribe', 'prayer_cell', 'group', 'communication', 'artistic_group', 'ngo', 'school', 'sports_group', 'educational_group', 'other_group', 'company')" />
+                </header>
+            </sheet>
+            
             <!-- Existing fields and attributes -->
             <xpath expr="//field[@name='street']" position="attributes">
                 <attribute name="placeholder">Commune</attribute>
@@ -1701,5 +1726,321 @@
                 Aucune inscription en attente
             </p>
         </field>
+    </record>
+
+    <!-- Vue de recherche étendue avec filtres supplémentaires -->
+    <record id="view_partner_inscription_search_extended" model="ir.ui.view">
+        <field name="name">res.partner.inscription.search.extended</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter" />
+        <field name="arch" type="xml">
+            <search position="inside">
+                <!-- Filtres par statut -->
+                <separator/>
+                <!-- <filter name="new_members" string="Nouveaux membres" 
+                        domain="[('is_new_member','=',True)]" /> -->
+                <!-- <filter name="birthdays" string="Anniversaires aujourd'hui" 
+                        domain="[('is_birthday','=',True)]" /> -->
+                
+                <!-- Filtres par genre -->
+                <separator/>
+                <filter name="male" string="Hommes" 
+                        domain="[('gender','=','male')]" />
+                <filter name="female" string="Femmes" 
+                        domain="[('gender','=','female')]" />
+                
+                <!-- Filtres par état civil -->
+                <separator/>
+                <filter name="married" string="Mariés" 
+                        domain="[('marital_status','=','married')]" />
+                <filter name="single" string="Célibataires" 
+                        domain="[('marital_status','=','single')]" />
+                
+                <!-- Filtres par âge -->
+                <separator/>
+                <filter name="children" string="Enfants (0-12 ans)" 
+                        domain="[('age','&lt;=',12)]" />
+                <filter name="youth" string="Jeunes (13-25 ans)" 
+                        domain="[('age','&gt;=',13),('age','&lt;=',25)]" />
+                <filter name="adults" string="Adultes (26-59 ans)" 
+                        domain="[('age','&gt;=',26),('age','&lt;=',59)]" />
+                <filter name="seniors" string="Seniors (60+ ans)" 
+                        domain="[('age','&gt;=',60)]" />
+                
+                <!-- Filtres par rôles dans l'église -->
+                <separator/>
+                <filter name="pastors" string="Pasteurs" 
+                        domain="[('is_pastor','=',True)]" />
+                <filter name="elders" string="Anciens" 
+                        domain="[('is_elder','=',True)]" />
+                <filter name="deacons" string="Diacres" 
+                        domain="[('is_deacon','=',True)]" />
+                <filter name="teachers" string="Enseignants" 
+                        domain="[('is_teacher','=',True)]" />
+                <filter name="leaders" string="Responsables" 
+                        domain="[('is_leader','=',True)]" />
+                
+                <!-- Filtres par type d'organisation -->
+                <separator/>
+                <filter name="churches" string="Églises" 
+                        domain="[('is_company','=',True),('organization_type','=','company')]" />
+                <filter name="regions" string="Régions" 
+                        domain="[('is_company','=',True),('organization_type','=','region')]" />
+                <filter name="tribes" string="Tribus" 
+                        domain="[('is_company','=',True),('organization_type','=','tribe')]" />
+                <filter name="prayer_cells" string="Cellules de prière" 
+                        domain="[('is_company','=',True),('organization_type','=','prayer_cell')]" />
+                <filter name="groups" string="Groupes" 
+                        domain="[('is_company','=',True),('organization_type','=','group')]" />
+                
+                <!-- Filtres par structures spécialisées -->
+                <separator/>
+                <filter name="communication_groups" string="Groupes de communication" 
+                        domain="[('is_company','=',True),('organization_type','=','communication')]" />
+                <filter name="artistic_groups" string="Groupes artistiques" 
+                        domain="[('is_company','=',True),('organization_type','=','artistic_group')]" />
+                <filter name="ngos" string="ONG" 
+                        domain="[('is_company','=',True),('organization_type','=','ngo')]" />
+                <filter name="schools" string="Écoles" 
+                        domain="[('is_company','=',True),('organization_type','=','school')]" />
+                <filter name="sports_groups" string="Groupes sportifs" 
+                        domain="[('is_company','=',True),('organization_type','=','sports_group')]" />
+                <filter name="educational_groups" string="Groupes éducatifs" 
+                        domain="[('is_company','=',True),('organization_type','=','educational_group')]" />
+                <filter name="other_groups" string="Groupes spécialisés" 
+                        domain="[('is_company','=',True),('organization_type','=','other_group')]" />
+                
+                <!-- Filtres par date -->
+                <separator/>
+                <filter name="this_week" string="Arrivés cette semaine" 
+                        domain="[('arrival_date','&gt;=',(context_today()-datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]" />
+                <filter name="this_month" string="Arrivés ce mois" 
+                        domain="[('arrival_date','&gt;=',time.strftime('%Y-%m-01'))]" />
+                <filter name="this_year" string="Arrivés cette année" 
+                        domain="[('arrival_date','&gt;=',time.strftime('%Y-01-01'))]" />
+                
+                <!-- Groupement -->
+                <separator/>
+                <group expand="0" string="Grouper par">
+                    <filter name="group_by_church" string="Église" 
+                            context="{'group_by':'church_id'}" />
+                    <filter name="group_by_tribe" string="Tribu" 
+                            context="{'group_by':'tribe_id'}" />
+                    <filter name="group_by_prayer_cell" string="Cellule de prière" 
+                            context="{'group_by':'prayer_cell_id'}" />
+                    <filter name="group_by_group" string="Groupe" 
+                            context="{'group_by':'group_id'}" />
+                    <filter name="group_by_gender" string="Genre" 
+                            context="{'group_by':'gender'}" />
+                    <filter name="group_by_marital_status" string="État civil" 
+                            context="{'group_by':'marital_status'}" />
+                    <filter name="group_by_organization_type" string="Type d'organisation" 
+                            context="{'group_by':'organization_type'}" />
+                    <filter name="group_by_arrival_month" string="Mois d'arrivée" 
+                            context="{'group_by':'arrival_date:month'}" />
+                </group>
+                
+                <!-- Champs de recherche supplémentaires -->
+                <field name="gender" string="Genre" />
+                <field name="marital_status" string="État civil" />
+                <field name="tribe_id" string="Tribu" />
+                <field name="prayer_cell_id" string="Cellule de prière" />
+                <field name="group_id" string="Groupe" />
+                <field name="organization_type" string="Type d'organisation" />
+                <field name="unique_code" string="Code unique" />
+                <field name="arrival_date" string="Date d'arrivée" />
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue de recherche spécifique pour les membres individuels -->
+    <record id="view_partner_members_search" model="ir.ui.view">
+        <field name="name">res.partner.members.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search>
+                <!-- Filtres de base -->
+                <filter name="active_members" string="Membres actifs" 
+                        domain="[('active','=',True),('is_company','=',False)]" />
+                <filter name="inactive_members" string="Membres inactifs" 
+                        domain="[('active','=',False),('is_company','=',False)]" />
+                
+                <!-- Filtres rapides par âge -->
+                <separator/>
+                <filter name="children_quick" string="Enfants" 
+                        domain="[('age','&lt;=',12),('is_company','=',False)]" />
+                <filter name="youth_quick" string="Jeunes" 
+                        domain="[('age','&gt;=',13),('age','&lt;=',25),('is_company','=',False)]" />
+                <filter name="adults_quick" string="Adultes" 
+                        domain="[('age','&gt;=',26),('is_company','=',False)]" />
+                
+                <!-- Filtres par rôles -->
+                <separator/>
+                <filter name="leadership" string="Équipe dirigeante" 
+                        domain="['|','|','|',('is_pastor','=',True),('is_elder','=',True),('is_deacon','=',True),('is_leader','=',True)]" />
+                <filter name="ministry_team" string="Équipe ministérielle" 
+                        domain="['|','|',('is_teacher','=',True),('is_missionary','=',True),('is_monitor','=',True)]" />
+                
+                <!-- Recherche par champs -->
+                <field name="name" string="Nom" 
+                       filter_domain="['|',('name','ilike',self),('unique_code','ilike',self)]" />
+                <field name="email" string="Email" />
+                <field name="phone" string="Téléphone" 
+                       filter_domain="['|',('phone','ilike',self),('mobile','ilike',self)]" />
+                <field name="church_id" string="Église" />
+                <field name="father_id" string="Père" />
+                <field name="mother_id" string="Mère" />
+                
+                <!-- Groupement -->
+                <group expand="0" string="Grouper par">
+                    <filter name="group_by_church_members" string="Église" 
+                            context="{'group_by':'church_id'}" />
+                    <filter name="group_by_age_range" string="Tranche d'âge" 
+                            context="{'group_by':'age'}" />
+                    <filter name="group_by_gender_members" string="Genre" 
+                            context="{'group_by':'gender'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue de recherche spécifique pour les organisations -->
+    <record id="view_partner_organizations_search" model="ir.ui.view">
+        <field name="name">res.partner.organizations.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search>
+                <!-- Filtres par type d'organisation -->
+                <filter name="all_organizations" string="Toutes les organisations" 
+                        domain="[('is_company','=',True)]" />
+                <filter name="main_churches" string="Églises principales" 
+                        domain="[('is_company','=',True),('is_church','=',True),('parent_church_id','=',False)]" />
+                <filter name="branch_churches" string="Églises filles" 
+                        domain="[('is_company','=',True),('is_church','=',True),('parent_church_id','!=',False)]" />
+                
+                <!-- Filtres par structure -->
+                <separator/>
+                <filter name="with_members" string="Avec membres" 
+                        domain="[('is_company','=',True),'|','|','|','|','|','|','|','|','|','|',('company_contacts','!=',False),('tribe_members','!=',False),('prayer_cell_members','!=',False),('group_members','!=',False),('communication_members','!=',False),('artistic_group_members','!=',False),('ngo_members','!=',False),('school_members','!=',False),('sports_group_members','!=',False),('educational_group_members','!=',False),('other_group_members','!=',False)]" />
+                <filter name="without_members" string="Sans membres" 
+                        domain="[('is_company','=',True),('company_contacts','=',False),('tribe_members','=',False),('prayer_cell_members','=',False),('group_members','=',False)]" />
+                
+                <!-- Recherche -->
+                <field name="name" string="Nom de l'organisation" />
+                <field name="organization_type" string="Type" />
+                <field name="region_id" string="Région" />
+                <field name="parent_church_id" string="Église mère" />
+                
+                <!-- Groupement -->
+                <group expand="0" string="Grouper par">
+                    <filter name="group_by_org_type" string="Type d'organisation" 
+                            context="{'group_by':'organization_type'}" />
+                    <filter name="group_by_region_org" string="Région" 
+                            context="{'group_by':'region_id'}" />
+                    <filter name="group_by_parent_church" string="Église mère" 
+                            context="{'group_by':'parent_church_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action avec filtres prédéfinis pour les membres -->
+    <record id="action_church_members_with_filters" model="ir.actions.act_window">
+        <field name="name">Membres de l'église</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('is_company', '=', False), ('active', '=', True)]</field>
+        <field name="context">{
+            'search_default_active_members': 1,
+            'search_default_group_by_church_members': 1
+        }</field>
+        <field name="search_view_id" ref="view_partner_members_search"/>
+    </record>
+
+    <!-- Action avec filtres prédéfinis pour les organisations -->
+    <record id="action_church_organizations_with_filters" model="ir.actions.act_window">
+        <field name="name">Organisations</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('is_company', '=', True)]</field>
+        <field name="context">{
+            'search_default_all_organizations': 1,
+            'search_default_group_by_org_type': 1
+        }</field>
+        <field name="search_view_id" ref="view_partner_organizations_search"/>
+    </record>
+    
+    <!-- Action pour impression rapide des églises -->
+    <record id="action_print_church_members" model="ir.actions.act_window">
+        <field name="name">Imprimer membres d'église</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_company', '=', True), ('is_church', '=', True)]</field>
+        <field name="context">{
+            'default_is_company': True,
+            'search_default_group_by_region_org': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smily_face">
+                Sélectionnez une église pour imprimer sa liste de membres
+            </p>
+        </field>
+    </record>
+    <!-- Action pour impression des tribus -->
+    <record id="action_print_tribe_members" model="ir.actions.act_window">
+        <field name="name">Imprimer membres de tribu</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_company', '=', True), ('organization_type', '=', 'tribe')]</field>
+        <field name="context">{
+            'default_is_company': True,
+            'default_organization_type': 'tribe'
+        }</field>
+    </record>
+    <!-- Action pour impression des cellules de prière -->
+    <record id="action_print_prayer_cell_members" model="ir.actions.act_window">
+        <field name="name">Imprimer membres de cellule</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_company', '=', True), ('organization_type', '=', 'prayer_cell')]</field>
+        <field name="context">{
+            'default_is_company': True,
+            'default_organization_type': 'prayer_cell'
+        }</field>
+    </record>
+    <!-- Action pour impression des groupes -->
+    <record id="action_print_group_members" model="ir.actions.act_window">
+        <field name="name">Imprimer membres de groupe</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_company', '=', True), ('organization_type', 'in', ['group', 'communication', 'artistic_group', 'ngo', 'school', 'sports_group', 'educational_group', 'other_group'])]</field>
+        <field name="context">{
+            'default_is_company': True,
+            'search_default_group_by_org_type': 1
+        }</field>
+    </record>
+    <!-- Action pour tableau de bord des statistiques -->
+    <record id="action_church_statistics_dashboard" model="ir.actions.act_window">
+        <field name="name">Tableau de bord</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="domain">[('is_company', '=', False), ('active', '=', True)]</field>
+        <field name="context">{
+            'search_default_group_by_church_members': 1,
+            'search_default_group_by_gender_members': 1,
+            'search_default_active_members': 1
+        }</field>
+    </record>
+    <!-- Action rapide pour impression d'église -->
+    <record id="action_quick_print_church" model="ir.actions.server">
+        <field name="name">Impression rapide - Église</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+if records.filtered(lambda r: r.is_company and r.organization_type == 'company'):
+    action = records.filtered(lambda r: r.is_company and r.organization_type == 'company')[0].action_print_members_list()
+        </field>
+        <field name="binding_type">action</field>
     </record>
 </odoo>
