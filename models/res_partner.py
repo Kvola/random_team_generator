@@ -732,7 +732,7 @@ class ResPartner(models.Model):
     group_leader_id = fields.Many2one(
         "res.partner",
         string="Responsable du groupe",
-        domain="[('is_leader','=',True)]",
+        domain="[('is_leader','=',True), ('group_id','=',id)]",
     )
     # Pour les responsables adjoints de groupe
     group_assistant_leader_ids = fields.Many2many(
@@ -741,7 +741,7 @@ class ResPartner(models.Model):
         "group_id",
         "leader_id",
         string="Responsables adjoints du groupe",
-        domain="[('is_leader','=',True)]",
+        domain="[('is_leader','=',True), ('group_id','=',id)]",
     )
 
     prayer_cell_leader_id = fields.Many2one(
