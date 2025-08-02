@@ -732,7 +732,7 @@ class ResPartner(models.Model):
     group_leader_id = fields.Many2one(
         "res.partner",
         string="Responsable du groupe",
-        domain="[('is_leader','=',True), ('group_id','=',id)]",
+        domain="[('is_leader','=',True)]",
     )
     # Pour les responsables adjoints de groupe
     group_assistant_leader_ids = fields.Many2many(
@@ -741,7 +741,7 @@ class ResPartner(models.Model):
         "group_id",
         "leader_id",
         string="Responsables adjoints du groupe",
-        domain="[('is_leader','=',True), ('group_id','=',id)]",
+        domain="[('is_leader','=',True)]",
     )
 
     prayer_cell_leader_id = fields.Many2one(
@@ -830,160 +830,10 @@ class ResPartner(models.Model):
         help="Classes associées à cette école"
     )
 
-    def action_print_members_list(self):
-        """
-        Action pour imprimer la liste des membres selon le type d'organisation
-        """
-        self.ensure_one()
-        
-        if not self.is_company:
-            raise UserError("Cette action n'est disponible que pour les organisations.")
-        
-        # Vérifier qu'il y a des membres à imprimer
-        members_count = 0
-        
-        if self.organization_type == 'company':
-            members_count = len(self.company_contacts)
-        elif self.organization_type == 'tribe':
-            members_count = len(self.tribe_members)
-        elif self.organization_type == 'prayer_cell':
-            members_count = len(self.prayer_cell_members)
-        elif self.organization_type == 'group':
-            members_count = len(self.group_members)
-        elif self.organization_type == 'communication':
-            members_count = len(self.communication_members)
-        elif self.organization_type == 'artistic_group':
-            members_count = len(self.artistic_group_members)
-        elif self.organization_type == 'ngo':
-            members_count = len(self.ngo_members)
-        elif self.organization_type == 'school':
-            members_count = len(self.school_members)
-        elif self.organization_type == 'sports_group':
-            members_count = len(self.sports_group_members)
-        elif self.organization_type == 'educational_group':
-            members_count = len(self.educational_group_members)
-        elif self.organization_type == 'other_group':
-            members_count = len(self.other_group_members)
-        
-        if members_count == 0:
-            raise UserError("Aucun membre trouvé pour cette organisation.")
-        
-        # Retourner l'action du rapport
-        return self.env.ref('church_management.report_members_list').report_action(self)
-
-    def _get_filtered_members_for_print(self, context):
-        """
-        Récupérer les membres filtrés pour l'impression
-        """
-        self.ensure_one()
-        
-        # Si des membres spécifiques sont définis dans le contexte, les utiliser
-        if context.get('members_to_print'):
-            return self.env['res.partner'].browse(context['members_to_print'])
-        
-        # Sinon, récupérer tous les membres selon le type d'organisation
-        if self.organization_type == 'company':
-            return self.company_contacts.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'tribe':
-            return self.tribe_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'prayer_cell':
-            return self.prayer_cell_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'group':
-            return self.group_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'communication':
-            return self.communication_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'artistic_group':
-            return self.artistic_group_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'ngo':
-            return self.ngo_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'school':
-            return self.school_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'sports_group':
-            return self.sports_group_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'educational_group':
-            return self.educational_group_members.sorted(key=lambda r: r.name)
-        elif self.organization_type == 'other_group':
-            return self.other_group_members.sorted(key=lambda r: r.name)
-        else:
-            return self.env['res.partner']
-
-
-    def action_print_members_list_with_filters(self):
-        """
-        Action pour imprimer la liste des membres avec des options de filtrage
-        """
-        self.ensure_one()
-        
-        if not self.is_company:
-            raise UserError("Cette action n'est disponible que pour les organisations.")
-            
-        # Ouvrir un wizard pour choisir les options d'impression
-        return {
-            'name': 'Options d\'impression',
-            'type': 'ir.actions.act_window',
-            'res_model': 'church.print.members.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_organization_id': self.id,
-                'default_organization_type': self.organization_type,
-            }
-        }
-
-
     @api.depends('school_monitor_ids')
     def _compute_monitor_count(self):
         for record in self:
             record.monitor_count = len(record.school_monitor_ids)
-
-    def action_print_compact_list(self):
-        """
-        Action pour imprimer la liste compacte des membres
-        """
-        self.ensure_one()
-        
-        if not self.is_company:
-            raise UserError("Cette action n'est disponible que pour les organisations.")
-        
-        return self.env.ref('church_management.report_members_list_compact').report_action(self)
-
-    def action_print_attendance_sheet(self):
-        """
-        Action pour imprimer une feuille de présence
-        """
-        self.ensure_one()
-        
-        if not self.is_company:
-            raise UserError("Cette action n'est disponible que pour les organisations.")
-        
-        return self.env.ref('church_management.report_attendance_sheet').report_action(self)
-
-    def get_members_count_by_category(self):
-        """
-        Retourne les statistiques des membres par catégorie
-        """
-        self.ensure_one()
-        
-        members = self._get_filtered_members_for_print({})
-        
-        stats = {
-            'total': len(members),
-            'male': len(members.filtered(lambda m: m.gender == 'male')),
-            'female': len(members.filtered(lambda m: m.gender == 'female')),
-            'new_members': len(members.filtered(lambda m: m.is_new_member)),
-            'children': len(members.filtered(lambda m: m.age and m.age <= 12)),
-            'youth': len(members.filtered(lambda m: m.age and 13 <= m.age <= 25)),
-            'adults': len(members.filtered(lambda m: m.age and 26 <= m.age <= 59)),
-            'seniors': len(members.filtered(lambda m: m.age and m.age >= 60)),
-            'married': len(members.filtered(lambda m: m.marital_status == 'married')),
-            'single': len(members.filtered(lambda m: m.marital_status == 'single')),
-            'pastors': len(members.filtered(lambda m: m.is_pastor)),
-            'elders': len(members.filtered(lambda m: m.is_elder)),
-            'deacons': len(members.filtered(lambda m: m.is_deacon)),
-            'leaders': len(members.filtered(lambda m: m.is_leader)),
-        }
-        
-        return stats
 
     # Méthode pour ouvrir la vue des moniteurs/professeurs
     def action_view_school_monitors(self):

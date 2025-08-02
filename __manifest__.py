@@ -23,7 +23,6 @@
         'reports/churches.xml',
         'reports/prayer_cell.xml',
         'reports/schools.xml',
-        'reports/list_reports.xml',
         'data/ir_cron.xml',
         'views/menu.xml',
     ],
